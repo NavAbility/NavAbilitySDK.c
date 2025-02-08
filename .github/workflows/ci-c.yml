@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      nva_api_url:
+        description: 'NavAbility API location'
+        required: true
+        default: "https://api.navability.io/graphql"
+        type: string
+      nva_token:
+        description: 'NavAbility API Token'
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup
+      run: |
+        make install-deps
+        export NVA_API_URL=$(cat $GITHUB_EVENT_PATH | jq -r ".inputs.nva_api_url" )
+        echo "::add-mask::$NVA_API_URL"
+        export NVA_API_TOKEN=$(cat $GITHUB_EVENT_PATH | jq -r ".inputs.nva_token" )
+        echo "::add-mask::$NVA_API_TOKEN"
+        make fetch-schema
+    - name: Build wasm
+      run: make build-wasm
+    - name: Build tokio
+      run: make build-tokio
+    - name: Install Test Deps
+      run: cargo install --force cbindgen
+    - name: Run tests
+      run: |
+        make test-tokio
+        make generate-cbindgen-c
+        make generate-cbindgen-cpp
+        # make test-capi
