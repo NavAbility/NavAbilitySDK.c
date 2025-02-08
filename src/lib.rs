@@ -82,12 +82,6 @@ pub use crate::services::{
 pub mod deprecated;
 pub use crate::deprecated::*;
 
-// FFI for publishing C compliant library 
-#[cfg(feature = "tokio")]
-mod capi;
-#[cfg(feature = "tokio")]
-use crate::capi::*;
-
 
 const SDK_VERSION: &str = "0.25";
 

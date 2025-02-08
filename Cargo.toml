@@ -1,11 +1,11 @@
 [package]
 name = "navabilitysdk"
-version = "0.1.0"
+version = "0.1.0-b3"
 authors = ["NavAbility™ by WhereWhen.ai Technologies Inc."]
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+crate-type = ["rlib"]
 
 [dependencies]
 serde = "^1.0"
@@ -26,8 +26,6 @@ reqwest = {version = "^0.12", optional=true, features = [
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { version = "^1.40", default-features = false, optional=true}
 tracing = "^0.1"
-ffi-convert = { version="^0.6", optional=true }
-libc = { version = "^0.2", default-features = false, optional=true}
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
@@ -35,7 +33,7 @@ gloo-console = { version = "^0.3", optional = true }
 
 
 [features]
-tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
+tokio = ["dep:tokio", "dep:reqwest"]
 blocking = ["graphql_client/reqwest","graphql_client/reqwest-blocking"]
 wasm = ["dep:reqwest"]
 wasm-dev = ["dep:gloo-console"]
