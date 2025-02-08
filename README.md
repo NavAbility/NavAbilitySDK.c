@@ -4,12 +4,12 @@ Copyright 2025, NavAbility Contributors.  This repo is licensed according to Apa
 
 [![CI](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml/badge.svg)](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml)
 
-!!! note
-    This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs e.g. `develop->develop`.  Changes for C export are local to SDK.c only.  See git stategy here https://stackoverflow.com/a/37104851.
+> [!IMPORTANT]
+> This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs e.g. `develop->develop`.  Changes for C export are local to SDK.c only.  See git stategy here https://stackoverflow.com/a/37104851.
 
 ## Introduction
 
-Access NavAbility Cloud factor graph features from Rust.  See related repos at Gihub.com/NavAbility for other language interfaces such as Julia, C/C++*, Python, JS.
+Access NavAbility Accelerator features from C/C++.  See related multi-language SDKs at Gihub.com/NavAbility/NavAbilitySDK.*.
 
 ## Docs
 
