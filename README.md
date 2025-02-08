@@ -1,8 +1,11 @@
-# NavAbilitySDK.rs
+# NavAbilitySDK.c
 
 Copyright 2025, NavAbility Contributors.  This repo is licensed according to Apache 2.0.  See the LICENSE file.
 
-[![CI](https://github.com/NavAbility/NavAbilitySDK.rs/actions/workflows/ci.yml/badge.svg)](https://github.com/NavAbility/NavAbilitySDK.rs/actions/workflows/ci.yml)
+[![CI](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml/badge.svg)](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml)
+
+!!! note
+    This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs e.g. `develop->develop`.  Changes for C export are local to SDK.c only.  See git stategy here https://stackoverflow.com/a/37104851.
 
 ## Introduction
 
@@ -18,18 +21,6 @@ Get the schema with NVA_API_URL and NVA_API_TOKEN args/env var set:
 ```shell
 make install-deps # modifies system cargo crates
 make fetch-schema
-```
-
-Compile for either native or wasm:
-```shell
-make build-wasm
-make build-tokio
-```
-
-## Running tests
-
-```shell
-make test-tokio
 ```
 
 ## Exporting Shared Library
