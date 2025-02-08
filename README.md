@@ -9,7 +9,7 @@ Copyright 2025, NavAbility Contributors.  This repo is licensed according to Apa
 
 ## Introduction
 
-Access NavAbility Accelerator features from C/C++.  See related multi-language SDKs at Gihub.com/NavAbility/NavAbilitySDK.*.
+Access NavAbility Accelerator features from C/C++.  See related multi-language SDKs at Github.com/NavAbility/NavAbilitySDK.*.
 
 ## Docs
 
