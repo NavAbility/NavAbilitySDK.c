@@ -5,7 +5,7 @@ Copyright 2025, NavAbility Contributors.  This repo is licensed according to Apa
 [![CI](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml/badge.svg)](https://github.com/NavAbility/NavAbilitySDK.c/actions/workflows/ci.yml)
 
 > [!IMPORTANT]
-> This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs e.g. `develop->develop`.  Changes for C export are local to SDK.c only.  See git stategy here https://stackoverflow.com/a/37104851.
+> This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs e.g. `develop->develop`.  Changes for C export are local to SDK.c only.  See git stategy here https://stackoverflow.com/a/37104851, and accidental upstream protection https://stackoverflow.com/a/7556269.
 
 ## Introduction
 
