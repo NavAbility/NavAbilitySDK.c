@@ -1,0 +1,31 @@
+query FindOrgModelGraphs(
+  $org_id: ID!, 
+  $model_label_CONTAINS: String = ""
+  $fg_label_CONTAINS: String = "", 
+) {
+  factorgraphs(
+    where: {
+      label_CONTAINS: $fg_label_CONTAINS, 
+      org: {
+        id: $org_id, 
+        modelsConnection_SOME: {
+          node: {
+            label_CONTAINS: $model_label_CONTAINS
+          }
+        }
+      }
+    }
+  ) {
+    id
+    label
+    numVariables
+    numFactors
+    agentsConnection {
+      edges {
+        node {
+          label
+        }
+      }
+    }
+  }
+}

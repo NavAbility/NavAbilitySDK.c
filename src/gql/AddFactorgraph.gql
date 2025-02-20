@@ -1,0 +1,33 @@
+mutation AddFactorgraph(
+    $orgId: ID = "",
+    $id: ID = "",
+    $label: String = "",
+    $description: String = "",
+    $metadata: String = "",
+    $_version: String = "",
+) {
+  addFactorgraphs(
+    input: {
+      id: $id, 
+      label: $label, 
+      _version: $_version, 
+      description: $description, 
+      metadata: $metadata, 
+      org: {
+        connect: {
+          where: {
+            node: {
+              id: $orgId
+            }
+          }
+        }
+      }
+    }
+  ) {
+    factorgraphs {
+        label
+        createdTimestamp
+        namespace
+    }
+  }
+}

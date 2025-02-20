@@ -11,6 +11,7 @@ fragment agent_fields_summary on Agent {
 }
 
 fragment blobEntry_fields_summary on BlobEntry {
+  id
   label
   size
   mimeType

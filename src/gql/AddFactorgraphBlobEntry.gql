@@ -1,0 +1,47 @@
+
+mutation AddFactorgraphBlobEntry(
+  $fg_label: String!,
+  $entry_id: ID!,
+  $entry_label: String!,
+  $blob_id: ID!,
+  $blobstore: String,
+  $origin: String,
+  $mime_type: String,
+  $metadata: String!,
+  $description: String,
+  $hash: String!,
+  $size: BigInt
+  $timestamp: DateTime
+) {
+    addBlobEntries(
+    input: {
+      id: $entry_id, 
+      blobId: $blob_id,
+      label: $entry_label, 
+      blobstore: $blobstore,
+      origin: $origin,
+      mimeType: $mime_type, 
+      metadata: $metadata,
+      description: $description,
+      hash: $hash,
+      size: $size,
+      timestamp: $timestamp,
+      _version: "0.25", 
+      parent: {
+        Factorgraph: {
+          connect: {
+            where: {
+              node: {
+                label: $fg_label
+              }
+            }
+          }
+        }
+      }
+    }
+  ) {
+    blobEntries {
+      id
+    }
+  }
+}
