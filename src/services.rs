@@ -36,9 +36,9 @@ pub mod Model;
 pub use Model::*;
 
 #[allow(non_snake_case)]
-pub mod Graph;
+pub mod Factorgraph;
 #[allow(non_snake_case)]
-pub use Graph::*;
+pub use Factorgraph::*;
 
 #[allow(non_snake_case)]
 pub mod Variable;
@@ -54,3 +54,7 @@ pub use Factors::*;
 pub mod LegacyURS;
 #[allow(non_snake_case)]
 pub use LegacyURS::*;
+
+pub mod Worker;
+pub use Worker::*;
+// pub mod StartWorker;

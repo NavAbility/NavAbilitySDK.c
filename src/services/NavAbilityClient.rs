@@ -43,6 +43,12 @@ impl NavAbilityClient {
                 )).chain(
                     std::iter::once((
                         reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
+                        reqwest::header::HeaderValue::from_str("https://navability.io")
+                            .unwrap(),
+                    ))
+                ).chain(
+                    std::iter::once((
+                        reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
                         reqwest::header::HeaderValue::from_str(&apiurl)
                             .unwrap(),
                     ))

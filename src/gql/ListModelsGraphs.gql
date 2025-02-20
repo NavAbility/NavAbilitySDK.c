@@ -1,12 +1,11 @@
 query ListModelsGraphs(
-  $label_CONTAINS: String = ""
+  $id: ID!
 ) {
   models(
     where: {
-      label_CONTAINS: $label_CONTAINS
+      id: $id
     }
   ) {
-    id
     label
     lastUpdatedTimestamp
     tags
@@ -14,8 +13,6 @@ query ListModelsGraphs(
       id
       label
       lastUpdatedTimestamp
-      numFactors
-      numVariables
       solveKeys
     }
   }

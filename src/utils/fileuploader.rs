@@ -25,8 +25,8 @@ pub struct FileUploader<T> {
     nbytes_uploaded: u64,
 }
 
-
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+// TODO , feature = "blocking"
+#[cfg(any(feature = "tokio", feature = "wasm"))]
 #[allow(non_snake_case)]
 impl<T> FileUploader<T> {
     pub fn new(
@@ -46,7 +46,6 @@ impl<T> FileUploader<T> {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
     pub async fn upload_file(
         &mut self,
         content: Vec<u8>,
@@ -71,14 +70,14 @@ impl<T> FileUploader<T> {
             .await?;
             
             // // .multipart(file)
-            // gloo_console::log!(format!("inner header {:?}", &postclient));
+            // to_console_debug(&format!("inner header {:?}", &postclient));
             
             let status_code = response.status();
             if reqwest::StatusCode::OK == status_code {
                 let res_head = response.headers();
                 let etag = res_head["etag"].to_str().unwrap().replace("\"","");
-                // gloo_console::log!(format!("Headers:\n{:#?}", response.headers()));
-                // gloo_console::log!(format!("Body:\n{}", response.text().await?));
+                // to_console_debug(&format!("Headers:\n{:#?}", response.headers()));
+                // to_console_debug(&format!("Body:\n{}", response.text().await?));
                 return Ok(etag)
             } else {
                 to_console_error(&format!("Status: {:?}", &status_code));

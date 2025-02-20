@@ -15,6 +15,7 @@ query GetAgentEntriesMetadata(
     blobEntries(
       where: {mimeType_CONTAINS: $mimeType_CONTAINS}
     ) {
+      id
       label
       blobId
       mimeType

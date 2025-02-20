@@ -1,0 +1,26 @@
+
+mutation ConnectGraphAgent(
+  $fgId: ID!
+  $agentId: ID!, 
+) {
+  updateAgents(
+    where: { 
+      id: $agentId 
+    }
+    update: { 
+      fgs: { 
+        connect: { 
+          where: { 
+            node: { 
+              id: $fgId 
+            } 
+          } 
+        } 
+      } 
+    }
+  ) {
+    info {
+      relationshipsCreated
+    }
+  }
+}

@@ -18,7 +18,9 @@ use crate::{
     NavAbilityDFG,
     check_deser,
     send_query_result,
-    send_api_response,
+    send_api_result,
+    post_to_nvaapi,
+    // send_api_response,
     GetVariable, 
     GraphQLQuery,
     ListVariables,
@@ -62,7 +64,7 @@ impl MeanMaxPPE {
 
     #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
     pub fn from_gql(
-        ppe: &ppe_fields
+        ppe: &ppe_fields // FIXME refac to trait similar to BlobEntry_fields
     ) -> Self {
         let mut ppesugg = Vec::new();
         if let Some(ps) = &ppe.suggested {
@@ -269,33 +271,38 @@ impl PackedVariableNodeData {
 // ===================== Queries =========================
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-pub async fn fetch_variable(
+pub async fn post_get_variable(
     nvafg: &NavAbilityDFG,
     label: &str,
-    fields_summary: bool,
     fields_full: bool,
-) -> Result<Response<get_variable::ResponseData>, Box<dyn Error>> {
+) -> Result<Option<VariableDFG>, Box<dyn Error>> {
+    use crate::GQLResponseEmptyError;
+
     let id = nvafg.fg.getId(label); 
     let request_body = GetVariable::build_query(
         get_variable::Variables {
             var_id: id.to_string(),
-            fields_summary,
+            fields_summary: true, // TODO simplify, since this must always be true
             fields_full,
         }
     );
 
-    let req_res = nvafg.client.client
-    .post(&nvafg.client.apiurl)
-    .json(&request_body)
-    .send().await;
-
-    if let Err(ref re) = req_res {
-        to_console_error(&format!("API request error: {:?}", re));
-    }
-
-    return check_deser::<get_variable::ResponseData>(
-        req_res?.json().await
-    )
+    return post_to_nvaapi::<
+        get_variable::Variables,
+        get_variable::ResponseData,
+        Option<VariableDFG>
+    >(
+        &nvafg.client,
+        request_body, 
+        |s| {
+            if 0 < s.variables.len() {
+                // FIXME return the entire list of variables
+                return Some(VariableDFG::from_gql(&s.variables[0]));
+            }
+            return None;
+        },
+        Some(3)
+    ).await;
 }
 
 
@@ -304,38 +311,24 @@ pub async fn fetch_variable(
 pub fn getVariable(
     nvafg: &NavAbilityDFG,
     label: &str,
-    fields_summary: bool,
     fields_full: bool,
 ) -> Option<VariableDFG> {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .unwrap();
-    let response_body = rt.block_on(async { 
-        fetch_variable(
+    let result = rt.block_on(async { 
+        post_get_variable(
             nvafg,
             label,
-            fields_summary,
             fields_full,
         ).await
     });
 
-    let variable_data = check_query_response_data::<
-        get_variable::ResponseData,
-        get_variable::ResponseData
-    >(response_body, |s| {s});
-
-    match variable_data {
-        Ok(vdata) => {
-            if 0 < vdata.variables.len() {
-                // FIXME return the entire list of variables
-                return Some(VariableDFG::from_gql(&vdata.variables[0]))
-            }
-        },
-        Err(e) => {
-            to_console_error(&format!("NvaSDK.rs error during getVariable: {:?}", e));
-        }
+    if let Ok(variable) = result {
+        return variable;
     }
+
     return None
 }
 
@@ -343,9 +336,9 @@ pub fn getVariable(
 // TODO get better function signature
 // #[allow(non_snake_case)]
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-pub async fn fetch_list_variables(
+pub async fn post_list_variables(
     nvafg: &NavAbilityDFG,
-) -> Result<Response<list_variables::ResponseData>, Box<dyn Error>> {
+) -> Result<Vec<String>, Box<dyn Error>> {
     let id = nvafg.fg.getId(""); 
     let request_body = ListVariables::build_query(
         list_variables::Variables {
@@ -359,31 +352,28 @@ pub async fn fetch_list_variables(
         }
     );
 
-    let req_res = nvafg.client.client
-    .post(&nvafg.client.apiurl)
-    .json(&request_body)
-    .send().await;
-
-    if let Err(ref re) = req_res {
-        to_console_error(&format!("API request error: {:?}", re));
-    }
-
-    return check_deser::<list_variables::ResponseData>(
-        req_res?.json().await
-    )
+    return post_to_nvaapi::<
+        list_variables::Variables,
+        list_variables::ResponseData,
+        Vec<String>
+    >(
+        &nvafg.client,
+        request_body, 
+        |s| {
+            return s.list_variables;
+        },
+        Some(3)
+    ).await;
 }
 
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 pub async fn send_list_variables(
-    send_into: Sender<list_variables::ResponseData>,
+    send_into: Sender<Vec<String>>,
     nvafg: &NavAbilityDFG,
-) {
-    let resp = fetch_list_variables(nvafg).await;
-    let _ = send_query_result::<
-        list_variables::ResponseData,
-        list_variables::ResponseData
-    >(send_into, resp, |s| {s});
+) -> Result<(), Box<dyn Error>> {
+    let result = post_list_variables(nvafg).await;
+    send_api_result(send_into, result)
 }
 
 
@@ -392,20 +382,13 @@ pub async fn send_list_variables(
 pub fn listVariables(
     nvafg: &NavAbilityDFG,
 ) -> Result<Vec<String>, Box<dyn Error>> {
-    let rt = tokio::runtime::Builder::new_current_thread()
+    return tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .unwrap();
-    let response_body = rt.block_on(async { 
-        fetch_list_variables(
+        .unwrap()
+        .block_on(post_list_variables(
             nvafg,
-        ).await
-    });
-
-    return check_query_response_data::<
-        list_variables::ResponseData,
-        Vec<String>
-    >(response_body, |s| {s.list_variables});
+        ));
 }
 
 
@@ -453,22 +436,18 @@ pub async fn post_add_variable(
 
     let request_body = AddVariable::build_query(variables);
 
-    let req_res = nvafg.client.client
-        .post(&nvafg.client.apiurl)
-        .json(&request_body)
-        .send().await;
-
-    if let Err(ref re) = req_res {
-        to_console_error(&format!("API request error: {:?}", re));
-    }
-
-    let response_body = check_deser::<crate::add_variable::ResponseData>(
-        req_res?.json().await
-    );
-
-    return check_query_response_data(response_body, |s| {
-        Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response")
-    });
+    return post_to_nvaapi::<
+        crate::add_variable::Variables,
+        crate::add_variable::ResponseData,
+        Uuid
+    >(
+        &nvafg.client,
+        request_body, 
+        |s| {
+            return Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response");
+        },
+        Some(1)
+    ).await;
 }
 
 
@@ -485,7 +464,7 @@ pub async fn add_variable_send(
     _metadata: Option<String>,
 ) -> Result<(),Box<dyn Error>> {
     
-    return send_api_response(
+    return send_api_result(
         send_into, 
         post_add_variable(
             nvafg,
@@ -496,7 +475,7 @@ pub async fn add_variable_send(
             _timestamp,
             _nstime,
             _metadata,
-        ).await?,
+        ).await,
     );
 }
 

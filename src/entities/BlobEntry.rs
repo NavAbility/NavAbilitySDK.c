@@ -55,6 +55,7 @@ pub struct BlobEntry {
 
 
 pub trait BlobEntrySummaryImporters {
+    fn id(&self) -> Option<Uuid>;
     fn label(&self) -> String;
     fn size(&self) -> Option<i64>;
     fn mimeType(&self) -> String;
@@ -67,7 +68,8 @@ pub trait BlobEntrySummaryImporters {
 macro_rules! BlobEntry_importers_summary { 
     ($T:ident) => {
         impl BlobEntrySummaryImporters for $T {
-            
+            fn id(&self) -> Option<Uuid> { Some(Uuid::parse_str(&self.id).expect("failed to parse blobentry id to uuid")) }
+
             fn label(&self) -> String { self.label.to_string() }
 
             fn size(&self) -> Option<i64> {
@@ -215,10 +217,4 @@ macro_rules! BlobEntry_importers {
 }
 
 
-// =============== DEPRECTED =================
-
-
-pub trait SameBlobEntryFields {
-    fn to_gql_blobentry(self) -> get_blob_entry::blobEntry_fields;
-}
 
