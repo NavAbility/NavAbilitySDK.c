@@ -17,6 +17,7 @@ mutation AddFactorgraphBlobEntry(
     input: {
       id: $entry_id, 
       blobId: $blob_id,
+      originId: $blob_id,
       label: $entry_label, 
       blobstore: $blobstore,
       origin: $origin,

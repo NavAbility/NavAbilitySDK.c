@@ -174,9 +174,9 @@ impl VariableDFG {
         // label
         let mut tags = Vec::new();
         for tag in vgql.variable_skeleton_fields.tags.iter() {
-            if (&tag).is_some() {
-                tags.push(tag.as_ref().unwrap().clone());
-            }
+            // if (&tag).is_some() {
+                tags.push(tag.clone());
+            // }
         }
         variable.tags = tags;
 
