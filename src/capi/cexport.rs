@@ -317,8 +317,8 @@ fn getVariable(
     let vari = crate::services::getVariable(
         nvafg.unwrap(), 
         &cstr_to_str(label),
-        false,
-        false,
+        true,
+        // false,
     );
     
     match vari {
