@@ -1037,6 +1037,7 @@ dependencies = [
  "ffi-convert",
  "gloo-console",
  "graphql_client",
+ "graphql_client_cli",
  "libc",
  "log",
  "reqwest 0.12.12",
