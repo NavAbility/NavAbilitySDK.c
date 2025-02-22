@@ -45,13 +45,15 @@ use crate::{
 
 // https://users.rust-lang.org/t/passing-vector-of-vectors-buffer-to-c/37345/9
 // https://users.rust-lang.org/t/preparing-an-array-of-structs-for-ffi/33411
+// Alt C style, https://users.rust-lang.org/t/how-to-return-byte-array-from-rust-function-to-ffi-c/18136/4
 #[repr(C)]
 #[derive(Debug)]
 pub struct RVec<T> {
     pub ptr: *mut T,
     pub len: usize, // number of elems
 }
-// alt use safer_ffi (still experimental) https://users.rust-lang.org/t/pass-a-vec-from-rust-to-c/59184/6
+// (24Q4, passed since safer_ffi was still experimental) 
+// alt `use safer_ffi` https://users.rust-lang.org/t/pass-a-vec-from-rust-to-c/59184/6
 
 
 
@@ -397,7 +399,7 @@ fn length(rv_agent: &RVec<crate::Agent>) -> usize {
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn get_index(
+fn getIndex_Agent(
     rv_agent: &RVec<crate::Agent>,
     index: usize
 ) -> *mut crate::Agent {
@@ -463,11 +465,18 @@ fn free_cstr(pointer: *mut c_char) -> () {
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn free_rvecagent (
+fn free_RVec_Agent (
     rvec: Box<RVec<crate::Agent>>
 ) {
     free_rvec::<crate::Agent>(*rvec)
 }
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_Agent(
+    _: Option<Box<crate::Agent>>
+) {}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]

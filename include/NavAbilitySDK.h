@@ -104,6 +104,8 @@ struct Option_____c_char addVariable(const struct NavAbilityDFG *nvafg,
                                      struct Option_usize _nstime,
                                      struct Option______c_char _metadata);
 
+void free_Agent(struct Agent*);
+
 void free_BlobEntry(struct BlobEntry*);
 
 void free_FullNormal(struct FullNormal*);
@@ -116,13 +118,15 @@ void free_NavAbilityDFG(struct NavAbilityDFG*);
 
 void free_Pose3Pose3(struct Pose3Pose3_FullNormal*);
 
+void free_RVec_Agent(struct RVec_Agent *rvec);
+
 void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
 
-void free_rvecagent(struct RVec_Agent *rvec);
-
 struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl);
+
+struct Agent *getIndex_Agent(const struct RVec_Agent *rv_agent, size_t index);
 
 const char *getLabel_Agent(const struct Agent *agent);
 
@@ -140,13 +144,20 @@ struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *l
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 
-struct Agent *get_index(const struct RVec_Agent *rv_agent, size_t index);
-
 size_t length(const struct RVec_Agent *rv_agent);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);
+
+// Overloading via C macros using _Generic
+
+// https://stackoverflow.com/a/73458289 
+// _Generic wont work since Rust type sizes likely unknown to C compiler
+// https://thelinuxcode.com/function-overloading-c/
+// http://www.robertgamble.net/2012/01/c11-generic-selections.html
+// https://stackoverflow.com/a/76240760
+// printf("[%s] @ line [%d]: \n", #obj, __LINE__);  
 
 
 #define getLabel(obj)                                         \
@@ -156,18 +167,28 @@ const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
         NavAbilityBlobStore*:  getLabel_NavAbilityBlobStore,  \
         NavAbilityDFG*:        getLabel_NavAbilityDFG         \
     ) (obj)
-// https://stackoverflow.com/a/73458289 
-// _Generic wont work since Rust type sizes likely unknown to C compiler
-// https://thelinuxcode.com/function-overloading-c/
-// http://www.robertgamble.net/2012/01/c11-generic-selections.html
-// https://stackoverflow.com/a/76240760
-// printf("[%s] @ line [%d]: \n", #obj, __LINE__);  
+
+    
+#define getIndex(obj2,i)                                       \
+    _Generic(obj2,                                             \
+        RVec_Agent*:                getIndex_Agent             \
+    ) (obj2,i)
 
 
 
-
-
-
+#define freeR(obj)                                            \
+    _Generic(obj,                                             \
+        char*:                    free_cstr,                    \
+        Agent*:                   free_Agent,                    \
+        RVec_Agent*:              free_RVec_Agent,               \
+        BlobEntry*:               free_BlobEntry,                \
+        NavAbilityClient*:        free_NavAbilityClient,         \
+        NavAbilityBlobStore*:     free_NavAbilityBlobStore,      \
+        NavAbilityDFG*:           free_NavAbilityDFG,            \
+        VariableDFG*:             free_VariableDFG,              \
+        FullNormal*:              free_FullNormal,               \
+        Pose3Pose3_FullNormal*:   free_Pose3Pose3               \
+    ) (obj)
 
 
 
