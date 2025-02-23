@@ -41,10 +41,10 @@ int main(void) {
     printf("get agents length: %ld\n", length(agents));
     int i;
     for (i = 0; i < length(agents); i++) {
-        printf("getLabel(agents[%d]): %s\n", i, getLabel(get_index(agents,i)));
+        printf("getLabel(agents[%d]): %s\n", i, getLabel(getIndex(agents,i)));
     }
 
-    free_rvecagent(agents);
+    freeR(agents);
 
     NavAbilityBlobStore *store = NULL;
     store = NavAbilityBlobStore_new(nvacl, "default");
@@ -67,7 +67,7 @@ int main(void) {
     BlobEntry *be = NULL;
     be = BlobEntry_basic("test_entry","text/plain");
     printf("getLabel(bentry): %s\n", getLabel(be));
-    free_BlobEntry(be);
+    freeR(be);
 
     FullNormal *normal = NULL;
     double mn[3] = { 0.0 };
@@ -80,8 +80,8 @@ int main(void) {
     Pose3Pose3_FullNormal *pf = NULL;
     pf = Pose3Pose3(normal);
 
-    free_Pose3Pose3(pf);
-    free_FullNormal(normal);
+    freeR(pf);
+    freeR(normal);
 
     printf("About to getVariable with nvafg\n");
     // test getVariable
@@ -96,11 +96,11 @@ int main(void) {
     // int x;
     // typeof(x) y;
 
-    free_VariableDFG(variable);
-    free_NavAbilityDFG(nvafg);
-    free_NavAbilityBlobStore(store);
-    free_NavAbilityClient(nvacl);
-    free_cstr(api); // possibly redundant but doesn't hurt
+    freeR(variable);
+    freeR(nvafg);
+    freeR(store);
+    freeR(nvacl);
+    freeR(api); // possibly redundant but doesn't hurt
 
     printf("check for NullPtr arg handling\n");
     get_apiurl(NULL);

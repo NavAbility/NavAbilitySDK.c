@@ -12,17 +12,13 @@ use crate::{
   get_variable, 
   parse_str_utc, 
   post_to_nvaapi,
-  check_query_response_data,
   send_api_result,
-  // send_api_response,
-  // send_query_result, 
-  to_console_debug, 
+  // to_console_debug, 
   to_console_error, 
   update_blobentry_metadata, 
   Error, 
-  Response, 
+  // Response, 
   UpdateBlobentryMetadata, 
-  check_deser, 
   DeleteBlobEntry,
   delete_blob_entry,
   GetBlobEntry, 
@@ -39,7 +35,7 @@ use crate::{
   BlobEntry_importers_summary,
   BlobEntryFieldsImporters,
   BlobEntry_importers,
-  SameBlobEntryFields, // DEPRECATING
+  // SameBlobEntryFields, // DEPRECATING
 };
 
 
@@ -56,11 +52,14 @@ BlobEntry_importers!(GV_BlobEntryFields);
 
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-use get_agents::blobEntry_fields_summary as GA_BlobEntrySummary;
+use get_agents::blobEntry_fields_summary as GAs_BlobEntrySummary;
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+BlobEntry_importers_summary!(GAs_BlobEntrySummary);
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+use crate::get_agent::blobEntry_fields_summary as GA_BlobEntrySummary;
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 BlobEntry_importers_summary!(GA_BlobEntrySummary);
-
 
 
 impl BlobEntry {

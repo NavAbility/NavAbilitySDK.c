@@ -45,13 +45,15 @@ use crate::{
 
 // https://users.rust-lang.org/t/passing-vector-of-vectors-buffer-to-c/37345/9
 // https://users.rust-lang.org/t/preparing-an-array-of-structs-for-ffi/33411
+// Alt C style, https://users.rust-lang.org/t/how-to-return-byte-array-from-rust-function-to-ffi-c/18136/4
 #[repr(C)]
 #[derive(Debug)]
 pub struct RVec<T> {
     pub ptr: *mut T,
     pub len: usize, // number of elems
 }
-// alt use safer_ffi (still experimental) https://users.rust-lang.org/t/pass-a-vec-from-rust-to-c/59184/6
+// (24Q4, passed since safer_ffi was still experimental) 
+// alt `use safer_ffi` https://users.rust-lang.org/t/pass-a-vec-from-rust-to-c/59184/6
 
 
 
@@ -224,30 +226,7 @@ fn Pose3Pose3<'a>(
 
 // ==================================== SERVICES LOGIC =======================================
 
-#[allow(non_snake_case)]
-#[no_mangle] pub unsafe extern "C" 
-fn getAgents(
-    _nvacl: Option<&crate::NavAbilityClient>,
-) -> Option<Box<RVec<crate::Agent>>> {
-    if _nvacl.is_none() {
-        to_console_error("listAgents: provided *NavAbilityClient is NULL/None");
-        return None;
-    }
 
-    match crate::services::getAgents(_nvacl.unwrap()) {
-        Ok(agents) => {
-            return Some(Box::new(vec_to_ffi(agents)))
-        }
-        Err(e) => {
-            to_console_error(&format!("NvaSDK.rs error during getAgents: {:?}", e));
-            // return None;
-            return Some(Box::new(RVec::<crate::Agent> { 
-                ptr: ptr::null_mut(), 
-                len: 0 as usize 
-            }))
-        }
-    }
-}
 
 
 #[no_mangle] pub unsafe extern "C" 
@@ -397,7 +376,7 @@ fn length(rv_agent: &RVec<crate::Agent>) -> usize {
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn get_index(
+fn getIndex_Agent(
     rv_agent: &RVec<crate::Agent>,
     index: usize
 ) -> *mut crate::Agent {
@@ -463,11 +442,18 @@ fn free_cstr(pointer: *mut c_char) -> () {
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn free_rvecagent (
+fn free_RVec_Agent (
     rvec: Box<RVec<crate::Agent>>
 ) {
     free_rvec::<crate::Agent>(*rvec)
 }
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_Agent(
+    _: Option<Box<crate::Agent>>
+) {}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
@@ -553,7 +539,7 @@ fn free_NavAbilityBlobStore(
 // ============================ ADDITIONAL UTILS ==================================
 
 
-fn vec_to_ffi<T> (
+pub fn vec_to_ffi<T> (
     v: Vec<T>
 ) -> RVec<T> {
     // Going from Vec<_> to Box<[_]> just drops the (extra) `capacity`
@@ -579,7 +565,7 @@ fn vec_to_ffi<T> (
 //     RVec::<crate::Agent> { ptr: slim_ptr, len }
 // }
 
-unsafe fn free_rvec<T> (
+pub unsafe fn free_rvec<T> (
     rvec: RVec<T>
 ) {
     let ptr = rvec.ptr;

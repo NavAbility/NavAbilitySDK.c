@@ -19,7 +19,7 @@ use graphql_client::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 use reqwest::Client;
 #[cfg(feature="blocking")]
 use ::reqwest::blocking::Client;
@@ -27,16 +27,6 @@ use ::reqwest::blocking::Client;
 use graphql_client::reqwest::post_graphql_blocking;
 
 
-#[cfg(target_arch = "wasm32")]
-use gloo_console::{
-    __macro::JsValue, 
-    log
-};
-// #[cfg(feature="wasm")]
-// use reqwest::multipart::Part; // requires multipart
-
-#[cfg(feature = "tokio")]
-use tokio;
 
 pub mod entities;
 pub use crate::entities::*;
@@ -49,7 +39,7 @@ pub use crate::utils::*;
 
 
 pub mod services;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub use crate::services::{
     post_get_agents,
     // post_get_blob_entry,
@@ -74,10 +64,6 @@ pub use crate::services::{
 };
 
 
-#[cfg(feature = "tokio")]
-pub use crate::services::{
-    getAgents_send,
-};
 
 pub mod deprecated;
 pub use crate::deprecated::*;
@@ -103,7 +89,7 @@ type Latitude = f64;
 type Longitude = f64;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -113,7 +99,7 @@ type Longitude = f64;
 pub struct GetBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -123,7 +109,7 @@ pub struct GetBlobEntry;
 pub struct ListAgents;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -133,7 +119,7 @@ pub struct ListAgents;
 pub struct UpdateAgentMetadata;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -143,7 +129,17 @@ pub struct UpdateAgentMetadata;
 pub struct GetAgents;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[derive(GraphQLQuery, Clone)]
+#[graphql(
+    schema_path = "src/schema.json",
+    query_path = "src/gql/GetAgent.gql",
+    response_derives = "Debug"
+)]
+pub struct GetAgent;
+
+
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -153,7 +149,7 @@ pub struct GetAgents;
 pub struct GetURS;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -163,7 +159,7 @@ pub struct GetURS;
 pub struct ListModels;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -173,7 +169,7 @@ pub struct ListModels;
 pub struct ListModelsGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -183,7 +179,7 @@ pub struct ListModelsGraphs;
 pub struct AddFactorgraph;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -193,7 +189,7 @@ pub struct AddFactorgraph;
 pub struct GetAgentEntriesMetadata;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -203,7 +199,7 @@ pub struct GetAgentEntriesMetadata;
 pub struct CreateDownload;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -213,7 +209,7 @@ pub struct CreateDownload;
 pub struct CreateUpload;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -223,7 +219,7 @@ pub struct CreateUpload;
 pub struct CompleteUpload;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -233,7 +229,7 @@ pub struct CompleteUpload;
 pub struct StartWorker;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -243,7 +239,7 @@ pub struct StartWorker;
 pub struct GetVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -254,7 +250,7 @@ pub struct ListVariables;
 // Implicit ListWhere due to graphql-client limitation: https://github.com/graphql-rust/graphql-client/issues/508
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -264,7 +260,7 @@ pub struct ListVariables;
 pub struct AddVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -274,7 +270,7 @@ pub struct AddVariable;
 pub struct AddBlobEntryAgent;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -284,7 +280,7 @@ pub struct AddBlobEntryAgent;
 pub struct AddFactorgraphBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -294,7 +290,7 @@ pub struct AddFactorgraphBlobEntry;
 pub struct ConnectGraphAgent;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -304,7 +300,7 @@ pub struct ConnectGraphAgent;
 pub struct AddBlobEntryModel;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -313,7 +309,7 @@ pub struct AddBlobEntryModel;
 )]
 pub struct DeleteBlobEntry;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -322,7 +318,7 @@ pub struct DeleteBlobEntry;
 )]
 pub struct DeleteBlob;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -332,7 +328,7 @@ pub struct DeleteBlob;
 pub struct GetOrg;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -342,7 +338,7 @@ pub struct GetOrg;
 pub struct ListGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -352,7 +348,7 @@ pub struct ListGraphs;
 pub struct FindOrgModelGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -361,7 +357,7 @@ pub struct FindOrgModelGraphs;
 )]
 pub struct AddAgent;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -370,7 +366,7 @@ pub struct AddAgent;
 )]
 pub struct AddModel;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
@@ -435,7 +431,7 @@ macro_rules! genGetLabel {
 genGetLabel!(User);
 genGetLabel!(Agent);
 genGetLabel!(BlobEntry);
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 genGetLabel!(NavAbilityBlobStore);
 
 // TO BE DEPRECATED
@@ -446,7 +442,7 @@ impl<T> GetLabel for NvaNode<T> {
     fn getLabel(&self) -> &String { &self.label }
 }
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl GetLabel for crate::entities::ClientDFG::NavAbilityDFG {
     fn getLabel(&self) -> &String { &self.fg.getLabel() }
 }
@@ -463,7 +459,7 @@ pub trait GetId {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl<T> GetId for NvaNode<T> {
     fn getId(
         &self, 
@@ -485,7 +481,7 @@ impl<T> GetId for NvaNode<T> {
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[cfg(test)]
 mod tests {
     use super::*;

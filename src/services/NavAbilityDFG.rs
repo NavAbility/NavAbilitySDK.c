@@ -42,6 +42,9 @@ impl NavAbilityDFG {
         let _client = client.clone();
         let namespace = Uuid::parse_str(&client.user_label).unwrap();
         let storelb = storeLabel.unwrap_or("default");
+        
+        
+
         let fg = NvaNode::<Factorgraph>{
             namespace: namespace.clone(),
             label: fgLabel.to_string(),

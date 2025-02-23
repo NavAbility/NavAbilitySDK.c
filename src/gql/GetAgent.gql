@@ -33,12 +33,12 @@ fragment agent_fields_full on Agent {
   }
 }
 
-query GetAgents(
+query GetAgent(
   $org_id: ID!, 
-  $label_contains: String!,
+  $agent_id: ID, 
   $full: Boolean = false
 ) {
-  agents(where: {label_CONTAINS: $label_contains}) {
+  agents(where: {id: $agent_id}) {
     org(where: {id: $org_id}) {
       id
     } 
