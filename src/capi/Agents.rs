@@ -51,7 +51,7 @@ fn getAgents(
         return None;
     }
 
-    match crate::services::getAgents(_nvacl.unwrap(), None) {
+    match crate::services::getAgents(_nvacl.unwrap(), "".into()) {
         Ok(agents) => {
             return Some(Box::new(vec_to_ffi(agents)))
         }
