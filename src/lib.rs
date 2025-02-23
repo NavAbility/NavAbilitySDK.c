@@ -64,10 +64,6 @@ pub use crate::services::{
 };
 
 
-// #[cfg(feature = "tokio")]
-// pub use crate::services::{
-//     getAgents_send,
-// };
 
 pub mod deprecated;
 pub use crate::deprecated::*;
@@ -131,6 +127,16 @@ pub struct UpdateAgentMetadata;
     response_derives = "Debug"
 )]
 pub struct GetAgents;
+
+
+#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[derive(GraphQLQuery, Clone)]
+#[graphql(
+    schema_path = "src/schema.json",
+    query_path = "src/gql/GetAgent.gql",
+    response_derives = "Debug"
+)]
+pub struct GetAgent;
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
