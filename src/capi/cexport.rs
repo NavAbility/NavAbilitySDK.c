@@ -226,30 +226,7 @@ fn Pose3Pose3<'a>(
 
 // ==================================== SERVICES LOGIC =======================================
 
-#[allow(non_snake_case)]
-#[no_mangle] pub unsafe extern "C" 
-fn getAgents(
-    _nvacl: Option<&crate::NavAbilityClient>,
-) -> Option<Box<RVec<crate::Agent>>> {
-    if _nvacl.is_none() {
-        to_console_error("listAgents: provided *NavAbilityClient is NULL/None");
-        return None;
-    }
 
-    match crate::services::getAgents(_nvacl.unwrap()) {
-        Ok(agents) => {
-            return Some(Box::new(vec_to_ffi(agents)))
-        }
-        Err(e) => {
-            to_console_error(&format!("NvaSDK.rs error during getAgents: {:?}", e));
-            // return None;
-            return Some(Box::new(RVec::<crate::Agent> { 
-                ptr: ptr::null_mut(), 
-                len: 0 as usize 
-            }))
-        }
-    }
-}
 
 
 #[no_mangle] pub unsafe extern "C" 
@@ -562,7 +539,7 @@ fn free_NavAbilityBlobStore(
 // ============================ ADDITIONAL UTILS ==================================
 
 
-fn vec_to_ffi<T> (
+pub fn vec_to_ffi<T> (
     v: Vec<T>
 ) -> RVec<T> {
     // Going from Vec<_> to Box<[_]> just drops the (extra) `capacity`
@@ -588,7 +565,7 @@ fn vec_to_ffi<T> (
 //     RVec::<crate::Agent> { ptr: slim_ptr, len }
 // }
 
-unsafe fn free_rvec<T> (
+pub unsafe fn free_rvec<T> (
     rvec: RVec<T>
 ) {
     let ptr = rvec.ptr;

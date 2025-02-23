@@ -7,7 +7,7 @@ use crate::{
 
 use std::collections::HashMap;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[macro_use]
 use crate::{
   Sender,
@@ -51,17 +51,17 @@ use crate::to_console_debug;
 
 // ===================== HELPERS ========================
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::get_agents::agent_fields_summary as GA_AgentFieldsSummary;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 Agent_importers_summary!(GA_AgentFieldsSummary);
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::get_agents::agent_fields_full as GA_AgentFieldsFull;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 Agent_importers_full!(GA_AgentFieldsFull);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl Agent {
   pub fn from_gql_summary(
     aggql: &impl AgentFieldImportersSummary,
@@ -94,7 +94,7 @@ impl Agent {
 // ===================== QUERIES ========================
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_list_agents(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -167,7 +167,7 @@ pub fn q_listAgents(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_get_agents(
   nvacl: &NavAbilityClient,
   agent_label: Option<&str>
@@ -222,7 +222,7 @@ pub fn getAgents(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 pub async fn getAgents_send(
   send_into: Sender<Vec<Agent>>,
   nvacl: &NavAbilityClient,
@@ -237,7 +237,7 @@ pub async fn getAgents_send(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_add_agent(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -292,7 +292,7 @@ pub async fn post_add_agent(
 
 
 // FIXME parse result to Vec<Agent> with metadata and Vec<BlobEntry_summary> populated
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_get_agent_entries_metadata(
   nvacl: &NavAbilityClient,
   agent_label: String,
@@ -325,7 +325,7 @@ pub async fn post_get_agent_entries_metadata(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn get_agent_entries_metadata_send(
   send_into: Sender<get_agent_entries_metadata::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -345,7 +345,7 @@ pub async fn get_agent_entries_metadata_send(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_add_agent_entry(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -410,7 +410,7 @@ pub async fn post_add_agent_entry(
 // };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 pub async fn add_agent_entry_send(
   send_into: std::sync::mpsc::Sender<String>,
   nvacl: &NavAbilityClient,
@@ -450,7 +450,7 @@ pub fn addAgentBlobEntry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_update_agent_metadata(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -478,7 +478,7 @@ pub async fn post_update_agent_metadata(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 pub async fn update_agent_metadata_send(
   send_into: std::sync::mpsc::Sender<String>,
   nvacl: &NavAbilityClient,

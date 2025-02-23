@@ -7,14 +7,14 @@ use crate::{
     Factorgraph,
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     Client,
     NavAbilityBlobStore,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(Debug, Clone)]
 #[allow(non_snake_case)]
 pub struct NavAbilityClient {
@@ -25,7 +25,7 @@ pub struct NavAbilityClient {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(Debug)]
 #[allow(non_snake_case)]
 pub struct NavAbilityDFG {
