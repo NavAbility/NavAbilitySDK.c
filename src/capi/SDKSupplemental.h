@@ -14,29 +14,28 @@
         Agent*:                getLabel_Agent,                \
         BlobEntry*:            getLabel_BlobEntry,            \
         NavAbilityBlobStore*:  getLabel_NavAbilityBlobStore,  \
-        NavAbilityDFG*:        getLabel_NavAbilityDFG         \
+        NavAbilityDFG*:        getLabel_NavAbilityDFG        \
     ) (obj)
 
     
-#define getIndex(obj2,i)                                       \
-    _Generic(obj2,                                             \
-        RVec_Agent*:                getIndex_Agent             \
-    ) (obj2,i)
-
+#define getIndex(obj,i)                                       \
+    _Generic(obj,                                             \
+        RVec_Agent*:                getIndex_Agent           \
+    ) (obj,i)
 
 
 #define freeR(obj)                                            \
     _Generic(obj,                                             \
-        char*:                    free_cstr,                    \
-        Agent*:                   free_Agent,                    \
-        RVec_Agent*:              free_RVec_Agent,               \
-        BlobEntry*:               free_BlobEntry,                \
-        NavAbilityClient*:        free_NavAbilityClient,         \
-        NavAbilityBlobStore*:     free_NavAbilityBlobStore,      \
-        NavAbilityDFG*:           free_NavAbilityDFG,            \
-        VariableDFG*:             free_VariableDFG,              \
-        FullNormal*:              free_FullNormal,               \
-        Pose3Pose3_FullNormal*:   free_Pose3Pose3               \
+        char*:                    free_cstr,                  \
+        Agent*:                   free_Agent,                 \
+        RVec_Agent*:              free_RVec_Agent,            \
+        BlobEntry*:               free_BlobEntry,             \
+        NavAbilityClient*:        free_NavAbilityClient,      \
+        NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \
+        NavAbilityDFG*:           free_NavAbilityDFG,         \
+        VariableDFG*:             free_VariableDFG,           \
+        FullNormal*:              free_FullNormal,            \
+        Pose3Pose3_FullNormal*:   free_Pose3Pose3            \
     ) (obj)
 
 
