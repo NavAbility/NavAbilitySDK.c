@@ -14,6 +14,7 @@ chrono = "^0.4"
 log = "^0.4"
 # hyper-util = "^0.1.3"
 uuid = { version ="^1.14", features = ["v4","v5"] }
+wasm-bindgen-futures = { version = "^0.4", optional = true }
 graphql_client = "^0.14"
 reqwest = {version = "^0.12", optional=true, features = [
   "json",
@@ -37,8 +38,7 @@ gloo-console = { version = "^0.3", optional = true }
 [features]
 tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
 blocking = ["graphql_client/reqwest","graphql_client/reqwest-blocking"]
-wasm = ["dep:reqwest"]
-wasm-dev = ["dep:gloo-console"]
+thread = []
 
 [profile.release]
 opt-level = 'z' # fast and small wasm

@@ -34,13 +34,14 @@ fragment agent_fields_full on Agent {
 }
 
 query GetAgents(
-  $org_id: ID!
+  $org_id: ID!, 
+  $agent_id: ID, 
   $full: Boolean = false
 ) {
-  agents {
+  agents(where: {id: $agent_id}) {
     org(where: {id: $org_id}) {
       id
-    }
+    } 
     ...agent_fields_summary
     ...agent_fields_full @include(if: $full)
   }

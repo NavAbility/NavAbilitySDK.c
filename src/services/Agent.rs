@@ -126,40 +126,62 @@ pub async fn post_list_agents(
 }
 
 
-#[cfg(feature = "tokio")]
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
 pub fn listAgents(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
-  return tokio::runtime::Builder::new_current_thread()
-  .enable_all()
-  .build()
-  .unwrap()
-  .block_on(post_list_agents(nvacl));
+  return crate::execute(post_list_agents(nvacl));
 }
 
-// FIXME update to newer pattern without requiring separate wasm config
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-#[allow(non_snake_case)]
-pub async fn listAgents_send(
+#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+pub fn q_listAgents(
   send_into: Sender<Vec<String>>, 
-  nvacl: &NavAbilityClient
-) -> Result<(),Box<dyn Error>> {
-  // use common send_query_result
-  return send_api_result(
-    send_into, 
-    post_list_agents(&nvacl).await,
-  );
+  nvacl: &NavAbilityClient,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_list_agents(&nvacl).await,
+    );
+  })
 }
+
+#[cfg(feature = "wasm")]
+pub fn q_listAgents(
+  send_into: Sender<Vec<String>>, 
+  nvacl: &NavAbilityClient,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into_, 
+      post_list_agents(&nvacl_).await,
+    );
+  });
+}
+
+
 
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 pub async fn post_get_agents(
   nvacl: &NavAbilityClient,
+  agent_label: Option<&str>
 ) -> Result<Vec<Agent>, Box<dyn Error>> {
   
+  let mut agent_id = None;
+  if let Some(agl) = agent_label {
+    agent_id = Some(nvacl.getId(agl).to_string());
+  }
+
   // https://github.com/graphql-rust/graphql-client/blob/3090e0add5504ed31df74c32c2bda203793a890a/examples/github/examples/github.rs#L45C1-L48C7
   let variables = crate::get_agents::Variables {
     org_id: nvacl.user_label.to_string(),
+    agent_id,
     full: Some(true)
   };
   
@@ -188,24 +210,27 @@ pub async fn post_get_agents(
 
 #[cfg(feature = "tokio")]
 pub fn getAgents(
-  nvacl: &NavAbilityClient
+  nvacl: &NavAbilityClient,
+  agent_label: Option<&str>,
 ) -> Result<Vec<Agent>, Box<dyn Error>> {
+  // return crate::execute(post_get_agents(nvacl, agent_label));
   return tokio::runtime::Builder::new_current_thread()
   .enable_all()
   .build()
   .unwrap()
-  .block_on(post_get_agents(nvacl));
+  .block_on(post_get_agents(nvacl, agent_label));
 }
 
 
 #[cfg(any(feature = "tokio", feature = "wasm"))]
 pub async fn getAgents_send(
   send_into: Sender<Vec<Agent>>,
-  nvacl: &NavAbilityClient
+  nvacl: &NavAbilityClient,
+  agent_label: Option<&str>,
 ) -> Result<(),Box<dyn Error>> {
   return send_api_result(
     send_into, 
-    post_get_agents(nvacl).await,
+    post_get_agents(nvacl, agent_label).await,
   );
 }
 

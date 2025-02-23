@@ -18,6 +18,8 @@ use graphql_client::{
     Response
 };
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen_futures;
 
 #[cfg(any(feature = "tokio", feature = "wasm"))]
 use reqwest::Client;
@@ -35,8 +37,6 @@ use gloo_console::{
 // #[cfg(feature="wasm")]
 // use reqwest::multipart::Part; // requires multipart
 
-#[cfg(feature = "tokio")]
-use tokio;
 
 pub mod entities;
 pub use crate::entities::*;
