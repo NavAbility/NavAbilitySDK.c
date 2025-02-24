@@ -21,21 +21,10 @@ use crate::{
   Response
 };
 
-#[cfg(feature = "wasm")]
-use wasm_bindgen_futures;
 #[cfg(feature = "tokio")]
 use tokio;
 
 
-#[cfg(feature = "wasm")]
-pub fn execute<F>(
-  future: F
-) where 
-  // https://docs.rs/wasm-bindgen-futures/latest/wasm_bindgen_futures/fn.spawn_local.html
-  F:  Future<Output = ()>  + 'static 
-{
-  wasm_bindgen_futures::spawn_local(future);
-}
 
 #[cfg(feature = "thread")]
 pub fn execute<R, F: Future<Output = R>>(  //  + Send + 'static

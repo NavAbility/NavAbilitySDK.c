@@ -1,5 +1,5 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
   Utc,
   Uuid,
@@ -25,7 +25,7 @@ use crate::{
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_create_download(
   nvacl: NavAbilityClient,
   blob_id: Uuid,
@@ -54,7 +54,7 @@ pub async fn post_create_download(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn create_download_send(
   send_into: Sender<create_download::ResponseData>,
   nvacl: NavAbilityClient,
@@ -69,7 +69,7 @@ pub async fn create_download_send(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_create_upload(
   nvacl: NavAbilityClient,
   // filename: String,
@@ -100,7 +100,7 @@ pub async fn post_create_upload(
   )
 }
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn create_upload_send(
   send_into: Sender<create_upload::ResponseData>, 
   client: &NavAbilityClient,
@@ -118,7 +118,7 @@ pub async fn create_upload_send(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_complete_upload(
   nvacl: NavAbilityClient,
   blob_id: Uuid,
@@ -168,7 +168,7 @@ pub async fn post_complete_upload(
 
 
 // TODO , feature = "blocking"
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 #[allow(non_snake_case)]
 pub async fn post_blob_singlepart(
   _nvacl: &NavAbilityClient,
@@ -229,7 +229,7 @@ pub async fn post_blob_singlepart(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_delete_blob(
   nvacl: &NavAbilityClient,
   blob_id: Uuid,
@@ -261,7 +261,7 @@ pub async fn post_delete_blob(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn delete_blob_send(
   send_into: std::sync::mpsc::Sender<delete_blob::ResponseData>,
   nvacl: &NavAbilityClient,
