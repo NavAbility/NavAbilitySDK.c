@@ -162,7 +162,21 @@ void free_NavAbilityClient(struct NavAbilityClient*);
 
 void free_NavAbilityDFG(struct NavAbilityDFG*);
 
+void free_Point2Point2(struct Point2Point2_FullNormal*);
+
+void free_Point3Point3(struct Point3Point3_FullNormal*);
+
+void free_Pose2Pose2(struct Pose2Pose2_FullNormal*);
+
 void free_Pose3Pose3(struct Pose3Pose3_FullNormal*);
+
+void free_PriorPoint2(struct PriorPoint2_FullNormal*);
+
+void free_PriorPoint3(struct PriorPoint3_FullNormal*);
+
+void free_PriorPose2(struct PriorPose2_FullNormal*);
+
+void free_PriorPose3(struct PriorPose3_FullNormal*);
 
 void free_RVec_Agent(struct RVec_Agent *rvec);
 

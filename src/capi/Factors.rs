@@ -40,7 +40,6 @@ fn PriorPoint3_new<'a>(
 }
 
 
-
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn PriorPose2_new<'a>(
