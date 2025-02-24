@@ -1,5 +1,5 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
   // Serialize,
   GraphQLQuery,
@@ -17,7 +17,7 @@ use crate::{
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_start_worker(
   nvacl: &NavAbilityClient,
   input: &str,

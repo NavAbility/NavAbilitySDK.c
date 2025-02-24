@@ -236,26 +236,26 @@ pub fn q_getAgents(
   })
 }
 
-#[cfg(feature = "wasm")]
-pub fn q_getAgents(
-  send_into: Sender<Vec<Agent>>, 
-  nvacl: &NavAbilityClient,
-  label_contains: String,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = nvacl.clone();
-  let send_into_ = send_into.clone();
-  let label_contains_ = label_contains.clone();
-  crate::execute(async move {
-    let _ = send_api_result(
-      send_into_, 
-      post_get_agents(&nvacl_, label_contains_).await,
-    );
-  });
-}
+// #[cfg(feature = "wasm")]
+// pub fn q_getAgents(
+//   send_into: Sender<Vec<Agent>>, 
+//   nvacl: &NavAbilityClient,
+//   label_contains: String,
+// ) {
+//   // wasmbindgen limitation?  overcome +'static requirement
+//   let nvacl_ = nvacl.clone();
+//   let send_into_ = send_into.clone();
+//   let label_contains_ = label_contains.clone();
+//   crate::execute(async move {
+//     let _ = send_api_result(
+//       send_into_, 
+//       post_get_agents(&nvacl_, label_contains_).await,
+//     );
+//   });
+// }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_get_agent(
   nvacl: &NavAbilityClient,
   agent_label: Option<&str>

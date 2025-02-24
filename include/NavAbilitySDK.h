@@ -89,7 +89,7 @@ struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
                                         const bool *addAgentIfAbsent,
                                         const bool *addGraphIfAbsent);
 
-struct Pose3Pose3_FullNormal *Pose3Pose3(const struct FullNormal *Z);
+struct Pose3Pose3_FullNormal *Pose3Pose3_new(const struct FullNormal *Z);
 
 const char *addAgentBlobEntry(const struct NavAbilityClient *_nvacl,
                               const char *agent_label,

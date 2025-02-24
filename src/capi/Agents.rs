@@ -5,10 +5,10 @@
 
 use std::{
     ptr,
-    // os::raw::{
-    //     c_char,
-    //     // c_void, 
-    // },
+    os::raw::{
+        c_char,
+        // c_void, 
+    },
     // ffi::{
     //     CString,
     //     CStr
@@ -32,7 +32,8 @@ use std::{
 // };
 
 use crate::{
-    // get_agents, 
+    cstr_to_str,
+    convert_str,
     parse_str_utc, 
     RVec,
     vec_to_ffi,
@@ -62,6 +63,35 @@ fn getAgents(
                 ptr: ptr::null_mut(), 
                 len: 0 as usize 
             }))
+        }
+    }
+}
+
+
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn updateAgentMetadata(
+    _nvacl: Option<&crate::NavAbilityClient>,
+    agent_label: *const c_char,
+    metadata: *const c_char,
+) -> *const c_char {
+    if _nvacl.is_none() {
+        to_console_error("updateAgentMetadata: provided *NavAbilityClient is NULL/None");
+        return convert_str("");
+    }
+
+    match crate::services::updateAgentMetadata(
+        _nvacl.unwrap(),
+        &cstr_to_str(agent_label).to_string(),
+        &cstr_to_str(metadata).to_string(),
+    ) {
+        Ok(metadata) => {
+            return convert_str(&metadata);
+        }
+        Err(e) => {
+            to_console_error(&format!("NvaSDK.rs error during updateAgentMetadata: {:?}", e));
+            return convert_str("");
         }
     }
 }

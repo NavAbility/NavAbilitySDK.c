@@ -9,7 +9,7 @@ use crate::{
     Factorgraph,
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     NavAbilityClient,
     NavAbilityDFG,
@@ -17,7 +17,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl GetId for NavAbilityDFG {
     fn getId(
         &self, 
@@ -28,7 +28,7 @@ impl GetId for NavAbilityDFG {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[allow(non_snake_case)]
 impl NavAbilityDFG {
     pub fn new(

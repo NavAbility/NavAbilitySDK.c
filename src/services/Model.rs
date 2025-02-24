@@ -1,5 +1,5 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     Utc,
     Uuid,
@@ -27,7 +27,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn list_models_query(
     model_label_contains: Option<&str>,
 ) -> QueryBody<list_models::Variables> {
@@ -43,7 +43,7 @@ pub fn list_models_query(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn fetch_list_models(
     nvacl: &NavAbilityClient,
     model_label_contains: Option<&str>,
@@ -64,7 +64,7 @@ pub async fn fetch_list_models(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn add_model_async(
     nvacl: &NavAbilityClient,
     model_label: &String,
@@ -95,7 +95,7 @@ pub async fn add_model_async(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn add_entry_model_async(
     nvacl: &NavAbilityClient,
     model_label: &String,
@@ -146,7 +146,7 @@ pub async fn add_entry_model_async(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_list_model_graphs(
     nvacl: NavAbilityClient,
     mlabel: Option<&str>, // FIXME must exist

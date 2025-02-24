@@ -78,7 +78,7 @@ int main(void) {
     normal = FullNormal_new(3,mn,cv);
     
     Pose3Pose3_FullNormal *pf = NULL;
-    pf = Pose3Pose3(normal);
+    pf = Pose3Pose3_new(normal);
 
     freeR(pf);
     freeR(normal);

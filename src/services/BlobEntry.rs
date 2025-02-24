@@ -6,7 +6,7 @@ use crate::{
   SDK_VERSION
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
   chrono::ParseError, 
   get_variable, 
@@ -28,7 +28,7 @@ use crate::{
   NavAbilityClient,
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[macro_use]
 use crate::{
   BlobEntrySummaryImporters,
@@ -39,26 +39,26 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use get_blob_entry::blobEntry_fields as GB_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use get_variable::blobEntry_fields as GV_BlobEntryFields;
 
 // duplication in blobEntry_fields GQL fragments in different queries
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 BlobEntry_importers!(GB_BlobEntryFields);
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 BlobEntry_importers!(GV_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use get_agents::blobEntry_fields_summary as GAs_BlobEntrySummary;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 BlobEntry_importers_summary!(GAs_BlobEntrySummary);
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::get_agent::blobEntry_fields_summary as GA_BlobEntrySummary;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 BlobEntry_importers_summary!(GA_BlobEntrySummary);
 
 
@@ -76,7 +76,7 @@ impl BlobEntry {
     return be
   }
   
-  #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "blocking"))]
   pub fn from_gql_summary(
     begql: &impl BlobEntrySummaryImporters,
   ) -> Self {
@@ -90,7 +90,7 @@ impl BlobEntry {
     return be;
   }
   
-  #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "blocking"))]
   pub fn from_gql(
     begql: &impl BlobEntryFieldsImporters,
   ) -> Self {
@@ -115,7 +115,7 @@ impl BlobEntry {
     return be;
   }
   
-  #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "blocking"))]
   pub fn try_from_receiver(
     rx: &std::sync::mpsc::Receiver<Vec<BlobEntry>>, //get_blob_entry::ResponseData>
   ) -> Option<Vec<Self>> {
@@ -135,7 +135,7 @@ impl BlobEntry {
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_get_blob_entry(
   nvacl: &NavAbilityClient,
   id: Uuid
@@ -181,7 +181,7 @@ pub async fn post_get_blob_entry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))]
 pub async fn get_blob_entry_send(
   send_into: std::sync::mpsc::Sender<Vec<BlobEntry>>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -196,7 +196,7 @@ pub async fn get_blob_entry_send(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_delete_blobentry(
   nvacl: &NavAbilityClient,
   id: Uuid,
@@ -220,7 +220,7 @@ pub async fn post_delete_blobentry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn delete_blobentry_send(
   send_into: std::sync::mpsc::Sender<delete_blob_entry::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -252,7 +252,7 @@ pub fn deleteBlobEntry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_update_blobentry_metadata(
   nvacl: &NavAbilityClient,
   id: &Uuid,

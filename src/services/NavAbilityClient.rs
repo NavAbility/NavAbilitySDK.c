@@ -1,5 +1,5 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     Uuid,
     Client,
@@ -8,7 +8,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl GetId for NavAbilityClient {
     fn getId(
         &self, 
@@ -22,7 +22,7 @@ impl GetId for NavAbilityClient {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl NavAbilityClient {
     pub fn new(
         apiurl: &String, 

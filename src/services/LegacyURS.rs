@@ -14,7 +14,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     NavAbilityClient,
     check_deser,
@@ -60,7 +60,7 @@ pub fn fetch_ur_list_blocking(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn fetch_urs_async(
     nvacl: &NavAbilityClient,
     // robot_label: String,

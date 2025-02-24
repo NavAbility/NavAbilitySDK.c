@@ -1,7 +1,7 @@
 
 
 use crate::GetLabel;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
   Utc,
   Uuid,
@@ -24,7 +24,7 @@ use crate::{
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn fetch_list_graphs(
   nvacl: &NavAbilityClient,
   id: &Uuid,
@@ -49,7 +49,7 @@ pub async fn fetch_list_graphs(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_add_factorgraph(
   nvacl: &NavAbilityClient,
   label: &str,
@@ -80,7 +80,7 @@ pub async fn post_add_factorgraph(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn add_factorgraph_send(
   send_into: std::sync::mpsc::Sender<crate::add_factorgraph::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -123,7 +123,7 @@ pub fn addFactorgraph(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_add_graph_entry(
   nvacl: &NavAbilityClient,
   fg_label: &String,
@@ -177,7 +177,7 @@ pub async fn post_add_graph_entry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_connect_graph_agent(
   nvacl: &NavAbilityClient,
   graph: &str,
@@ -207,7 +207,7 @@ pub async fn post_connect_graph_agent(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_find_org_model_fgs(
   nvacl: &NavAbilityClient,
   model_label_contains: Option<String>,
@@ -236,7 +236,7 @@ pub async fn post_find_org_model_fgs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn find_org_model_fgs_send(
   send_into: std::sync::mpsc::Sender<crate::find_org_model_graphs::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
