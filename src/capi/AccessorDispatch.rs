@@ -124,6 +124,7 @@ fn free_RVec_Agent (
     free_rvec::<crate::Agent>(*rvec)
 }
 
+
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
 #[no_mangle] pub extern "C" 
@@ -137,6 +138,61 @@ fn free_Agent(
 fn free_VariableDFG(
     _: Option<Box<crate::VariableDFG>>
 ) {}
+
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_PriorPoint2(
+    _: Option<Box<crate::PriorPoint2<crate::FullNormal>>>
+) {}
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_PriorPoint3(
+    _: Option<Box<crate::PriorPoint3<crate::FullNormal>>>
+) {}
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_PriorPose2(
+    _: Option<Box<crate::PriorPose2<crate::FullNormal>>>
+) {}
+
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_PriorPose3(
+    _: Option<Box<crate::PriorPose3<crate::FullNormal>>>
+) {}
+
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_Point2Point2(
+    _: Option<Box<crate::Point2Point2<crate::FullNormal>>>
+) {}
+
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_Point3Point3(
+    _: Option<Box<crate::Point3Point3<crate::FullNormal>>>
+) {}
+
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_Pose2Pose2(
+    _: Option<Box<crate::Pose2Pose2<crate::FullNormal>>>
+) {}
+
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
