@@ -6,24 +6,25 @@ use uuid::Uuid;
 use core::slice;
 
 use std::{
-    ptr,
-    os::raw::{
-        c_char,
-        c_uchar,
-        // c_void, 
-    },
-    // ffi::{
-    //     CString,
-    //     CStr
-    // },
+  ptr,
+  os::raw::{
+    c_char,
+    c_uchar,
+    // c_void, 
+  },
+  // ffi::{
+  //     CString,
+  //     CStr
+  // },
 };
 
 use crate::{
-    convert_str,
-    cstr_to_str,
-    parse_str_utc,
-    to_console_error,
-    to_console_debug
+  NavAbilityClient,
+  convert_str,
+  cstr_to_str,
+  parse_str_utc,
+  to_console_error,
+  to_console_debug
 };
 
 // use crate::post_blob_singlepart;
@@ -84,4 +85,34 @@ fn addBlob(
   );
 
   return convert_str(&retbid);
+}
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn deleteBlob<'a>(
+  nvacl_: Option<&NavAbilityClient>,
+  blob_id: *const c_char,
+  store: Option<&'a c_char>,
+) {
+  if nvacl_.is_none() {
+    to_console_error("deleteBlob: the provided *NavAbilityClient is NULL");
+    return ();
+  }
+  let mut storelbl = None;
+  if nvacl_.is_none() {
+    storelbl = Some(cstr_to_str(store.unwrap()));
+  }
+
+  let bid = Uuid::parse_str(cstr_to_str(blob_id)).expect("Cannot parse blobId string to uuid");
+  let ret = crate::services::deleteBlob(
+    nvacl_.unwrap(),
+    bid,
+    storelbl
+  );
+
+  to_console_debug(&format!("finished deleting blobId {:?}", bid));
+
+  ();
 }

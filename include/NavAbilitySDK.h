@@ -156,6 +156,8 @@ struct Option_____c_char addVariable(const struct NavAbilityDFG *nvafg,
                                      struct Option_usize _nstime,
                                      struct Option______c_char _metadata);
 
+void deleteBlob(const struct NavAbilityClient *nvacl_, const char *blob_id, const char *store);
+
 void free_Agent(struct Agent*);
 
 void free_BlobEntry(struct BlobEntry*);
