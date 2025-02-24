@@ -228,6 +228,41 @@ pub async fn post_blob_singlepart(
 
 
 
+// TODO , feature = "blocking"
+#[cfg(any(feature = "tokio", feature = "thread"))]
+#[allow(non_snake_case)]
+pub fn addBlob(
+  nvacl_: NavAbilityClient,
+  blobId: Uuid,
+  filename: &str,
+  file_mime: &str,
+  file_timestamp: &chrono::DateTime<Utc>,
+  file_bytes: std::sync::Arc<[u8]>,
+) {
+
+  let nvacl = nvacl_.clone();
+  let blobId_ = blobId.clone();
+  let filename_ = filename.to_string();
+  let mime_  = file_mime.to_string();
+  let timestamp_ = file_timestamp.clone();
+  let nbytes = (*file_bytes).len();
+  let mut bytes = vec![0u8];
+  bytes.resize(nbytes, 0x00);
+  bytes[..nbytes].clone_from_slice(&file_bytes);
+
+  crate::execute(async move {
+    let ret = crate::services::post_blob_singlepart(
+      &nvacl,
+      blobId_.clone(),
+      &filename_,
+      &mime_,
+      &timestamp_,
+      bytes.into(),
+    ).await;
+  });
+}
+
+
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_delete_blob(
@@ -282,6 +317,14 @@ pub fn deleteBlob(
   blob_id: Uuid,
   label: Option<&str>,
 ) -> Result<delete_blob::ResponseData, Box<dyn Error>> {
+  // // TODO
+  // crate::execute( async {
+  //   let _ = post_delete_blob(
+  //     nvacl,
+  //     blob_id,
+  //     label,
+  //   ).await;
+  // });
   return tokio::runtime::Builder::new_current_thread()
   .enable_all()
   .build()
