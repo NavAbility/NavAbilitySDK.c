@@ -101,7 +101,9 @@ int main(void) {
     char* bid = NULL;
     char* buffer = "{\"key\": \"Here is some test data.\"}";
     bid = addBlob(nvacl, "testdata", "plain/text", buffer, strlen(buffer)); 
-    printf("C uploaded blobId: %s\n", bid);
+    printf("Uploaded blobId: %s\n", bid);
+
+    deleteBlob(nvacl, bid, NULL);
 
     freeR(variable);
     freeR(nvafg);
