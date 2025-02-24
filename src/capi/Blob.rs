@@ -62,8 +62,6 @@ fn addBlob(
 
   let bytes = slice::from_raw_parts(data, nbytes);
 
-  to_console_debug(&format!("got [u8]: {:?}", bytes));
-
   let nvacl = (*nvacl_.unwrap()).clone();
 
   let blobId = Uuid::new_v4();
@@ -75,8 +73,6 @@ fn addBlob(
   // use bytes; if ownership is required, then:
   let owned_bytes = bytes.to_vec();
   let data_bytes: std::sync::Arc<[u8]> = vec_i8_into_u8(owned_bytes).into();
-
-  to_console_debug(&format!("capi bytes: {:?}", &data_bytes));
 
   crate::services::addBlob(
     nvacl,
