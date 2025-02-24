@@ -233,22 +233,16 @@ pub async fn delete_blobentry_send(
 }
 
 
-#[cfg(feature = "tokio")]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[allow(non_snake_case)]
 pub fn deleteBlobEntry(
   nvacl: &NavAbilityClient,
   id: Uuid,
 ) -> Result<delete_blob_entry::ResponseData, Box<dyn Error>> {
-  return tokio::runtime::Builder::new_current_thread()
-  .enable_all()
-  .build()
-  .unwrap()
-  .block_on(
-    post_delete_blobentry(
-      nvacl,
-      id,
-    )
-  );
+  crate::execute(post_delete_blobentry(
+    nvacl,
+    id,
+  ))
 }
 
 
