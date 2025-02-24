@@ -29,7 +29,7 @@ fetch-schema:
 .PHONY: fetch-schema
 
 install-sys-deps:
-	sudo apt install curl pkg-config libssl-dev -y
+	sudo apt install curl pkg-config libssl-dev xclip -y
 
 install-rust: install-sys-deps
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -54,6 +54,34 @@ update-api-token: default-browser-firefox-api default-browser-chromium-api defau
 	@echo ""
 	@echo "Find the newly opened browser and log in to Nva App, then run the following command in your terminal:"
 	@echo "$(bold)export NAVABILITY_API_TOKEN=<paste your token here>$(sgr0)"
+
+# Copy output of command to clipboard
+nva-api-url-to-clipboard:
+	@echo "Dumping the contents of env variable NVA_API_URL into the clipboard"
+	@echo $(NVA_API_URL) | tr -d '\n' | xclip -selection clipboard
+
+# Copy output of command to clipboard
+nva-api-token-to-clipboard:
+	@echo "Dumping the contents of env variable NVA_API_TOKEN into the clipboard"
+	@echo $(NVA_API_TOKEN) | tr -d '\n' | xclip -selection clipboard
+	
+# Retrieve text from clipboard
+nva-api-token-from-clipboard:
+	@echo "Dumping the clipboard into env variable NVA_API_TOKEN"
+	$(NVA_API_TOKEN)=$(xclip -o -selection clipboard)
+
+# Retrieve text from clipboard
+nva-org-id-from-clipboard:
+	@echo "Dumping the clipboard into env variable NVA_API_TOKEN"
+	$(NVA_ORG_ID)=$(xclip -o -selection clipboard)
+
+fetch-org-id-to-clipboard:
+	@echo "Fetching org-id and dumping into the clipboard: $(NVA_API_URL)"
+	@curl -s $(NVA_API_URL) \
+		-X POST \
+		-H 'Authorization: Bearer $(NVA_API_TOKEN)' \
+		-H 'content-type: application/json' \
+		--data '{ "query": "{ orgs { id } }" }' | grep -o -P "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" | tr -d '\n' | xclip -selection clipboard
 
 info: help
 .PHONY: info

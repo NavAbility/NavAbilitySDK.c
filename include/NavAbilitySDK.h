@@ -42,6 +42,18 @@ typedef struct Option_i64 Option_i64;
 
 typedef struct Option_usize Option_usize;
 
+typedef struct Point2Point2_FullNormal Point2Point2_FullNormal;
+
+typedef struct Point3Point3_FullNormal Point3Point3_FullNormal;
+
+/**
+ * Create a Pose2->Pose2 factor with a distribution Z representing the (x,y,th) relationship
+ * between the variables, e.g. `FullNormal([1;0;0], diagm(0.01*ones(3)))`.
+ *
+ * Example value: Z = `FullNormal(zeros(3), diagm(0.01*ones(3)))`.
+ */
+typedef struct Pose2Pose2_FullNormal Pose2Pose2_FullNormal;
+
 /**
  * Create a Pose3->Pose3 factor with a distribution Z representing the (x,y,z,a,b,c) relationship
  * between the variables, e.g. `FullNormal([1;zeros(5)], diagm(0.01*ones(6)))`.
@@ -49,6 +61,26 @@ typedef struct Option_usize Option_usize;
  * Example value: Z = `FullNormal(zeros(6), diagm(0.01*ones(6)))`.
  */
 typedef struct Pose3Pose3_FullNormal Pose3Pose3_FullNormal;
+
+typedef struct PriorPoint2_FullNormal PriorPoint2_FullNormal;
+
+typedef struct PriorPoint3_FullNormal PriorPoint3_FullNormal;
+
+/**
+ * Create a PriorPose2 factor with a distribution Z representing the (x,y,th) relationship
+ * between the variables, e.g. `FullNormal([1;0;0], diagm(0.01*ones(3)))`.
+ *
+ * Example value: Z = `FullNormal(zeros(3), diagm(0.01*ones(3)))`.
+ */
+typedef struct PriorPose2_FullNormal PriorPose2_FullNormal;
+
+/**
+ * Create a PriorPose3 factor with a distribution Z representing the (x,y,z,a,b,c) relationship
+ * between the variables, e.g. `FullNormal([1;zeros(5)], diagm(0.01*ones(6)))`.
+ *
+ * Example value: Z = `FullNormal(zeros(6), diagm(0.01*ones(6)))`.
+ */
+typedef struct PriorPose3_FullNormal PriorPose3_FullNormal;
 
 /**
  * The Variable information packed in a way that accomdates multi-lang using json.
@@ -89,7 +121,21 @@ struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
                                         const bool *addAgentIfAbsent,
                                         const bool *addGraphIfAbsent);
 
+struct Point2Point2_FullNormal *Point2Point2_new(const struct FullNormal *Z);
+
+struct Point3Point3_FullNormal *Point3Point3_new(const struct FullNormal *Z);
+
+struct Pose2Pose2_FullNormal *Pose2Pose2_new(const struct FullNormal *Z);
+
 struct Pose3Pose3_FullNormal *Pose3Pose3_new(const struct FullNormal *Z);
+
+struct PriorPoint2_FullNormal *PriorPoint2_new(const struct FullNormal *Z);
+
+struct PriorPoint3_FullNormal *PriorPoint3_new(const struct FullNormal *Z);
+
+struct PriorPose2_FullNormal *PriorPose2_new(const struct FullNormal *Z);
+
+struct PriorPose3_FullNormal *PriorPose3_new(const struct FullNormal *Z);
 
 const char *addAgentBlobEntry(const struct NavAbilityClient *_nvacl,
                               const char *agent_label,
