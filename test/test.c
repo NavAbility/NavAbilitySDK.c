@@ -105,6 +105,11 @@ int main(void) {
 
     deleteBlob(nvacl, bid, NULL);
 
+    // TODO add agent
+    // TODO add blobentry to agent
+    // TODO delete blobentry from agent
+    // TODO delete agent
+
     freeR(variable);
     freeR(nvafg);
     freeR(store);

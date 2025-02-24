@@ -137,9 +137,9 @@ struct PriorPose2_FullNormal *PriorPose2_new(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *PriorPose3_new(const struct FullNormal *Z);
 
-const char *addAgentBlobEntry(const struct NavAbilityClient *_nvacl,
+const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
-                              const struct BlobEntry *_entry);
+                              const struct BlobEntry *entry_);
 
 const char *addBlob(const struct NavAbilityClient *nvacl_,
                     const char *filename,
@@ -155,6 +155,10 @@ struct Option_____c_char addVariable(const struct NavAbilityDFG *nvafg,
                                      struct Option______c_char _timestamp,
                                      struct Option_usize _nstime,
                                      struct Option______c_char _metadata);
+
+void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
+                          const char *agent_label,
+                          const char *bentry_label);
 
 void deleteBlob(const struct NavAbilityClient *nvacl_, const char *blob_id, const char *store);
 
