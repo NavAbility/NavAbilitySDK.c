@@ -141,6 +141,12 @@ const char *addAgentBlobEntry(const struct NavAbilityClient *_nvacl,
                               const char *agent_label,
                               const struct BlobEntry *_entry);
 
+const char *addBlob(const struct NavAbilityClient *nvacl_,
+                    const char *filename,
+                    const char *mime,
+                    const char *data,
+                    size_t nbytes);
+
 struct Option_____c_char addVariable(const struct NavAbilityDFG *nvafg,
                                      const char *label,
                                      const char *variableType,

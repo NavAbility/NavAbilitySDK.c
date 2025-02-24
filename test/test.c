@@ -96,6 +96,13 @@ int main(void) {
     // int x;
     // typeof(x) y;
 
+    // test upload of blob
+    // char[] databuffer = ;
+    char* bid = NULL;
+    char* buffer = "{\"key\": \"Here is some test data.\"}";
+    bid = addBlob(nvacl, "testdata", "plain/text", buffer, strlen(buffer)); 
+    printf("C uploaded blobId: %s\n", bid);
+
     freeR(variable);
     freeR(nvafg);
     freeR(store);
@@ -106,6 +113,7 @@ int main(void) {
     get_apiurl(NULL);
     getAgents(NULL); 
     getVariable(NULL,"");
+
 
     printf("All done.\n");
     return 0;

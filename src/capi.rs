@@ -8,6 +8,9 @@ pub use Agents::*;
 mod BlobEntry;
 pub use BlobEntry::*;
 
+mod Blob;
+pub use Blob::*;
+
 mod Variables;
 pub use Variables::*;
 
