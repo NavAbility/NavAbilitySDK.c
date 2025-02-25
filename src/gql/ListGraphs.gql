@@ -1,7 +1,11 @@
-query ListGraphs($id: ID!) {
-    orgs(where: {id: $id}) {
-        fgs {
-            label
-        }
+query ListGraphs(
+  $id: ID!
+) {
+    orgs(
+      where: {id: $id}
+  ) {
+    fgs {
+      label
     }
+  }
 }

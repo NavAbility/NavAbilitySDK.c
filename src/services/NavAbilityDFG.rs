@@ -42,8 +42,6 @@ impl NavAbilityDFG {
         let _client = client.clone();
         let namespace = Uuid::parse_str(&client.user_label).unwrap();
         let storelb = storeLabel.unwrap_or("default");
-        
-        
 
         let fg = NvaNode::<Factorgraph>{
             namespace: namespace.clone(),
@@ -61,6 +59,30 @@ impl NavAbilityDFG {
         };
         let mut blobStores = HashMap::new();
         blobStores.insert(store.label.clone(), store);
+
+        // check if fgraph exists
+        let fgs = crate::services::listGraphs(client);
+        if !fgs.is_ok() || !fgs.unwrap().contains(&fgLabel.to_string()) {
+            let _ = crate::services::addFactorgraph(
+                client, 
+                fgLabel,
+                "",
+                "e30="
+            );
+        }
+
+        // check if agent exists
+        let agents = crate::services::listAgents(client);
+        if !agents.is_ok() || !agents.unwrap().contains(&agentLabel.to_string()) {
+            let _ = crate::services::addAgent(client, &(agentLabel.to_string()));
+        }
+
+        let _ = crate::services::connectAgentGraph(
+            client, 
+            agentLabel, 
+            fgLabel
+        );
+
         return Self {
             client: _client,
             fg,

@@ -25,27 +25,71 @@ use crate::{
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
-pub async fn fetch_list_graphs(
+pub async fn post_list_graphs(
   nvacl: &NavAbilityClient,
-  id: &Uuid,
-) -> Result<list_graphs::ResponseData, Box<dyn Error>> {
+) -> Result<Vec<String>, Box<dyn Error>> {
   
+  // let org_id = nvacl.getOrgId();
   let request_body = ListGraphs::build_query(list_graphs::Variables {
-    id: id.to_string()
+    id: nvacl.user_label.to_string()
   });
   
   return post_to_nvaapi::<
     list_graphs::Variables,
     list_graphs::ResponseData,
-    list_graphs::ResponseData
+    Vec<String>
   >(
     nvacl,
     request_body, 
-    |s| s,
+    |s| {
+      let mut ags = Vec::new();
+      for oa in s.orgs {
+        for a in oa.fgs {
+          ags.push(a.label);
+        }
+      }
+      return ags;
+    },
     Some(3)
   ).await;
 }
 
+
+#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+pub fn q_listGraphs(
+  send_into: Sender<Vec<String>>, 
+  nvacl: &NavAbilityClient,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return crate::send_api_result(
+      send_into, 
+      post_list_graphs(&nvacl).await,
+    );
+  })
+}
+
+#[cfg(feature = "wasm")]
+pub fn q_listGraphs(
+  send_into: Sender<Vec<String>>, 
+  nvacl: &NavAbilityClient,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  crate::execute(async move {
+    let _ = crate::send_api_result(
+      send_into_, 
+      post_list_graphs(&nvacl_).await,
+    );
+  });
+}
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn listGraphs(
+  nvacl: &NavAbilityClient,
+) -> Result<Vec<String>, Box<dyn Error>> {
+  return crate::execute(post_list_graphs(nvacl));
+}
 
 
 
@@ -104,18 +148,12 @@ pub fn addFactorgraph(
   description: &str,
   metadata: &str,
 ) -> Result<crate::add_factorgraph::ResponseData, Box<dyn Error>> {
-  return tokio::runtime::Builder::new_current_thread()
-  .enable_all()
-  .build()
-  .unwrap()
-  .block_on(
-    post_add_factorgraph(
-      nvacl,
-      label,
-      description,
-      metadata
-    )
-  );
+  return crate::execute(post_add_factorgraph(
+    nvacl,
+    label,
+    description,
+    metadata
+  ));
 }
 
 
@@ -204,6 +242,22 @@ pub async fn post_connect_graph_agent(
   ).await;
 }
 
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn connectAgentGraph(
+  nvacl: &NavAbilityClient,
+  graph: &str,
+  agent: &str,
+) -> Result<crate::connect_graph_agent::ResponseData, Box<dyn Error>> {
+  return crate::execute(
+    post_connect_graph_agent(
+      nvacl,
+      graph,
+      agent
+    )
+  );
+}
 
 
 
