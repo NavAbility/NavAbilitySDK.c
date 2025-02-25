@@ -19,7 +19,21 @@ typedef struct Agent Agent;
  */
 typedef struct BlobEntry BlobEntry;
 
+typedef struct FactorDFG_Point2Point2_FullNormal FactorDFG_Point2Point2_FullNormal;
+
+typedef struct FactorDFG_Point3Point3_FullNormal FactorDFG_Point3Point3_FullNormal;
+
+typedef struct FactorDFG_Pose2Pose2_FullNormal FactorDFG_Pose2Pose2_FullNormal;
+
 typedef struct FactorDFG_Pose3Pose3_FullNormal FactorDFG_Pose3Pose3_FullNormal;
+
+typedef struct FactorDFG_PriorPoint2_FullNormal FactorDFG_PriorPoint2_FullNormal;
+
+typedef struct FactorDFG_PriorPoint3_FullNormal FactorDFG_PriorPoint3_FullNormal;
+
+typedef struct FactorDFG_PriorPose2_FullNormal FactorDFG_PriorPose2_FullNormal;
+
+typedef struct FactorDFG_PriorPose3_FullNormal FactorDFG_PriorPose3_FullNormal;
 
 /**
  * Multidimensional normal distribution specified by means and a covariance matrix.
@@ -168,7 +182,21 @@ void free_Agent(struct Agent*);
 
 void free_BlobEntry(struct BlobEntry*);
 
+void free_FactorDFG_Point2Point2_FullNormal(struct FactorDFG_Point2Point2_FullNormal*);
+
+void free_FactorDFG_Point3Point3_FullNormal(struct FactorDFG_Point3Point3_FullNormal*);
+
+void free_FactorDFG_Pose2Pose2_FullNormal(struct FactorDFG_Pose2Pose2_FullNormal*);
+
 void free_FactorDFG_Pose3Pose3_FullNormal(struct FactorDFG_Pose3Pose3_FullNormal*);
+
+void free_FactorDFG_PriorPoint2_FullNormal(struct FactorDFG_PriorPoint2_FullNormal*);
+
+void free_FactorDFG_PriorPoint3_FullNormal(struct FactorDFG_PriorPoint3_FullNormal*);
+
+void free_FactorDFG_PriorPose2_FullNormal(struct FactorDFG_PriorPose2_FullNormal*);
+
+void free_FactorDFG_PriorPose3_FullNormal(struct FactorDFG_PriorPose3_FullNormal*);
 
 void free_FullNormal(struct FullNormal*);
 
@@ -322,8 +350,22 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
         NavAbilityDFG*:           free_NavAbilityDFG,         \
         VariableDFG*:             free_VariableDFG,           \
         FullNormal*:              free_FullNormal,            \
+        PriorPoint2_FullNormal*:   free_PriorPoint2,          \
+        PriorPoint3_FullNormal*:   free_PriorPoint3,          \
+        PriorPose2_FullNormal*:   free_PriorPose2,            \
+        PriorPose3_FullNormal*:   free_PriorPose3,            \
+        Point2Point2_FullNormal*:   free_Point2Point2,        \
+        Point3Point3_FullNormal*:   free_Point3Point3,        \
+        Pose2Pose2_FullNormal*:   free_Pose2Pose2,            \
         Pose3Pose3_FullNormal*:   free_Pose3Pose3,            \
-        struct FactorDFG_Pose3Pose3_FullNormal*:   free_FactorDFG_Pose3Pose3_FullNormal            \
+        struct FactorDFG_PriorPoint2_FullNormal*:    free_FactorDFG_PriorPoint2_FullNormal,              \ 
+        struct FactorDFG_PriorPoint3_FullNormal*:    free_FactorDFG_PriorPoint3_FullNormal,              \ 
+        struct FactorDFG_PriorPose2_FullNormal*:    free_FactorDFG_PriorPose2_FullNormal,                \ 
+        struct FactorDFG_PriorPose3_FullNormal*:    free_FactorDFG_PriorPose3_FullNormal,                \ 
+        struct FactorDFG_Point2Point2_FullNormal*:    free_FactorDFG_Point2Point2_FullNormal,            \ 
+        struct FactorDFG_Point3Point3_FullNormal*:    free_FactorDFG_Point3Point3_FullNormal,            \ 
+        struct FactorDFG_Pose2Pose2_FullNormal*:    free_FactorDFG_Pose2Pose2_FullNormal,                \ 
+        struct FactorDFG_Pose3Pose3_FullNormal*:    free_FactorDFG_Pose3Pose3_FullNormal                \ 
     ) (obj)
 
 
