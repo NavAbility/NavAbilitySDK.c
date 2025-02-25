@@ -95,7 +95,8 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
         NavAbilityDFG*:           free_NavAbilityDFG,         \
         VariableDFG*:             free_VariableDFG,           \
         FullNormal*:              free_FullNormal,            \
-        Pose3Pose3_FullNormal*:   free_Pose3Pose3            \
+        Pose3Pose3_FullNormal*:   free_Pose3Pose3,            \
+        struct FactorDFG_Pose3Pose3_FullNormal*:   free_FactorDFG_Pose3Pose3_FullNormal            \
     ) (obj)
 
 

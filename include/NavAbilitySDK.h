@@ -19,6 +19,8 @@ typedef struct Agent Agent;
  */
 typedef struct BlobEntry BlobEntry;
 
+typedef struct FactorDFG_Pose3Pose3_FullNormal FactorDFG_Pose3Pose3_FullNormal;
+
 /**
  * Multidimensional normal distribution specified by means and a covariance matrix.
  */
@@ -165,6 +167,8 @@ void deleteBlob(const struct NavAbilityClient *nvacl_, const char *blob_id, cons
 void free_Agent(struct Agent*);
 
 void free_BlobEntry(struct BlobEntry*);
+
+void free_FactorDFG_Pose3Pose3_FullNormal(struct FactorDFG_Pose3Pose3_FullNormal*);
 
 void free_FullNormal(struct FullNormal*);
 
@@ -318,7 +322,8 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
         NavAbilityDFG*:           free_NavAbilityDFG,         \
         VariableDFG*:             free_VariableDFG,           \
         FullNormal*:              free_FullNormal,            \
-        Pose3Pose3_FullNormal*:   free_Pose3Pose3            \
+        Pose3Pose3_FullNormal*:   free_Pose3Pose3,            \
+        struct FactorDFG_Pose3Pose3_FullNormal*:   free_FactorDFG_Pose3Pose3_FullNormal            \
     ) (obj)
 
 

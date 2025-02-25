@@ -139,6 +139,12 @@ fn free_VariableDFG(
     _: Option<Box<crate::VariableDFG>>
 ) {}
 
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_FullNormal(
+    _: Option<Box<crate::FullNormal>>
+) {}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
@@ -199,13 +205,6 @@ fn free_Pose2Pose2(
 #[no_mangle] pub extern "C" 
 fn free_Pose3Pose3(
     _: Option<Box<crate::Pose3Pose3<crate::FullNormal>>>
-) {}
-
-// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
-#[allow(non_snake_case)]
-#[no_mangle] pub extern "C" 
-fn free_FullNormal(
-    _: Option<Box<crate::FullNormal>>
 ) {}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.

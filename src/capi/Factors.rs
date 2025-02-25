@@ -138,15 +138,13 @@ GenFactorDFG_Type!(Pose2Pose2, FactorDFG_Pose2Pose2_FullNormal_new);
 GenFactorDFG_Type!(Pose3Pose3, FactorDFG_Pose3Pose3_FullNormal_new);
 
 
-// #[allow(non_snake_case)]
-// #[no_mangle] pub unsafe extern "C" 
-// fn FactorDFG_Pose2Pose2_FullNormal_new<'a>(
-//     varlbls: *const *const c_char,
-//     varlbls_len: usize,
-//     fnc: Option<&crate::Pose2Pose2<FullNormal<'a>>>,
-// ) -> Option<Box<crate::FactorDFG<crate::Pose2Pose2<FullNormal<'a>>>>> {
-//     todo!()
-// }
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
+fn free_FactorDFG_Pose3Pose3_FullNormal(
+    _: Option<Box<crate::FactorDFG<crate::Pose3Pose3<crate::FullNormal<'_>>>>>
+) {}
+
 
 
 //
