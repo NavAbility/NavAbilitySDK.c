@@ -80,10 +80,10 @@ GenDistrFactor!(Pose3Pose3);
 // =======================================================
 
 
-fn assemble_factor_name(ovlb: Vec<&str>) -> String {
+fn assemble_factor_name(ovlb: Vec<String>) -> String {
   let mut flb = "".to_string();
   for o in ovlb {
-    flb += o;
+    flb += &o;
   }
   flb += "_";
   flb += &(Uuid::new_v4().to_string()[0..4]);
@@ -154,9 +154,9 @@ where
   /// # Note
   /// * This is a simplified version of the ::new_more function, which has more options.
   pub fn new(
-    varlbls: Vec<&str>,
+    varlbls: Vec<String>,
     fnctype: F,
-    tags: Vec<&str>,
+    tags: Vec<String>,
     timestamp: Option<DateTime<Utc>>,
     nstime: Option<usize>,
   ) -> Self {
@@ -182,9 +182,9 @@ where
   /// # Returns
   /// * `FactorDFG` - a new factor
   pub fn new_more(
-    varlbls: Vec<&str>,
+    varlbls: Vec<String>,
     fnctype: F,
-    tags: Vec<&str>,
+    tags: Vec<String>,
     timestamp: Option<DateTime<Utc>>,
     nstime: Option<usize>,
     solvable: Option<i64>,
