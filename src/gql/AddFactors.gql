@@ -1,0 +1,33 @@
+
+fragment factor_skeleton_fields on Factor {
+  id
+  label
+  tags
+  _variableOrderSymbols
+}
+
+fragment factor_summary_fields on Factor {
+  timestamp
+  nstime
+}
+
+fragment factor_full_fields on Factor {
+  fnctype
+  solvable
+  data
+  metadata
+  _version
+}
+
+
+mutation AddFactors($factorsToCreate: [FactorCreateInput!]!) {
+  addFactors(
+    input: $factorsToCreate
+  ) {
+    factors {
+      ...factor_skeleton_fields
+      ...factor_summary_fields
+      ...factor_full_fields
+    }
+  }
+}

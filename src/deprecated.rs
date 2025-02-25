@@ -6,7 +6,10 @@ use crate::{
 };
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[macro_use]
 use crate::{
+    genGetLabel,
+    GetLabel,
     Sender,
     Error,
     send_api_result,
@@ -19,6 +22,11 @@ use crate::{
 
 
 // ================== DEPRECATED ===================
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+genGetLabel!(Session);
+
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 #[deprecated(since="0.1.0", note="please use send_api_result(send_into, `response_body=Ok(data)`) instead")]

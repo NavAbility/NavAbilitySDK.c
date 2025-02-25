@@ -212,7 +212,7 @@ pub async fn post_get_agents(
 }
 
 
-#[cfg(feature = "tokio")]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub fn getAgents(
   nvacl: &NavAbilityClient,
   label_contains: String,
@@ -222,7 +222,7 @@ pub fn getAgents(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio", feature = "thread"))] 
 pub fn q_getAgents(
   send_into: Sender<Vec<Agent>>, 
   nvacl: &NavAbilityClient,
