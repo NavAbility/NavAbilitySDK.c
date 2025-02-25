@@ -17,8 +17,10 @@ use std::{
 };
 
 
+
 use crate::{
   FullNormal,
+  entities::Factors::FactorType,
 };
 
 
@@ -96,10 +98,10 @@ fn Pose3Pose3_new<'a>(
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn FactorDFG<T>(
+fn FactorDFG<'a, F: FactorType<'a, FullNormal<'a>>>(
     varlbls: *const *const c_char,
     varlbls_len: usize,
-    fnc: T
+    fnc: F
 ) -> Option<Box<crate::VariableDFG>> {
     // const char *a[2];
     // a[0] = "x1";
@@ -108,10 +110,16 @@ fn FactorDFG<T>(
     for i in 0..varlbls_len {
         let v = *varlbls.offset(i as isize);
         let s = CStr::from_ptr(v).to_string_lossy().into_owned();
-        ovlb.push(s);
+        ovlb.push(s.as_str());
     }
     
-    let f = FactorDFG::new(ovlb, fnc);
+    let f = crate::FactorDFG::new(
+        ovlb, 
+        fnc,
+        Vec::new(),
+        None,
+        None
+    );
 
     todo!()
     // return Box::new(Some(
