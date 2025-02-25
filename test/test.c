@@ -79,9 +79,10 @@ int main(void) {
     
     Pose3Pose3_FullNormal *pf = NULL;
     pf = Pose3Pose3_new(normal);
-
-    FactorDFG *fd = NULL;
-    fd = FactorDFG(pf);
+    const char *vl[2];
+    vl[0] = "x1";
+    vl[1] = "x2";
+    FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
 
     freeR(pf);
     freeR(normal);

@@ -19,6 +19,8 @@ typedef struct Agent Agent;
  */
 typedef struct BlobEntry BlobEntry;
 
+typedef struct FactorDFG_Pose3Pose3_FullNormal FactorDFG_Pose3Pose3_FullNormal;
+
 /**
  * Multidimensional normal distribution specified by means and a covariance matrix.
  */
@@ -104,6 +106,10 @@ struct BlobEntry *BlobEntry_new(const char *blobId,
                                 const char *mimeType,
                                 const char *metadata,
                                 const char *timestamp);
+
+struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(const char *const *varlbls,
+                                                                            size_t varlbls_len,
+                                                                            const struct Pose3Pose3_FullNormal *fnc);
 
 struct FullNormal *FullNormal_new(size_t dim, const double *array_mean, const double *array_covr);
 

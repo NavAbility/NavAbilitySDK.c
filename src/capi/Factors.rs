@@ -96,16 +96,17 @@ fn Pose3Pose3_new<'a>(
 }
 
 
+
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn FactorDFG<'a, F: FactorType<'a, FullNormal<'a>> + Clone>(
+fn FactorDFG_Pose3Pose3_FullNormal_new<'a>(
     varlbls: *const *const c_char,
     varlbls_len: usize,
-    fnc: Option<&F>,
-) -> Option<Box<crate::VariableDFG>> {
-    // const char *a[2];
-    // a[0] = "x1";
-    // a[1] = "x23";
+    fnc: Option<&crate::Pose3Pose3<FullNormal<'a>>>,
+) -> Option<Box<crate::FactorDFG<crate::Pose3Pose3<FullNormal<'a>>>>> {
+
+
     let mut ovlb = Vec::new();
     for i in 0..varlbls_len {
         let v = *varlbls.offset(i as isize);
@@ -121,8 +122,8 @@ fn FactorDFG<'a, F: FactorType<'a, FullNormal<'a>> + Clone>(
         None
     );
 
-    todo!()
-    // return Box::new(Some(
-    // ));
+    return return Some(Box::new( f ));
 }
 
+
+//
