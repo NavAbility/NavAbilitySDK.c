@@ -1,4 +1,64 @@
 
+// manually define the prototypes for the FactorDFG functions we need
+
+
+struct FactorDFG_PriorPoint2_FullNormal *FactorDFG_PriorPoint2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPoint2_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPoint3_FullNormal *FactorDFG_PriorPoint3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPoint3_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPose2_FullNormal *FactorDFG_PriorPose2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPose2_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPose3_FullNormal *FactorDFG_PriorPose3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPose3_FullNormal *fnc
+);
+
+
+struct FactorDFG_Point2Point2_FullNormal *FactorDFG_Point2Point2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Point2Point2_FullNormal *fnc
+);
+
+struct FactorDFG_Point3Point3_FullNormal *FactorDFG_Point3Point3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Point3Point3_FullNormal *fnc
+);
+
+struct FactorDFG_Pose2Pose2_FullNormal *FactorDFG_Pose2Pose2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Pose2Pose2_FullNormal *fnc
+);
+
+
+struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Pose3Pose3_FullNormal *fnc
+);
+
+
+
+
+
 // Overloading via C macros using _Generic
 
 // https://stackoverflow.com/a/73458289 

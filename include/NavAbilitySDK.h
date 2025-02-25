@@ -19,8 +19,6 @@ typedef struct Agent Agent;
  */
 typedef struct BlobEntry BlobEntry;
 
-typedef struct FactorDFG_Pose3Pose3_FullNormal FactorDFG_Pose3Pose3_FullNormal;
-
 /**
  * Multidimensional normal distribution specified by means and a covariance matrix.
  */
@@ -106,10 +104,6 @@ struct BlobEntry *BlobEntry_new(const char *blobId,
                                 const char *mimeType,
                                 const char *metadata,
                                 const char *timestamp);
-
-struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(const char *const *varlbls,
-                                                                            size_t varlbls_len,
-                                                                            const struct Pose3Pose3_FullNormal *fnc);
 
 struct FullNormal *FullNormal_new(size_t dim, const double *array_mean, const double *array_covr);
 
@@ -227,6 +221,66 @@ size_t length(const struct RVec_Agent *rv_agent);
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);
+
+// manually define the prototypes for the FactorDFG functions we need
+
+
+struct FactorDFG_PriorPoint2_FullNormal *FactorDFG_PriorPoint2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPoint2_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPoint3_FullNormal *FactorDFG_PriorPoint3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPoint3_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPose2_FullNormal *FactorDFG_PriorPose2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPose2_FullNormal *fnc
+);
+
+
+struct FactorDFG_PriorPose3_FullNormal *FactorDFG_PriorPose3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct PriorPose3_FullNormal *fnc
+);
+
+
+struct FactorDFG_Point2Point2_FullNormal *FactorDFG_Point2Point2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Point2Point2_FullNormal *fnc
+);
+
+struct FactorDFG_Point3Point3_FullNormal *FactorDFG_Point3Point3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Point3Point3_FullNormal *fnc
+);
+
+struct FactorDFG_Pose2Pose2_FullNormal *FactorDFG_Pose2Pose2_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Pose2Pose2_FullNormal *fnc
+);
+
+
+struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
+    const char *const *varlbls,
+    size_t varlbls_len,
+    const struct Pose3Pose3_FullNormal *fnc
+);
+
+
+
+
 
 // Overloading via C macros using _Generic
 
