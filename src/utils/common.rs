@@ -26,6 +26,17 @@ use tokio;
 
 
 
+// helper macro to avoid repetition of "basic" impl Coordinates
+#[macro_export]
+macro_rules! genGetLabel { 
+    ($T:ident) => {
+        impl GetLabel for $T {
+            fn getLabel(&self) -> &String { &self.label }
+        }
+    }
+}
+
+
 #[cfg(feature = "thread")]
 pub fn execute<R, F: Future<Output = R>>(  //  + Send + 'static
 f: F

@@ -79,7 +79,13 @@ int main(void) {
     
     Pose3Pose3_FullNormal *pf = NULL;
     pf = Pose3Pose3_new(normal);
+    const char *vl[2];
+    vl[0] = "x1";
+    vl[1] = "x2";
+    struct FactorDFG_Pose3Pose3_FullNormal *f = NULL;
+    f = FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
 
+    freeR(f);
     freeR(pf);
     freeR(normal);
 

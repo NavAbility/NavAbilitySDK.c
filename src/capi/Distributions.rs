@@ -53,8 +53,8 @@ fn FullNormal_new<'a>(
 ) -> Box<crate::FullNormal<'a>> {
     // https://stackoverflow.com/a/29183118
     let normal = crate::FullNormal {
-        mean: std::slice::from_raw_parts(array_mean as *const f64, dim as usize),
-        covr: std::slice::from_raw_parts(array_covr as *const f64, dim*dim as usize)
+        mu: std::slice::from_raw_parts(array_mean as *const f64, dim as usize),
+        cov: std::slice::from_raw_parts(array_covr as *const f64, dim*dim as usize)
     };
 
     return Box::new(normal)

@@ -38,6 +38,8 @@ install-rust: install-sys-deps
 install-rust-deps:
 	@echo "Remember to first run 'make install-rust' or 'make install-sys-deps' if you have not already done so, or check this Makefile if you unsure of the impact."
 	cargo install graphql_client_cli
+	cargo install cbindgen
+.PHONY: install-rust-deps
 
 generate-cbindgen-cpp:
 	cbindgen  --config cbindgen.toml --crate navabilitysdk --output include/NavAbilitySDK.hpp

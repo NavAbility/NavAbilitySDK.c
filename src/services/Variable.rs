@@ -12,6 +12,7 @@ use crate::{
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
+    GQLResponseEmptyError,
     Error,     
     Sender, 
     Response, 
@@ -276,7 +277,6 @@ pub async fn post_get_variable(
     label: &str,
     fields_full: bool,
 ) -> Result<Option<VariableDFG>, Box<dyn Error>> {
-    use crate::GQLResponseEmptyError;
 
     let id = nvafg.fg.getId(label); 
     let request_body = GetVariable::build_query(
@@ -491,18 +491,14 @@ pub fn addVariable(
     _nstime: Option<usize>,
     _metadata: Option<String>,
 ) -> Result<Uuid, Box<dyn Error>> {
-    return tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(post_add_variable(
-            nvafg,
-            label,
-            variableType,
-            _tags,
-            _solvable,
-            _timestamp,
-            _nstime,
-            _metadata,
-        ));
+    return crate::execute(post_add_variable(
+        nvafg,
+        label,
+        variableType,
+        _tags,
+        _solvable,
+        _timestamp,
+        _nstime,
+        _metadata,
+    ));
 }
