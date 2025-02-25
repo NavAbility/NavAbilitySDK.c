@@ -136,7 +136,7 @@ pub async fn post_list_agents(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub fn listAgents(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -144,7 +144,7 @@ pub fn listAgents(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub fn q_listAgents(
   send_into: Sender<Vec<String>>, 
   nvacl: &NavAbilityClient,
@@ -318,9 +318,9 @@ pub async fn post_add_agent(
   let request_body = AddAgent::build_query(variables);
   
   return post_to_nvaapi::<
-  add_agent::Variables,
-  add_agent::ResponseData,
-  add_agent::ResponseData
+    add_agent::Variables,
+    add_agent::ResponseData,
+    add_agent::ResponseData
   >(
     nvacl,
     request_body, 
@@ -329,6 +329,51 @@ pub async fn post_add_agent(
   ).await;
 }
 
+
+#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+pub fn q_addAgent(
+  send_into: Sender<add_agent::ResponseData>, 
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return crate::send_api_result(
+      send_into, 
+      post_add_agent(&nvacl, agent_label).await,
+    );
+  })
+}
+
+#[cfg(feature = "wasm")]
+pub fn q_addAgent(
+  send_into: Sender<add_agent::ResponseData>, 
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  let ag_lbl_ = agent_label.clone();
+  crate::execute(async move {
+    crate::send_api_result(
+      send_into_, 
+      post_add_agent(&nvacl_, &ag_lbl_).await,
+    );
+    ()
+  });
+}
+
+#[cfg(feature = "tokio")]
+#[allow(non_snake_case)]
+pub fn addAgent(
+  nvacl: &NavAbilityClient,  
+  label: &String,
+) -> Result<crate::add_agent::ResponseData, Box<dyn Error>> {
+  return crate::execute(post_add_agent(
+    nvacl,
+    label,
+  ));
+}
 
 
 // ------------------------ Agent Entries Metadata ------------------------
