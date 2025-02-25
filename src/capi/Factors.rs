@@ -10,10 +10,10 @@ use std::{
       c_char,
       // c_void, 
   },
-  // ffi::{
+  ffi::{
   //     CString,
-  //     CStr
-  // },
+      CStr
+  },
 };
 
 
@@ -93,4 +93,28 @@ fn Pose3Pose3_new<'a>(
     return Box::new(crate::Pose3Pose3::new(Z.clone()))
 }
 
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn FactorDFG<T>(
+    varlbls: *const *const c_char,
+    varlbls_len: usize,
+    fnc: T
+) -> Option<Box<crate::VariableDFG>> {
+    // const char *a[2];
+    // a[0] = "x1";
+    // a[1] = "x23";
+    let mut ovlb = Vec::new();
+    for i in 0..varlbls_len {
+        let v = *varlbls.offset(i as isize);
+        let s = CStr::from_ptr(v).to_string_lossy().into_owned();
+        ovlb.push(s);
+    }
+    
+    let f = FactorDFG::new(ovlb, fnc);
+
+    todo!()
+    // return Box::new(Some(
+    // ));
+}
 

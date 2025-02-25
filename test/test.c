@@ -80,6 +80,9 @@ int main(void) {
     Pose3Pose3_FullNormal *pf = NULL;
     pf = Pose3Pose3_new(normal);
 
+    FactorDFG *fd = NULL;
+    fd = FactorDFG(pf);
+
     freeR(pf);
     freeR(normal);
 
