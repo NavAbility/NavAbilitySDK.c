@@ -157,7 +157,7 @@ const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
                               const struct BlobEntry *entry_);
 
-const char *addBlob(const struct NavAbilityClient *nvacl_,
+const char *addBlob(const struct NavAbilityBlobStore *nvabs_,
                     const char *filename,
                     const char *mime,
                     const char *data,

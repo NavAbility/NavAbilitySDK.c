@@ -55,10 +55,16 @@ impl NavAbilityDFG {
         };
         let store = NavAbilityBlobStore {
             client: _client.clone(),
-            label: storelb.to_owned(),
+            label: crate::NvaStoreLabel::cloud(storelb.to_owned()),
         };
         let mut blobStores = HashMap::new();
-        blobStores.insert(store.label.clone(), store);
+
+        let mut mkey = "".to_owned();
+        match &store.label {
+            crate::NvaStoreLabel::cloud(lb) => { mkey = lb.clone();},
+            crate::NvaStoreLabel::onprem(lb) => { mkey = lb.clone();},
+        }
+        blobStores.insert(mkey, store);
 
         // check if fgraph exists
         let fgs = crate::services::listGraphs(client);

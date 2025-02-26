@@ -1,4 +1,9 @@
 
+use serde::Serialize;
+
+use base64::{Engine as _, engine::{self, general_purpose}, alphabet};
+
+
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
   Utc,
@@ -9,6 +14,7 @@ use crate::{
   Sender,
   SDK_VERSION,
   NavAbilityClient,
+  NavAbilityBlobStore,
   CreateDownload,
   create_download,
   CreateUpload,
@@ -118,6 +124,7 @@ pub async fn create_upload_send(
 }
 
 
+// TODO update to new query/mutation pattern
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_complete_upload(
   nvacl: NavAbilityClient,
@@ -171,13 +178,14 @@ pub async fn post_complete_upload(
 #[cfg(any(feature = "tokio"))]
 #[allow(non_snake_case)]
 pub async fn post_blob_singlepart(
-  _nvacl: &NavAbilityClient,
+  nvabs: &NavAbilityBlobStore,
   blobId: Uuid,
   filename: &str,
   file_mime: &str,
   file_timestamp: &chrono::DateTime<Utc>,
   file_bytes: std::sync::Arc<[u8]>,
 ) {
+  let _nvacl = &nvabs.client;
   let upl = post_create_upload(
     _nvacl.clone(), // change to allow borrow 
     blobId,
@@ -227,12 +235,19 @@ pub async fn post_blob_singlepart(
 }
 
 
-
-// TODO , feature = "blocking"
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[derive(Serialize)]
 #[allow(non_snake_case)]
-pub fn addBlob(
-  nvacl_: NavAbilityClient,
+struct PostOnPrem {
+  storeLabel: String,
+  blobId: String,
+  input: String,
+}
+
+
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[allow(non_snake_case)]
+pub async fn post_blob_onprem(
+  nvabs: &NavAbilityBlobStore,
   blobId: Uuid,
   filename: &str,
   file_mime: &str,
@@ -240,7 +255,89 @@ pub fn addBlob(
   file_bytes: std::sync::Arc<[u8]>,
 ) {
 
-  let nvacl = nvacl_.clone();
+  let input = general_purpose::STANDARD.encode(file_bytes.to_vec());
+  let request_body = crate::QueryBody::<PostOnPrem> {
+    query: "addBlobFS",
+    variables: PostOnPrem {
+      storeLabel: "".to_owned(),
+      blobId: blobId.to_string(),
+      input,
+    },
+    operation_name: "addBlobFS",
+  };
+  
+  let req_res = nvabs.client.client
+  .post(&nvabs.client.apiurl)
+  .json(&request_body)
+  .send().await;
+
+  if let Err(ref re) = req_res {
+    to_console_error(&format!("Error in upload request to NavAbilityBlobStoreOnPrem: {:?}", re));
+  }
+  // TODO extract blobId from response and better error handling
+}
+// b64blob = base64encode(blob)
+// response = NvaSDK.GQL.mutate(
+//     store.client.client,
+//     "addBlobFS",
+//     Dict("storeLabel" => string(store.label), "blobId" => string(blobId), "input" => b64blob);
+//     throw_on_execution_error = true,
+// )
+// blobId_str = response.data["addBlobFS"]
+// blobId = tryparse(UUID, blobId_str)
+// isnothing(blobId) && error(blobId_str)
+
+
+
+// TODO , feature = "blocking"
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[allow(non_snake_case)]
+pub async fn post_blob_store(
+  nvabs: &NavAbilityBlobStore,
+  blobId: Uuid,
+  filename: &str,
+  file_mime: &str,
+  file_timestamp: &chrono::DateTime<Utc>,
+  file_bytes: std::sync::Arc<[u8]>,
+) {
+  match &nvabs.label {
+    crate::NvaStoreLabel::cloud(_store) => {
+      post_blob_singlepart(
+        nvabs,
+        blobId,
+        filename,
+        file_mime,
+        file_timestamp,
+        file_bytes
+      ).await;
+    }
+    crate::NvaStoreLabel::onprem(_store) => {
+      post_blob_onprem(
+        nvabs,
+        blobId,
+        filename,
+        file_mime,
+        file_timestamp,
+        file_bytes
+      ).await;
+    }
+  }
+}
+
+// TODO , feature = "blocking"
+#[cfg(any(feature = "tokio", feature = "thread"))]
+#[allow(non_snake_case)]
+pub fn addBlob(
+  nvabs: NavAbilityBlobStore,
+  blobId: Uuid,
+  filename: &str,
+  file_mime: &str,
+  file_timestamp: &chrono::DateTime<Utc>,
+  file_bytes: std::sync::Arc<[u8]>,
+) {
+  // TODO, multiple clones and likely unnecessary for non-wasm case
+  let nvabs_ = nvabs.clone();
+  // let nvacl = nvabs.nvacl.clone();
   let blobId_ = blobId.clone();
   let filename_ = filename.to_string();
   let mime_  = file_mime.to_string();
@@ -250,16 +347,14 @@ pub fn addBlob(
   bytes.resize(nbytes, 0x00);
   bytes[..nbytes].clone_from_slice(&file_bytes);
 
-  crate::execute(async move {
-    let ret = crate::services::post_blob_singlepart(
-      &nvacl,
-      blobId_.clone(),
-      &filename_,
-      &mime_,
-      &timestamp_,
-      bytes.into(),
-    ).await;
-  });
+  crate::execute(crate::services::post_blob_store(
+    &nvabs_,
+    blobId_.clone(),
+    &filename_,
+    &mime_,
+    &timestamp_,
+    bytes.into(),
+  ));
 }
 
 
@@ -271,6 +366,7 @@ pub async fn post_delete_blob(
   label: Option<&str>,
 ) -> Result<delete_blob::ResponseData, Box<dyn Error>> {
   
+  // TODO use NvaBlobStore::cloud(lb) instead
   let mut store = "default".to_owned();
   if let Some(lb) = label {
     store = lb.to_owned();

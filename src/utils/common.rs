@@ -307,9 +307,9 @@ pub fn check_deser<T>(
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 pub async fn post_to_nvaapi<
-V: Serialize,
-R: for<'de> Deserialize<'de>,
-T
+  V: Serialize,
+  R: for<'de> Deserialize<'de>,
+  T
 >(
   nvacl: &crate::NavAbilityClient,
   request_body: crate::QueryBody<V>,

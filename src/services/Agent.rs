@@ -355,7 +355,7 @@ pub fn q_addAgent(
   let send_into_ = send_into.clone();
   let ag_lbl_ = agent_label.clone();
   crate::execute(async move {
-    crate::send_api_result(
+    let _ = crate::send_api_result(
       send_into_, 
       post_add_agent(&nvacl_, &ag_lbl_).await,
     );
