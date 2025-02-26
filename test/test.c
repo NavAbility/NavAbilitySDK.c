@@ -106,7 +106,8 @@ int main(void) {
     // char[] databuffer = ;
     char* bid = NULL;
     char* buffer = "{\"key\": \"Here is some test data.\"}";
-    bid = addBlob(nvacl, "testdata", "plain/text", buffer, strlen(buffer)); 
+
+    bid = addBlob(store, "testdata", "plain/text", buffer, strlen(buffer)); 
     printf("Uploaded blobId: %s\n", bid);
 
     deleteBlob(nvacl, bid, NULL);
