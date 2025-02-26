@@ -42,8 +42,6 @@ impl NavAbilityDFG {
         let _client = client.clone();
         let namespace = Uuid::parse_str(&client.user_label).unwrap();
         let storelb = storeLabel.unwrap_or("default");
-        
-        
 
         let fg = NvaNode::<Factorgraph>{
             namespace: namespace.clone(),
@@ -57,10 +55,39 @@ impl NavAbilityDFG {
         };
         let store = NavAbilityBlobStore {
             client: _client.clone(),
-            label: storelb.to_owned(),
+            label: crate::NvaStoreLabel::cloud(storelb.to_owned()),
         };
         let mut blobStores = HashMap::new();
-        blobStores.insert(store.label.clone(), store);
+        let mut mkey = "".to_owned();
+        match &store.label {
+            crate::NvaStoreLabel::cloud(lb) => { mkey = lb.clone();},
+            crate::NvaStoreLabel::onprem(lb) => { mkey = lb.clone();},
+        }
+        blobStores.insert(mkey, store);
+
+        // check if fgraph exists
+        let fgs = crate::services::listGraphs(client);
+        if !fgs.is_ok() || !fgs.unwrap().contains(&fgLabel.to_string()) {
+            let _ = crate::services::addFactorgraph(
+                client, 
+                fgLabel,
+                "",
+                "e30="
+            );
+        }
+
+        // check if agent exists
+        let agents = crate::services::listAgents(client);
+        if !agents.is_ok() || !agents.unwrap().contains(&agentLabel.to_string()) {
+            let _ = crate::services::addAgent(client, &(agentLabel.to_string()));
+        }
+
+        let _ = crate::services::connectAgentGraph(
+            client, 
+            agentLabel, 
+            fgLabel
+        );
+
         return Self {
             client: _client,
             fg,

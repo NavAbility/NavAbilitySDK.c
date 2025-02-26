@@ -64,7 +64,7 @@ pub use crate::services::{
     add_model_async,
     add_entry_model_async,
     post_list_model_graphs,
-    fetch_list_graphs,
+    post_list_graphs,
 };
 
 
@@ -430,8 +430,18 @@ impl<Q: Serialize> QueryDetails<Q> for graphql_client::QueryBody<Q> {
 genGetLabel!(User);
 genGetLabel!(Agent);
 genGetLabel!(BlobEntry);
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-genGetLabel!(NavAbilityBlobStore);
+genGetLabel!(VariableDFG);
+
+#[cfg(any(feature = "tokio", feature = "blocking", feature = "thread"))]
+impl GetLabel for NavAbilityBlobStore {
+    fn getLabel(&self) -> &String { 
+        match &self.label {
+            NvaStoreLabel::cloud(l) =>  {return l},
+            NvaStoreLabel::onprem(l) => {return l},
+        };
+    }
+}
+
 
 // move to services
 impl<T> GetLabel for NvaNode<T> {
