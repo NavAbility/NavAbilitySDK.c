@@ -58,6 +58,7 @@ impl NavAbilityDFG {
             label: crate::NvaStoreLabel::cloud(storelb.to_owned()),
         };
         let mut blobStores = HashMap::new();
+
         let mut mkey = "".to_owned();
         match &store.label {
             crate::NvaStoreLabel::cloud(lb) => { mkey = lb.clone();},
