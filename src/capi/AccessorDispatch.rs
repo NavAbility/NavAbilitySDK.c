@@ -61,7 +61,14 @@ fn getLabel_BlobEntry(
 fn getLabel_NavAbilityBlobStore(
     store: &crate::NavAbilityBlobStore,
 ) -> *const c_char {
-    return convert_str(&((*store).label));
+    match &store.label {
+        crate::NvaStoreLabel::cloud(label) => {
+            return convert_str(label);
+        },
+        crate::NvaStoreLabel::onprem(label) => {
+            return convert_str(label);
+        },
+    }
 }
 
 

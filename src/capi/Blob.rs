@@ -50,20 +50,19 @@ fn vec_i8_into_u8(v: Vec<i8>) -> Vec<u8> {
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn addBlob(
-  nvacl_: Option<&crate::NavAbilityClient>,
+  nvabs_: Option<&crate::NavAbilityBlobStore>,
   filename: *const c_char,
   mime: *const c_char,
   data: *const c_char,
   nbytes: usize,
 ) -> *const c_char {
-  if nvacl_.is_none() {
+  if nvabs_.is_none() {
     to_console_error("addBlob: the provided *NavAbilityClient is NULL");
     return convert_str("");
   }
 
   let bytes = slice::from_raw_parts(data, nbytes);
-
-  let nvacl = (*nvacl_.unwrap()).clone();
+  let nvacl = (nvabs_.unwrap()).client.clone();
 
   let blobId = Uuid::new_v4();
   let blobId_ = blobId.clone();
@@ -76,7 +75,7 @@ fn addBlob(
   let data_bytes: std::sync::Arc<[u8]> = vec_i8_into_u8(owned_bytes).into();
 
   crate::services::addBlob(
-    nvacl,
+    nvabs_.unwrap().clone(),
     blobId,
     filename_,
     mime_,

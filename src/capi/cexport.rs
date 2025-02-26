@@ -147,7 +147,7 @@ fn NavAbilityBlobStore_new(
     }
     return Some(Box::new(crate::NavAbilityBlobStore {
         client: nvacl.unwrap().clone(),
-        label: cstr_to_str(label).to_string()
+        label: crate::NvaStoreLabel::cloud(cstr_to_str(label).to_string())
     }));
 }
 
