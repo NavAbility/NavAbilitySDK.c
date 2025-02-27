@@ -1,5 +1,6 @@
 
 use crate::{
+    Uuid,
     Error,
     Response,
     GraphQLQuery,
@@ -19,20 +20,27 @@ use crate::{
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
-pub async fn fetch_org_id(
+pub async fn post_org_id(
     nvacl: &NavAbilityClient,
-) -> Result<get_org::ResponseData, Box<dyn Error>> {
+) -> Result<Uuid, Box<dyn Error>> {
     
     let request_body = GetOrg::build_query(get_org::Variables {});
 
     return post_to_nvaapi::<
         get_org::Variables,
         get_org::ResponseData,
-        get_org::ResponseData
+        Uuid
     >(
         nvacl,
         request_body, 
-        |s| s,
+        |s| {
+            if s.orgs.is_empty() {
+                to_console_error("Error, no orgs found");
+                return Uuid::nil();
+            }
+            return Uuid::parse_str(&s.orgs[0].id.clone()).expect("Error, unable to parse OrgId Uuid from GQL GetOrg response string");
+        },
         Some(3)
     ).await;
 }
+

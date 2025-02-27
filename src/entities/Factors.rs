@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[allow(non_snake_case)]
-pub struct FunctionData {
+pub struct FunctionData { // FIXME FunctionNodeData
   pub eliminated:  Option<bool>,
   pub potialused: Option<bool>,
   pub edgeIDs: Option<Vec<i64>>,
@@ -35,17 +35,17 @@ pub struct FactorDFG<F> {
   pub variableOrderSymbols_: Vec<String>,
   pub timestamp: Option<DateTime<Utc>>,
   pub nstime: Option<String>,
-  pub fnctype: F,
+  pub fnctype: F, // REWORK TO BEST MATCH AS ABLE, https://github.com/JuliaRobotics/DistributedFactorGraphs.jl/issues/1119
   pub solvable: Option<i64>,
-  pub data: Option<String>,
-  pub metadata: Option<String>,
+  pub data: Option<String>, // FunctionNodeData<F>::to_json
+  pub metadata: Option<String>, 
   pub _version: Option<String>
 }
 
 
 
 #[allow(non_snake_case)]
-pub trait FactorType<'a, D: crate::Distribution<'a>> {
+pub trait FactorType<'a, D: crate::Distribution<'a>> {  // Should Distributions -> SampleableBelief?
   fn new(Z: D) -> Self;
   fn type_str(&self) -> String;
 }
