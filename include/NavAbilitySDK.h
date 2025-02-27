@@ -244,6 +244,14 @@ struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
 
+void startWorker_ImageWhitebalance(const struct NavAbilityDFG *nvafg);
+
+void startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg);
+
+void startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg);
+
+void startWorker_solveParametric(const struct NavAbilityDFG *nvafg);
+
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);

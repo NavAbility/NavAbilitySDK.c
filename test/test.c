@@ -87,7 +87,6 @@ int main(void) {
     
     Pose3Pose3_FullNormal* pf = NULL;
     pf = new_Pose3Pose3(normal);  // new_ means must freeR(pf) later
-
     const char* fid = addFactor(
         nvafg,
         "x1;x2;",

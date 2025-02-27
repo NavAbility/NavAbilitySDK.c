@@ -35,34 +35,47 @@ int main(void) {
   cv[0] = 1.0;
   cv[4] = 1.0;
   cv[8] = 1.0;
-  normal = FullNormal_new(3,mn,cv); // must freeR(normal) later
 
   // BUILD A FACTOR GRAPH 
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
   char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+  printf("added variable id: %s\n", v);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
-  PriorPose2_FullNormal *pf0 = NULL;
-  pf0 = PriorPose2_new(normal);
-    struct FactorDFG_PriorPose2_FullNormal *f1 = NULL;
-  f = addFactor(nvafg, "x0;", pf0);
-    freeR(f); freeR(pf0); free(vl);
+  normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
+  PriorPose2_FullNormal *f1 = NULL;
+  f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
+  const char* fid1 = addFactor(
+      nvafg,
+      "x1;",
+      f1,
+      "TESTTAG;", 
+      "", 0, 
+      1
+  ); freeR(f1); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid1);
   
 
-  // ROBOT MOVES TO (1,0,0)
+  // ROBOT MOVES TO (10,0,0)
   v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+  printf("added variable id: %s\n", v);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
-  freeR(normal);
   mn[0] = 10.0;
-  normal = FullNormal_new(3,mn,cv);
-  Pose2Pose2_FullNormal *pf1 = NULL;
-  pf1 = Pose2Pose2_new(normal);
-    struct FactorDFG_PriorPose2_FullNormal *f2 = NULL;
-  f = addFactor(nvafg, "x0;x1;", pf1);
-    freeR(f);freeR(pf1); free(vl);
+  normal = new_FullNormal(3,mn,cv);
+  Pose2Pose2_FullNormal *f2 = NULL;
+  f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
+  const char* fid2 = addFactor(
+      nvafg,
+      "x1;x2;",
+      f2,
+      "TESTTAG;", 
+      "", 0, 
+      1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid2);
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);
