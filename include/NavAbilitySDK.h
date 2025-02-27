@@ -244,8 +244,6 @@ char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
 
-void listGraphs(const struct NavAbilityClient *_nvacl);
-
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);

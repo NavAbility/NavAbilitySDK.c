@@ -67,16 +67,12 @@ int main(void) {
     // Test that accessor methods use ref not Box<> whereby Rust retakes ownership and drops (leads to segfault)
     printf("getLabel(nvafg): %s\n", getLabel(nvafg));
 
-    // check that the graph is there
-    // RVec_Graph* graphs = NULL;
-    listGraphs(nvafg);
-
 
     // add a variable
-    VariableDFG* v = NULL;
+    char* v = NULL;
     // const char* tac = SArr("TEST");
     v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
-    // freeR(v);
+    printf("added variable id: %s\n", v);
 
     BlobEntry *be = NULL;
     be = BlobEntry_basic("test_entry","text/plain");
