@@ -18,9 +18,12 @@ int main(void) {
   nvacl = NavAbilityClient_new(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
+  char fglbl[30];
+  sprintf(fglbl, "FG_%03d", rand());
+  printf("fglbl: %s\n", fglbl);
   nvafg = NavAbilityDFG_new(
       nvacl,
-      "FG001",
+      fglbl,
       "BOT_01",
       NULL,
       1,  // addAgentIfAbsent

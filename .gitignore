@@ -1,3 +1,4 @@
 /target
 /test/build
 src/schema.json
+examples/build
