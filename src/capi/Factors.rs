@@ -120,6 +120,16 @@ macro_rules! GenFactorDFG_Type {
             let tags = cstr_to_str(_tags).to_string();
             tags.split(";").for_each(|t| vtags.push(t.to_string()));
             
+            // let timestamp = (|ts: String| {
+            //     if ts.is_empty() {
+            //       return None;
+            //     } else {
+            //       return Some(crate::parse_str_utc(ts)
+            //         .expect("addVariable not able to parse timestamp string"));
+            //     }
+            // })(cstr_to_str(_timestamp).to_string());
+
+            // level 3 factor object with data
             let f = crate::FactorDFG::new(
                 vvlbls, 
                 fnc.unwrap().clone(),
@@ -129,9 +139,18 @@ macro_rules! GenFactorDFG_Type {
             );
 
             // Do the add factor call here
+            let idr = crate::services::addFactor(
+                nvafg.unwrap(), 
+                f
+            );
+
 
             // return Some(Box::new( f ));
-            return convert_str("_uuid_");
+            if let Ok(id) = idr {
+                return convert_str(&id.to_string());
+            } else {
+                return convert_str("ERROR");
+            }
         }
     };
 }

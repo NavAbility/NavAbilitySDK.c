@@ -116,8 +116,6 @@ struct BlobEntry *BlobEntry_new(const char *blobId,
                                 const char *metadata,
                                 const char *timestamp);
 
-struct FullNormal *FullNormal_new(size_t dim, const double *array_mean, const double *array_covr);
-
 struct NavAbilityBlobStore *NavAbilityBlobStore_new(const struct NavAbilityClient *nvacl,
                                                     const char *label);
 
@@ -227,6 +225,8 @@ struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *l
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
+
+struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const double *array_covr);
 
 struct Point2Point2_FullNormal *new_Point2Point2(const struct FullNormal *Z);
 
