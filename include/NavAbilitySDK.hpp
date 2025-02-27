@@ -48,16 +48,6 @@ typedef struct NavAbilityDFG NavAbilityDFG;
 
 typedef struct NvaNode_T NvaNode_T;
 
-typedef struct Option_Vec______c_char Option_Vec______c_char;
-
-typedef struct Option______c_char Option______c_char;
-
-typedef struct Option_____c_char Option_____c_char;
-
-typedef struct Option_i64 Option_i64;
-
-typedef struct Option_usize Option_usize;
-
 typedef struct Point2Point2_FullNormal Point2Point2_FullNormal;
 
 typedef struct Point3Point3_FullNormal Point3Point3_FullNormal;
@@ -132,8 +122,8 @@ struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
                                         const char *fgLabel,
                                         const char *agentLabel,
                                         const char *storeLabel,
-                                        const bool *addAgentIfAbsent,
-                                        const bool *addGraphIfAbsent);
+                                        size_t addAgentIfAbsent,
+                                        size_t addGraphIfAbsent);
 
 struct Point2Point2_FullNormal *Point2Point2_new(const struct FullNormal *Z);
 
@@ -161,14 +151,10 @@ const char *addBlob(const struct NavAbilityBlobStore *nvabs_,
                     const char *data,
                     size_t nbytes);
 
-struct Option_____c_char addVariable(const struct NavAbilityDFG *nvafg,
-                                     const char *label,
-                                     const char *variableType,
-                                     struct Option_Vec______c_char _tags,
-                                     struct Option_i64 _solvable,
-                                     struct Option______c_char _timestamp,
-                                     struct Option_usize _nstime,
-                                     struct Option______c_char _metadata);
+char *addVariable(const struct NavAbilityDFG *nvafg,
+                  const char *label,
+                  const char *variableType,
+                  const char *_tags);
 
 void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                           const char *agent_label,
@@ -253,6 +239,14 @@ const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *metadata);
 
 // manually define the prototypes for the FactorDFG functions we need
+
+// // FIXME -- DONT USE YET
+// #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+// #define SArr(...) GET_MACRO(__VA_ARGS__, SArr3, SArr2, SArr1)(__VA_ARGS__)
+// // #define SArr0() printf("%s","")
+// #define SArr1(a) strcat(strcat("",a),";")
+// #define SArr2(a, b) strcat(strcat(strcat(strcat("",a),";"),b),";")
+// #define SArr3(a, b, c) strcat(strcat(strcat(strcat(strcat("",a),";"),b),";"),";")
 
 
 struct FactorDFG_PriorPoint2_FullNormal *FactorDFG_PriorPoint2_FullNormal_new(

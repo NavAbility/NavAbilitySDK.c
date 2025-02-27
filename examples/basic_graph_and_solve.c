@@ -23,8 +23,8 @@ int main(void) {
       "FG001",
       "BOT_01",
       NULL,
-      true,  // addAgentIfAbsent
-      true   // addGraphIfAbsent
+      1,  // addAgentIfAbsent
+      1   // addGraphIfAbsent
   ); // must freeR(nvafg) later
 
   // a basic normal distribution
@@ -52,7 +52,7 @@ int main(void) {
     vl[0] = "x0";
     struct FactorDFG_PriorPose2_FullNormal *f = NULL;
   f = addFactor(vl,1,pf);
-    freeR(f);freeR(pf); free(vl);
+    freeR(f); freeR(pf); free(vl);
   
 
   // ROBOT MOVES TO (1,0,0)

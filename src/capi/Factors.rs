@@ -95,7 +95,6 @@ fn Pose3Pose3_new<'a>(
     return Box::new(crate::Pose3Pose3::new(Z.clone()))
 }
 
-
 macro_rules! GenFactorDFG_Type {
   ($T:ident, $fnm:ident) => {
         #[allow(non_snake_case)]
@@ -106,12 +105,13 @@ macro_rules! GenFactorDFG_Type {
             fnc: Option<&crate::$T<FullNormal<'a>>>,
         ) -> Option<Box<crate::FactorDFG<crate::$T<FullNormal<'a>>>>> {
             
-            let mut ovlb = Vec::new();
-            for i in 0..varlbls_len {
-                let v = *varlbls.offset(i as isize);
-                let s = CStr::from_ptr(v).to_string_lossy().into_owned();
-                ovlb.push(s);
-            }
+            let ovlb = crate::convert_arr_ptrchar(varlbls, varlbls_len);
+            // let mut ovlb = Vec::new();
+            // for i in 0..varlbls_len {
+            //     let v = *varlbls.offset(i as isize);
+            //     let s = CStr::from_ptr(v).to_string_lossy().into_owned();
+            //     ovlb.push(s);
+            // }
             
             let f = crate::FactorDFG::new(
                 ovlb, 

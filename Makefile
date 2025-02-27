@@ -51,6 +51,11 @@ generate-cbindgen-c:
 
 test-capi: build-lib
 	cd test && $(MAKE)
+.PHONY: test-capi
+
+test-examples: build-lib
+	cd examples && $(MAKE)
+.PHONY: test-examples
 
 update-api-token: default-browser-firefox-api default-browser-chromium-api default-browser-gchrome-api
 	@echo ""

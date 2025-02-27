@@ -51,18 +51,28 @@ int main(void) {
 
     printf("getLabel(store): %s\n", getLabel(store));
 
+    srand(time(NULL));
     NavAbilityDFG *nvafg = NULL;
+    char fglbl[30];
+    sprintf(fglbl, "FG_%03d", rand());
+    printf("fglbl: %s\n", fglbl);
     nvafg = NavAbilityDFG_new(
         nvacl,
-        "FG001",
+        fglbl,
         "BOT_01",
         NULL,
-        NULL,
-        NULL
+        0,
+        0
     );
 
     // Test that accessor methods use ref not Box<> whereby Rust retakes ownership and drops (leads to segfault)
     printf("getLabel(nvafg): %s\n", getLabel(nvafg));
+
+    // add a variable
+    VariableDFG* v = NULL;
+    // const char* tac = SArr("TEST");
+    v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;"); //, "", 0);
+    // freeR(v);
 
     BlobEntry *be = NULL;
     be = BlobEntry_basic("test_entry","text/plain");
@@ -105,10 +115,9 @@ int main(void) {
 
     // test upload of blob
     // char[] databuffer = ;
-    char* bid = NULL;
     char* buffer = "{\"key\": \"Here is some test data.\"}";
 
-    bid = addBlob(store, "testdata", "plain/text", buffer, strlen(buffer)); 
+    const char* bid = addBlob(store, "testdata", "plain/text", buffer, strlen(buffer)); 
     printf("Uploaded blobId: %s\n", bid);
 
     deleteBlob(nvacl, bid, NULL);

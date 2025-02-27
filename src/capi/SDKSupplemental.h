@@ -1,6 +1,14 @@
 
 // manually define the prototypes for the FactorDFG functions we need
 
+// // FIXME -- DONT USE YET
+// #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
+// #define SArr(...) GET_MACRO(__VA_ARGS__, SArr3, SArr2, SArr1)(__VA_ARGS__)
+// // #define SArr0() printf("%s","")
+// #define SArr1(a) strcat(strcat("",a),";")
+// #define SArr2(a, b) strcat(strcat(strcat(strcat("",a),";"),b),";")
+// #define SArr3(a, b, c) strcat(strcat(strcat(strcat(strcat("",a),";"),b),";"),";")
+
 
 struct FactorDFG_PriorPoint2_FullNormal *FactorDFG_PriorPoint2_FullNormal_new(
     const char *const *varlbls,
