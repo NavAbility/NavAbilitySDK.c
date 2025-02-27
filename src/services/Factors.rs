@@ -127,7 +127,7 @@ impl FunctionData {
 
 
 // TODO support more D: Distributions<'a>
-impl<'a, F> FactorDFG<F> 
+impl<'a, F> FactorDFG<F>
 where 
   F: crate::FactorType<'a, FullNormal<'a>>
 {
@@ -239,6 +239,8 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
     variable_order_symbols.push(Some(v));
   }
 
+
+  // DFG.FactorDFG + BlobEntry + ... ~= GQL.FactorCreateInput
   let newfac = add_factors::FactorCreateInput {
     id,
     label,

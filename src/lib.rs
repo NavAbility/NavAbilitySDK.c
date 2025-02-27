@@ -53,7 +53,7 @@ pub use crate::services::{
     post_create_download,
     create_download_send,
     post_complete_upload,
-    fetch_org_id,
+    // post_org_id,
     post_delete_blobentry,
     post_add_agent,
     post_update_blobentry_metadata,
@@ -517,7 +517,7 @@ mod tests {
             // std::env::var("NAVABILITY_API_TOKEN").expect("Missing NAVABILITY_API_TOKEN env var");
 
         let api_url: &str = "https://api.navability.io/graphql";
-        let client = NavAbilityClient::new(&api_url.to_string(), &nva_userlabel, &nva_api_token);
+        let client = NavAbilityClient::new(&api_url.to_string(), &nva_api_token, Some(&nva_userlabel));
         println!("client: {:?}", client);
 
         #[cfg(feature = "blocking")]
