@@ -48,21 +48,29 @@ int main(void) {
 
     NavAbilityBlobStore *store = NULL;
     store = NavAbilityBlobStore_new(nvacl, "default");
-
     printf("getLabel(store): %s\n", getLabel(store));
 
+    srand(time(NULL));
     NavAbilityDFG *nvafg = NULL;
+    char fglbl[30];
+    sprintf(fglbl, "FG_%03d", rand());
+    printf("fglbl: %s\n", fglbl);
     nvafg = NavAbilityDFG_new(
         nvacl,
-        "FG001",
+        fglbl,
         "BOT_01",
         NULL,
-        NULL,
-        NULL
+        1,
+        1
     );
 
     // Test that accessor methods use ref not Box<> whereby Rust retakes ownership and drops (leads to segfault)
     printf("getLabel(nvafg): %s\n", getLabel(nvafg));
+
+
+    // add a variable
+    char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+    printf("added variable id: %s\n", v);
 
     BlobEntry *be = NULL;
     be = BlobEntry_basic("test_entry","text/plain");
@@ -75,20 +83,20 @@ int main(void) {
     cv[0] = 1.0;
     cv[4] = 1.0;
     cv[8] = 1.0;
-    normal = FullNormal_new(3,mn,cv);
+    normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
     
-    Pose3Pose3_FullNormal *pf = NULL;
-    pf = Pose3Pose3_new(normal);
-    const char *vl[2];
-    vl[0] = "x1";
-    vl[1] = "x2";
-    struct FactorDFG_Pose3Pose3_FullNormal *f = NULL;
-    // f = FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
-    f = addFactor(vl,2,pf);
+    Pose3Pose3_FullNormal* pf = NULL;
+    pf = new_Pose3Pose3(normal);  // new_ means must freeR(pf) later
+    const char* fid = addFactor(
+        nvafg,
+        "x1;x2;",
+        pf,
+        "TESTTAG;", 
+        "", 0, 
+        1
+    ); freeR(pf); freeR(normal); // because new_ was used
+    printf("Added factor id: %s\n", fid);
 
-    freeR(f);
-    freeR(pf);
-    freeR(normal);
 
     printf("About to getVariable with nvafg\n");
     // test getVariable
@@ -105,10 +113,9 @@ int main(void) {
 
     // test upload of blob
     // char[] databuffer = ;
-    char* bid = NULL;
     char* buffer = "{\"key\": \"Here is some test data.\"}";
 
-    bid = addBlob(store, "testdata", "plain/text", buffer, strlen(buffer)); 
+    const char* bid = addBlob(store, "testdata", "plain/text", buffer, strlen(buffer)); 
     printf("Uploaded blobId: %s\n", bid);
 
     deleteBlob(nvacl, bid, NULL);

@@ -46,7 +46,7 @@ use crate::{
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn FullNormal_new<'a>(
+fn new_FullNormal<'a>(
     dim: usize,
     array_mean: *const libc::c_double,
     array_covr: *const libc::c_double,

@@ -23,8 +23,8 @@ int main(void) {
       "FG001",
       "BOT_01",
       NULL,
-      true,  // addAgentIfAbsent
-      true   // addGraphIfAbsent
+      1,  // addAgentIfAbsent
+      1   // addGraphIfAbsent
   ); // must freeR(nvafg) later
 
   // a basic normal distribution
@@ -35,40 +35,47 @@ int main(void) {
   cv[0] = 1.0;
   cv[4] = 1.0;
   cv[8] = 1.0;
-  normal = FullNormal_new(3,mn,cv); // must freeR(normal) later
 
   // BUILD A FACTOR GRAPH 
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  VariableDFG* v = NULL;
-  v = addVariable(nvafg, "x0", "Pose2",  NULL, NULL, NULL, NULL, NULL);
-    freeR(v);
+  char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+  printf("added variable id: %s\n", v);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
-  PriorPose2_FullNormal *pf = NULL;
-  pf = PriorPose2_new(normal);
-    const char *vl[1];
-    vl[0] = "x0";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,1,pf);
-    freeR(f);freeR(pf); free(vl);
+  normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
+  PriorPose2_FullNormal *f1 = NULL;
+  f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
+  const char* fid1 = addFactor(
+      nvafg,
+      "x1;",
+      f1,
+      "TESTTAG;", 
+      "", 0, 
+      1
+  ); freeR(f1); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid1);
   
 
-  // ROBOT MOVES TO (1,0,0)
-  v = addVariable(nvafg, "x1", "Pose2",  NULL, NULL, NULL, NULL, NULL);
-    freeR(v);
+  // ROBOT MOVES TO (10,0,0)
+  v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+  printf("added variable id: %s\n", v);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
-  freeR(normal);
   mn[0] = 10.0;
-  normal = FullNormal_new(3,mn,cv);
-  Pose2Pose2_FullNormal *pf = NULL;
-  pf = Pose2Pose2_new(normal);
-    const char *vl[2]; vl[0] = "x0"; vl[1] = "x1";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,2,pf);
-    freeR(f);freeR(pf); free(vl);
+  normal = new_FullNormal(3,mn,cv);
+  Pose2Pose2_FullNormal *f2 = NULL;
+  f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
+  const char* fid2 = addFactor(
+      nvafg,
+      "x1;x2;",
+      f2,
+      "TESTTAG;", 
+      "", 0, 
+      1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid2);
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);

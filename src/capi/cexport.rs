@@ -7,6 +7,7 @@ use std::{
     ptr,
     os::raw::{
         c_char,
+        c_int,
         // c_void, 
     },
     ffi::{
@@ -91,8 +92,8 @@ fn NavAbilityDFG_new<'a>(
     fgLabel: *const c_char,
     agentLabel: *const c_char,
     storeLabel: Option<&'a c_char>,
-    addAgentIfAbsent: Option<&'a bool>,
-    addGraphIfAbsent: Option<&'a bool>,
+    addAgentIfAbsent: usize,
+    addGraphIfAbsent: usize,
 ) -> Option<Box<crate::NavAbilityDFG>> {
     if _nvacl.is_none() {
         to_console_error("NavAbilityDFG: provided *NavAbilityClient is NULL/None");
@@ -114,8 +115,8 @@ fn NavAbilityDFG_new<'a>(
             fgl,
             agl,
             _storeLabel,
-            addAgentIfAbsent.copied(),
-            addGraphIfAbsent.copied(),
+            Some(addAgentIfAbsent != 0),
+            Some(addGraphIfAbsent != 0),
         )
     ));
 }
@@ -191,6 +192,20 @@ pub unsafe fn cstr_to_str(c_buf: *const i8) -> &'static str {
     let cstr = CStr::from_ptr(c_buf);
     return cstr.to_str().expect("bad *const c_char encoding");
 }
+
+
+// pub unsafe fn convert_arr_ptrchar(
+//     varlbls: *const *const c_char,
+//     varlbls_len: usize,
+// ) -> Vec<String> {
+//     let mut ovlb = Vec::new();
+//     for i in 0..varlbls_len {
+//         let v = *varlbls.offset(i as isize);
+//         let s = CStr::from_ptr(v).to_string_lossy().into_owned();
+//         ovlb.push(s);
+//     }
+//     return ovlb;
+// }
 
 
 fn format_type_of<T>(_: &T) {

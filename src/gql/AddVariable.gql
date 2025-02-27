@@ -1,13 +1,13 @@
-
 mutation AddVariable(
   $id: ID!,
   $label: String!,
   $variableType: String!,
   $tags: [String!]! = ["VARIABLE"],
-  $solvable: Int = 1,
-  $timestamp: DateTime = "",
-  $nstime: BigInt = "",
-  $metadata: String = "e30="
+  $timestamp: DateTime! = "2025-01-01 00:00:00.000",
+  $nstime: BigInt! = "0",
+  $solvable: Int! = 1,
+  $metadata: String = "e30=",
+  $fg_id: ID!
 ) {
   addVariables(
     input: {
@@ -19,7 +19,14 @@ mutation AddVariable(
       timestamp: $timestamp, 
       nstime: $nstime,
       metadata: $metadata, 
-      _version: "0.25"
+      _version: "0.25",
+      fg: {
+        connect: {
+          where: {
+            node: {id: $fg_id}
+          }
+        }
+      }
     }
   ) {
     variables {

@@ -391,8 +391,25 @@ pub fn listVariables(
         ));
 }
 
-
-
+// FIXME use standardized function instead, perhaps rfc3339
+// pub fn to_ISO8601(
+//     dt: chrono::DateTime<Utc>
+// ) -> String {
+//     Working example: "2025-01-01 00:00:00.000"
+//     return dt.to_rfc3339_opts(chrono::SecondsFormat::Millis??, false);
+// }
+pub fn to_string_ISO8601(
+    dt: chrono::DateTime<Utc>
+) -> String{
+    let mut timestamp = dt.to_string()
+    .replace(" UTC","")
+    .replace("UTC","")
+    .replace("Z","")
+    .replace("T"," ");
+    let parts = timestamp.split(".").collect::<Vec<&str>>();
+    timestamp = format!("{}.{:0<3}", parts[0], parts[1].get(..3).unwrap_or(parts[1]));
+    return timestamp;
+}
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
@@ -401,9 +418,9 @@ pub async fn post_add_variable(
     label: &String,
     variableType: &String,
     _tags: Option<Vec<String>>,
-    _solvable: Option<i64>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
+    _solvable: Option<i64>,
     _metadata: Option<String>,
 ) -> Result<Uuid,Box<dyn Error>> {
 
@@ -419,9 +436,9 @@ pub async fn post_add_variable(
         v.push("VARIABLE".to_owned());
         v
     };
-    let solvable = Some(_solvable.unwrap_or(1));
-    let timestamp = Some(_timestamp.unwrap_or(Utc::now()).to_string());
-    let nstime = Some(_nstime.unwrap_or(0).to_string());
+    let solvable = _solvable.unwrap_or(1);
+    let timestamp = to_string_ISO8601(_timestamp.unwrap_or(Utc::now()));
+    let nstime = _nstime.unwrap_or(0).to_string();
     
     let variables = crate::add_variable::Variables {
         id: nvafg.getId(label).to_string(),
@@ -429,9 +446,10 @@ pub async fn post_add_variable(
         variable_type: variableType.to_string(),
         tags,
         timestamp,
-        nstime,
+        nstime: nstime.to_string(),
         solvable,
-        metadata
+        metadata,
+        fg_id: nvafg.getId("").to_string(),
     };
 
     let request_body = AddVariable::build_query(variables);
@@ -458,9 +476,9 @@ pub async fn add_variable_send(
     label: &String,
     variableType: &String,
     _tags: Option<Vec<String>>,
-    _solvable: Option<i64>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
+    _solvable: Option<i64>,
     _metadata: Option<String>,
 ) -> Result<(),Box<dyn Error>> {
     
@@ -471,9 +489,9 @@ pub async fn add_variable_send(
             label,
             variableType,
             _tags,
-            _solvable,
             _timestamp,
             _nstime,
+            _solvable,
             _metadata,
         ).await,
     );
@@ -486,19 +504,20 @@ pub fn addVariable(
     label: &String,
     variableType: &String,
     _tags: Option<Vec<String>>,
-    _solvable: Option<i64>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
+    _solvable: Option<i64>,
     _metadata: Option<String>,
 ) -> Result<Uuid, Box<dyn Error>> {
+
     return crate::execute(post_add_variable(
         nvafg,
         label,
         variableType,
         _tags,
-        _solvable,
         _timestamp,
         _nstime,
+        _solvable,
         _metadata,
     ));
 }

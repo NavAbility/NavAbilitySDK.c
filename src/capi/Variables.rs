@@ -75,54 +75,47 @@ fn addVariable(
   nvafg: Option<&crate::NavAbilityDFG>,
   label: *const c_char,
   variableType: *const c_char,
-  _tags: Option<Vec<*const c_char>>,
-  _solvable: Option<i64>,
-  _timestamp: Option<*const c_char>,
-  _nstime: Option<usize>,
-  _metadata: Option<*const c_char>,
-) -> Option<*mut c_char> {
+  _tags: *const c_char,
+  _timestamp: *const c_char,
+  _nstime: usize,
+  _solvable: usize,
+) -> *const c_char {
   if nvafg.is_none() {
     to_console_error("addVariable: provided *NavAbilityDFG is NULL/None");
-    return None;
+    return convert_str("");
   }
   
-  let tags = if _tags.is_none() {
-    None
-  } else {
-    let mut v = Vec::new();
-    for t in _tags.unwrap() {
-      v.push(cstr_to_str(t).to_string());
+  let mut vtags = Vec::new();
+  let tags = cstr_to_str(_tags).to_string();
+  tags.split(";").for_each(|t| vtags.push(t.to_string()));
+
+  let timestamp = (|ts: String| {
+    if ts.is_empty() {
+      return None;
+    } else {
+      return Some(crate::parse_str_utc(ts)
+        .expect("addVariable not able to parse timestamp string"));
     }
-    Some(v)
-  };
-  let timestamp = if _timestamp.is_none() {
-    None
-  } else {
-    Some(crate::parse_str_utc(
-      cstr_to_str(
-        _timestamp.unwrap()
-      ).to_string()
-    ).expect("addVariable not able to parse timestamp string"))
-  };
-  
+  })(cstr_to_str(_timestamp).to_string());
+
   let vari = crate::services::addVariable(
     nvafg.unwrap(), 
     &cstr_to_str(label).to_string(),
     &cstr_to_str(variableType).to_string(),
-    tags,
-    _solvable,
+    Some(vtags),
     timestamp,
-    if _nstime.is_none() {None} else {Some(_nstime.unwrap() as usize)},
-    if _metadata.is_none() {None} else {Some(cstr_to_str(_metadata.unwrap()).to_string())}
+    Some(_nstime),
+    Some(_solvable as i64),
+    None,
   );
   
   match vari {
     Ok(id) => {
-      return Some(convert_str(&id.to_string()));
+      return convert_str(&id.to_string());
     },
     Err(e) => {
       to_console_error(&format!("Problem with addVariable {:?}",e));
-      return None
+      return convert_str("");
     }
   }
 }

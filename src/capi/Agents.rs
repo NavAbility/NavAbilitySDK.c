@@ -48,7 +48,7 @@ fn getAgents(
     _nvacl: Option<&crate::NavAbilityClient>,
 ) -> Option<Box<RVec<crate::Agent>>> {
     if _nvacl.is_none() {
-        to_console_error("listAgents: provided *NavAbilityClient is NULL/None");
+        to_console_error("getAgents: provided *NavAbilityClient is NULL/None");
         return None;
     }
 

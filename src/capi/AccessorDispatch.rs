@@ -131,6 +131,13 @@ fn free_RVec_Agent (
     free_rvec::<crate::Agent>(*rvec)
 }
 
+#[no_mangle] pub unsafe extern "C" 
+fn free_RVec_ListGraphs (
+    rvec: Box<RVec<*mut c_char>>
+) {
+    free_rvec::<*mut c_char>(*rvec)
+}
+
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
