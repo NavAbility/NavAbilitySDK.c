@@ -67,20 +67,19 @@ pub struct RVec<T> {
 #[no_mangle] pub unsafe extern "C" 
 fn NavAbilityClient_new(
     api_url: *const c_char,
-    orgid: *const c_char,
     api_token: *const c_char, 
 ) -> Box<crate::NavAbilityClient> {
     let capi_url = CStr::from_ptr(api_url);
     let url = capi_url.to_str().expect("Bad encoding url");
-    let oid_cstr = CStr::from_ptr(orgid);
-    let oid = oid_cstr.to_str().expect("Bad encoding oid");
+    // let oid_cstr = CStr::from_ptr(orgid);
+    // let oid = oid_cstr.to_str().expect("Bad encoding oid");
     let atk_cstr = CStr::from_ptr(api_token);
     let atk = atk_cstr.to_str().expect("Bad encoding atk");
 
     return Box::new(crate::NavAbilityClient::new(
         &url.to_owned(),
-        &oid.to_owned(),
         &atk.to_owned(),
+        None
     ))
 }
 

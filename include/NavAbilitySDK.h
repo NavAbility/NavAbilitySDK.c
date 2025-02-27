@@ -126,9 +126,7 @@ struct FullNormal *FullNormal_new(size_t dim, const double *array_mean, const do
 struct NavAbilityBlobStore *NavAbilityBlobStore_new(const struct NavAbilityClient *nvacl,
                                                     const char *label);
 
-struct NavAbilityClient *NavAbilityClient_new(const char *api_url,
-                                              const char *orgid,
-                                              const char *api_token);
+struct NavAbilityClient *NavAbilityClient_new(const char *api_url, const char *api_token);
 
 struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
                                         const char *fgLabel,

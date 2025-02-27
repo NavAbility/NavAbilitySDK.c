@@ -14,8 +14,8 @@ int main(void) {
 
     const char* url = getenv ("NVA_API_URL");
     printf("NVA_API_URL: %s\n", (url != NULL) ? "***" : "getenv returned NULL");
-    const char* oid = getenv ("NVA_ORG_ID");
-    printf("NVA_ORG_ID: %s\n", (oid != NULL) ? "***" : "getenv returned NULL");
+    // const char* oid = getenv ("NVA_ORG_ID");
+    // printf("NVA_ORG_ID: %s\n", (oid != NULL) ? "***" : "getenv returned NULL");
     const char* atk = getenv ("NVA_API_TOKEN");
     printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
@@ -24,7 +24,7 @@ int main(void) {
         clock_gettime(CLOCK_REALTIME, &start);
 
     NavAbilityClient* nvacl = NULL;
-    nvacl = NavAbilityClient_new(url,oid,atk);
+    nvacl = NavAbilityClient_new(url,atk);
 
         clock_gettime(CLOCK_REALTIME, &end);
         // time_spent = end - start
