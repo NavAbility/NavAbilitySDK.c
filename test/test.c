@@ -83,7 +83,8 @@ int main(void) {
     vl[0] = "x1";
     vl[1] = "x2";
     struct FactorDFG_Pose3Pose3_FullNormal *f = NULL;
-    f = FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
+    // f = FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
+    f = addFactor(vl,2,pf);
 
     freeR(f);
     freeR(pf);
