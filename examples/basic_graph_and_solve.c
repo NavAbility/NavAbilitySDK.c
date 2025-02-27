@@ -41,9 +41,7 @@ int main(void) {
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  VariableDFG* v = NULL;
-  v = addVariable(nvafg, "x0", "Pose2",  NULL, NULL, NULL, NULL, NULL);
-    freeR(v);
+  char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
   PriorPose2_FullNormal *pf = NULL;
@@ -56,8 +54,7 @@ int main(void) {
   
 
   // ROBOT MOVES TO (1,0,0)
-  v = addVariable(nvafg, "x1", "Pose2",  NULL, NULL, NULL, NULL, NULL);
-    freeR(v);
+  char* v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
   freeR(normal);

@@ -69,9 +69,7 @@ int main(void) {
 
 
     // add a variable
-    char* v = NULL;
-    // const char* tac = SArr("TEST");
-    v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+    char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
     printf("added variable id: %s\n", v);
 
     BlobEntry *be = NULL;
