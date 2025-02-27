@@ -130,22 +130,6 @@ struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
                                         size_t addAgentIfAbsent,
                                         size_t addGraphIfAbsent);
 
-struct Point2Point2_FullNormal *Point2Point2_new(const struct FullNormal *Z);
-
-struct Point3Point3_FullNormal *Point3Point3_new(const struct FullNormal *Z);
-
-struct Pose2Pose2_FullNormal *Pose2Pose2_new(const struct FullNormal *Z);
-
-struct Pose3Pose3_FullNormal *Pose3Pose3_new(const struct FullNormal *Z);
-
-struct PriorPoint2_FullNormal *PriorPoint2_new(const struct FullNormal *Z);
-
-struct PriorPoint3_FullNormal *PriorPoint3_new(const struct FullNormal *Z);
-
-struct PriorPose2_FullNormal *PriorPose2_new(const struct FullNormal *Z);
-
-struct PriorPose3_FullNormal *PriorPose3_new(const struct FullNormal *Z);
-
 const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
                               const struct BlobEntry *entry_);
@@ -244,6 +228,22 @@ char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
 
+struct Point2Point2_FullNormal *new_Point2Point2(const struct FullNormal *Z);
+
+struct Point3Point3_FullNormal *new_Point3Point3(const struct FullNormal *Z);
+
+struct Pose2Pose2_FullNormal *new_Pose2Pose2(const struct FullNormal *Z);
+
+struct Pose3Pose3_FullNormal *new_Pose3Pose3(const struct FullNormal *Z);
+
+struct PriorPoint2_FullNormal *new_PriorPoint2(const struct FullNormal *Z);
+
+struct PriorPoint3_FullNormal *new_PriorPoint3(const struct FullNormal *Z);
+
+struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
+
+struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
+
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);
@@ -259,58 +259,67 @@ const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
 // #define SArr3(a, b, c) strcat(strcat(strcat(strcat(strcat("",a),";"),b),";"),";")
 
 
-struct FactorDFG_PriorPoint2_FullNormal *FactorDFG_PriorPoint2_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct PriorPoint2_FullNormal *fnc
-);
+// typedef struct FactorDFG_##FNCTYPE ##FNCTYPE; \
 
+#define GEN_ADD_FACTOR(FNCTYPE) \
+    struct FactorDFG_##FNCTYPE *add_FactorDFG_##FNCTYPE( \
+        const struct NavAbilityDFG *nvafg, \
+        const char *_varlbls, \
+        const struct FNCTYPE *fnc, \
+        const char *_tags, \
+        const char *_timestamp, \
+        size_t _nstime, \
+        size_t _solvable \
+    );
 
-struct FactorDFG_PriorPoint3_FullNormal *FactorDFG_PriorPoint3_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct PriorPoint3_FullNormal *fnc
-);
+GEN_ADD_FACTOR(PriorPoint2_FullNormal);
+GEN_ADD_FACTOR(PriorPoint3_FullNormal);
+GEN_ADD_FACTOR(PriorPose2_FullNormal);
+GEN_ADD_FACTOR(PriorPose3_FullNormal);
+GEN_ADD_FACTOR(Point2Point2_FullNormal);
+GEN_ADD_FACTOR(Point3Point3_FullNormal);
+GEN_ADD_FACTOR(Pose2Pose2_FullNormal);
+GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 
+// struct FactorDFG_PriorPoint2_FullNormal *add_FactorDFG_PriorPoint2_FullNormal(
+//     const char *varlbls,
+//     const struct PriorPoint2_FullNormal *fnc
+// );
 
-struct FactorDFG_PriorPose2_FullNormal *FactorDFG_PriorPose2_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct PriorPose2_FullNormal *fnc
-);
+// struct FactorDFG_PriorPoint3_FullNormal *add_FactorDFG_PriorPoint3_FullNormal(
+//     const char *varlbls,
+//     const struct PriorPoint3_FullNormal *fnc
+// );
 
+// struct FactorDFG_PriorPose2_FullNormal *add_FactorDFG_PriorPose2_FullNormal(
+//     const char *varlbls,
+//     const struct PriorPose2_FullNormal *fnc
+// );
 
-struct FactorDFG_PriorPose3_FullNormal *FactorDFG_PriorPose3_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct PriorPose3_FullNormal *fnc
-);
+// struct FactorDFG_PriorPose3_FullNormal *add_FactorDFG_PriorPose3_FullNormal(
+//     const char *varlbls,
+//     const struct PriorPose3_FullNormal *fnc
+// );
 
+// struct FactorDFG_Point2Point2_FullNormal *add_FactorDFG_Point2Point2_FullNormal(
+//     const char *varlbls,
+//     const struct Point2Point2_FullNormal *fnc
+// );
 
-struct FactorDFG_Point2Point2_FullNormal *FactorDFG_Point2Point2_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct Point2Point2_FullNormal *fnc
-);
+// struct FactorDFG_Point3Point3_FullNormal *add_FactorDFG_Point3Point3_FullNormal(
+//     const char *varlbls,
+//     const struct Point3Point3_FullNormal *fnc
+// );
 
-struct FactorDFG_Point3Point3_FullNormal *FactorDFG_Point3Point3_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct Point3Point3_FullNormal *fnc
-);
+// struct FactorDFG_Pose2Pose2_FullNormal *add_FactorDFG_Pose2Pose2_FullNormal(
+//     const char *varlbls,
+//     const struct Pose2Pose2_FullNormal *fnc
+// );
 
-struct FactorDFG_Pose2Pose2_FullNormal *FactorDFG_Pose2Pose2_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct Pose2Pose2_FullNormal *fnc
-);
-
-
-struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
-    const char *const *varlbls,
-    size_t varlbls_len,
-    const struct Pose3Pose3_FullNormal *fnc
-);
+// struct FactorDFG_Pose3Pose3_FullNormal *add_FactorDFG_Pose3Pose3_FullNormal(
+//     const char *varlbls,
+//     const struct Pose3Pose3_FullNormal *fnc
+// );
 
 
 
@@ -371,17 +380,17 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
     ) (obj)
 
 
-#define addFactor(nfg,vl,obj,tags)                                                   \
+#define addFactor(nfg,vl,obj,tags,_timestamp,_nstime,_solvable)                                                   \
     _Generic(obj,                                                             \
-        PriorPoint2_FullNormal*:    FactorDFG_PriorPoint2_FullNormal_new,        \
-        PriorPoint3_FullNormal*:    FactorDFG_PriorPoint3_FullNormal_new,        \
-        PriorPose2_FullNormal*:    FactorDFG_PriorPose2_FullNormal_new,        \
-        PriorPose3_FullNormal*:    FactorDFG_PriorPose3_FullNormal_new,        \
-        Point2Point2_FullNormal*:    FactorDFG_Point2Point2_FullNormal_new,        \
-        Point3Point3_FullNormal*:    FactorDFG_Point3Point3_FullNormal_new,        \
-        Pose2Pose2_FullNormal*:    FactorDFG_Pose2Pose2_FullNormal_new,        \
-        Pose3Pose3_FullNormal*:    FactorDFG_Pose3Pose3_FullNormal_new        \
-    ) (nfg,vl,obj,tags)
+        PriorPoint2_FullNormal*:    add_FactorDFG_PriorPoint2_FullNormal,        \
+        PriorPoint3_FullNormal*:    add_FactorDFG_PriorPoint3_FullNormal,        \
+        PriorPose2_FullNormal*:    add_FactorDFG_PriorPose2_FullNormal,        \
+        PriorPose3_FullNormal*:    add_FactorDFG_PriorPose3_FullNormal,        \
+        Point2Point2_FullNormal*:    add_FactorDFG_Point2Point2_FullNormal,        \
+        Point3Point3_FullNormal*:    add_FactorDFG_Point3Point3_FullNormal,        \
+        Pose2Pose2_FullNormal*:    add_FactorDFG_Pose2Pose2_FullNormal,        \
+        Pose3Pose3_FullNormal*:    add_FactorDFG_Pose3Pose3_FullNormal        \
+    ) (nfg,vl,obj,tags,_timestamp,_nstime,_solvable)
 
 
 //

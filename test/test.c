@@ -86,15 +86,12 @@ int main(void) {
     normal = FullNormal_new(3,mn,cv);
     
     Pose3Pose3_FullNormal *pf = NULL;
-    pf = Pose3Pose3_new(normal);
-    const char *vl[2];
-    vl[0] = "x1";
-    vl[1] = "x2";
-    struct FactorDFG_Pose3Pose3_FullNormal *f = NULL;
+    pf = new_Pose3Pose3(normal);
+    // struct FactorDFG_Pose3Pose3_FullNormal *f = NULL;
     // f = FactorDFG_Pose3Pose3_FullNormal_new(vl,2,pf);
-    f = addFactor(vl,2,pf);
+    const char* fid = addFactor(nvafg,"x1;x2;",pf,"TESTTAG;", "", 0, 1);
 
-    freeR(f);
+    // freeR(f);
     freeR(pf);
     freeR(normal);
 
