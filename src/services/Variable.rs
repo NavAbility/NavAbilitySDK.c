@@ -476,11 +476,10 @@ pub async fn add_variable_send(
     label: &String,
     variableType: &String,
     _tags: Option<Vec<String>>,
-    _solvable: Option<i64>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
+    _solvable: Option<i64>,
     _metadata: Option<String>,
-    _fg_id: Uuid
 ) -> Result<(),Box<dyn Error>> {
     
     return send_api_result(
@@ -505,12 +504,12 @@ pub fn addVariable(
     label: &String,
     variableType: &String,
     _tags: Option<Vec<String>>,
-    _solvable: Option<i64>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
+    _solvable: Option<i64>,
     _metadata: Option<String>,
 ) -> Result<Uuid, Box<dyn Error>> {
-    let _fg_id = nvafg.getId(label);
+
     return crate::execute(post_add_variable(
         nvafg,
         label,
