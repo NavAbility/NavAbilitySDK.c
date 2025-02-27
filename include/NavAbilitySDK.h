@@ -98,6 +98,11 @@ typedef struct RVec_Agent {
   size_t len;
 } RVec_Agent;
 
+typedef struct RVec_____c_char {
+  char **ptr;
+  size_t len;
+} RVec_____c_char;
+
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
 struct BlobEntry *BlobEntry_new(const char *blobId,
@@ -151,10 +156,13 @@ const char *addBlob(const struct NavAbilityBlobStore *nvabs_,
                     const char *data,
                     size_t nbytes);
 
-char *addVariable(const struct NavAbilityDFG *nvafg,
-                  const char *label,
-                  const char *variableType,
-                  const char *_tags);
+const char *addVariable(const struct NavAbilityDFG *nvafg,
+                        const char *label,
+                        const char *variableType,
+                        const char *_tags,
+                        const char *_timestamp,
+                        size_t _nstime,
+                        size_t _solvable);
 
 void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                           const char *agent_label,
@@ -208,6 +216,8 @@ void free_PriorPose3(struct PriorPose3_FullNormal*);
 
 void free_RVec_Agent(struct RVec_Agent *rvec);
 
+void free_RVec_ListGraphs(struct RVec_____c_char *rvec);
+
 void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
@@ -233,6 +243,8 @@ struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *l
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
+
+void listGraphs(const struct NavAbilityClient *_nvacl);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,

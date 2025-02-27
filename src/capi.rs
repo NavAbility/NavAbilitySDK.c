@@ -5,6 +5,9 @@ pub use cexport::*;
 mod Agents;
 pub use Agents::*;
 
+mod Factorgraphs;
+pub use Factorgraphs::*;
+
 mod BlobEntry;
 pub use BlobEntry::*;
 

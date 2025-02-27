@@ -48,7 +48,6 @@ int main(void) {
 
     NavAbilityBlobStore *store = NULL;
     store = NavAbilityBlobStore_new(nvacl, "default");
-
     printf("getLabel(store): %s\n", getLabel(store));
 
     srand(time(NULL));
@@ -61,17 +60,22 @@ int main(void) {
         fglbl,
         "BOT_01",
         NULL,
-        0,
-        0
+        1,
+        1
     );
 
     // Test that accessor methods use ref not Box<> whereby Rust retakes ownership and drops (leads to segfault)
     printf("getLabel(nvafg): %s\n", getLabel(nvafg));
 
+    // check that the graph is there
+    // RVec_Graph* graphs = NULL;
+    listGraphs(nvafg);
+
+
     // add a variable
     VariableDFG* v = NULL;
     // const char* tac = SArr("TEST");
-    v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;"); //, "", 0);
+    v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
     // freeR(v);
 
     BlobEntry *be = NULL;
