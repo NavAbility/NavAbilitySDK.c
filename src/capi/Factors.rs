@@ -21,6 +21,8 @@ use std::{
 use crate::{
   FullNormal,
   entities::Factors::FactorType,
+  cstr_to_str,
+  convert_str,
 };
 
 
@@ -100,28 +102,31 @@ macro_rules! GenFactorDFG_Type {
         #[allow(non_snake_case)]
         #[no_mangle] pub unsafe extern "C" 
         fn $fnm<'a>(
-            varlbls: *const *const c_char,
-            varlbls_len: usize,
+            nvafg: Option<&crate::NavAbilityDFG>,
+            _vlbls: *const c_char,
             fnc: Option<&crate::$T<FullNormal<'a>>>,
+            _tags: *const c_char,
         ) -> Option<Box<crate::FactorDFG<crate::$T<FullNormal<'a>>>>> {
             
-            let ovlb = crate::convert_arr_ptrchar(varlbls, varlbls_len);
-            // let mut ovlb = Vec::new();
-            // for i in 0..varlbls_len {
-            //     let v = *varlbls.offset(i as isize);
-            //     let s = CStr::from_ptr(v).to_string_lossy().into_owned();
-            //     ovlb.push(s);
-            // }
+            let mut vvlbls = Vec::new();
+            let vlbls = cstr_to_str(_vlbls).to_string();
+            vlbls.split(";").for_each(|t| vvlbls.push(t.to_string()));
+
+            let mut vtags = Vec::new();
+            let tags = cstr_to_str(_tags).to_string();
+            tags.split(";").for_each(|t| vtags.push(t.to_string()));
             
             let f = crate::FactorDFG::new(
-                ovlb, 
+                vvlbls, 
                 fnc.unwrap().clone(),
                 Vec::new(),
                 None,
                 None
             );
 
-            return return Some(Box::new( f ));
+            // Do the add factor call here
+
+            return Some(Box::new( f ));
         }
     };
 }

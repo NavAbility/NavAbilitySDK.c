@@ -122,7 +122,7 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
     ) (obj)
 
 
-#define addFactor(vl,i,obj)                                                   \
+#define addFactor(nfg,vl,obj,tags)                                                   \
     _Generic(obj,                                                             \
         PriorPoint2_FullNormal*:    FactorDFG_PriorPoint2_FullNormal_new,        \
         PriorPoint3_FullNormal*:    FactorDFG_PriorPoint3_FullNormal_new,        \
@@ -132,7 +132,7 @@ struct FactorDFG_Pose3Pose3_FullNormal *FactorDFG_Pose3Pose3_FullNormal_new(
         Point3Point3_FullNormal*:    FactorDFG_Point3Point3_FullNormal_new,        \
         Pose2Pose2_FullNormal*:    FactorDFG_Pose2Pose2_FullNormal_new,        \
         Pose3Pose3_FullNormal*:    FactorDFG_Pose3Pose3_FullNormal_new        \
-    ) (vl,i,obj)
+    ) (nfg,vl,obj,tags)
 
 
 //

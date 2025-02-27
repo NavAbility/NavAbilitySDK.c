@@ -44,28 +44,25 @@ int main(void) {
   char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
-  PriorPose2_FullNormal *pf = NULL;
-  pf = PriorPose2_new(normal);
-    const char *vl[1];
-    vl[0] = "x0";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,1,pf);
-    freeR(f); freeR(pf); free(vl);
+  PriorPose2_FullNormal *pf0 = NULL;
+  pf0 = PriorPose2_new(normal);
+    struct FactorDFG_PriorPose2_FullNormal *f1 = NULL;
+  f = addFactor(nvafg, "x0;", pf0);
+    freeR(f); freeR(pf0); free(vl);
   
 
   // ROBOT MOVES TO (1,0,0)
-  char* v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+  v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
   freeR(normal);
   mn[0] = 10.0;
   normal = FullNormal_new(3,mn,cv);
-  Pose2Pose2_FullNormal *pf = NULL;
-  pf = Pose2Pose2_new(normal);
-    const char *vl[2]; vl[0] = "x0"; vl[1] = "x1";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,2,pf);
-    freeR(f);freeR(pf); free(vl);
+  Pose2Pose2_FullNormal *pf1 = NULL;
+  pf1 = Pose2Pose2_new(normal);
+    struct FactorDFG_PriorPose2_FullNormal *f2 = NULL;
+  f = addFactor(nvafg, "x0;x1;", pf1);
+    freeR(f);freeR(pf1); free(vl);
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);

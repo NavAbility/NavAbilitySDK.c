@@ -194,18 +194,18 @@ pub unsafe fn cstr_to_str(c_buf: *const i8) -> &'static str {
 }
 
 
-pub unsafe fn convert_arr_ptrchar(
-    varlbls: *const *const c_char,
-    varlbls_len: usize,
-) -> Vec<String> {
-    let mut ovlb = Vec::new();
-    for i in 0..varlbls_len {
-        let v = *varlbls.offset(i as isize);
-        let s = CStr::from_ptr(v).to_string_lossy().into_owned();
-        ovlb.push(s);
-    }
-    return ovlb;
-}
+// pub unsafe fn convert_arr_ptrchar(
+//     varlbls: *const *const c_char,
+//     varlbls_len: usize,
+// ) -> Vec<String> {
+//     let mut ovlb = Vec::new();
+//     for i in 0..varlbls_len {
+//         let v = *varlbls.offset(i as isize);
+//         let s = CStr::from_ptr(v).to_string_lossy().into_owned();
+//         ovlb.push(s);
+//     }
+//     return ovlb;
+// }
 
 
 fn format_type_of<T>(_: &T) {

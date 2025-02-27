@@ -85,8 +85,8 @@ fn addVariable(
     return convert_str("");
   }
   
-  let tags = cstr_to_str(_tags).to_string();
   let mut vtags = Vec::new();
+  let tags = cstr_to_str(_tags).to_string();
   tags.split(";").for_each(|t| vtags.push(t.to_string()));
 
   let timestamp = (|ts: String| {
