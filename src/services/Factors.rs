@@ -4,6 +4,7 @@ use std::{
   error::Error
 };
 
+use serde::Serialize;
 use uuid::Uuid;
 
 use chrono::{
@@ -224,6 +225,32 @@ where
   }
 }
 
+#[derive(Serialize)]
+struct ManualVarWhere {
+  id: String,
+}
+
+#[derive(Serialize)]
+struct ManualVarConnectWhereInput {
+  node: ManualVarWhere,
+}
+
+#[derive(Serialize)]
+struct ManualFacVarConnFieldInput {
+  r#where: ManualVarConnectWhereInput,
+}
+
+#[derive(Serialize)]
+struct ManualFacVarFieldInput {
+  connect: Vec<ManualFacVarConnFieldInput>,
+}
+
+impl ManualFacVarFieldInput {
+  pub fn to_json(&self) -> String {
+    serde_json::to_string(&self).unwrap().to_string()
+  }
+}
+
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
@@ -232,18 +259,31 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 ) -> Result<Uuid, Box<dyn crate::Error>> {
     use crate::to_console_error;
 
-
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
 
   let mut variable_order_symbols = Vec::new();
   for v in factor.variableOrderSymbols_ {
-    variable_order_symbols.push(Some(v));
+    variable_order_symbols.push(v);
   }
 
+  let mut connect = ManualFacVarFieldInput {
+    connect: Vec::new(),
+  };
+  for vl in &variable_order_symbols {
+    connect.connect.push(
+      ManualFacVarConnFieldInput {
+        r#where: ManualVarConnectWhereInput {
+          node: ManualVarWhere {
+            id: nvafg.getId(vl).to_string(),
+          }
+        }
+      }
+    );
+  }
 
   // DFG.FactorDFG + BlobEntry + ... ~= GQL.FactorCreateInput
-  let newfac = add_factors::FactorCreateInput {
+  let variables = add_factors::Variables {
     id,
     label,
     tags: factor.tags,
@@ -252,20 +292,18 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
     fnctype: factor.fnctype.type_str(),
     solvable: factor.solvable.expect("FactorDFG missing .solvable field"),
     data: factor.data.expect("FactorDFG missing .data field"),
-    metadata: factor.metadata,
-    variable_order_symbols: Some(variable_order_symbols),
+    // metadata: factor.metadata,
+    variable_order_symbols: variable_order_symbols,
     version: SDK_VERSION.to_string(),
-    blob_entries: None,
-    fg: None,
-    variables: None,
+    fg_id: nvafg.getId("").to_string(),
+    variables_connect: connect.to_json(),
+    blob_entries: None
     // _type: "",
   };
 
-  let request_body = AddFactors::build_query(
-    add_factors::Variables {
-        factors_to_create: vec![newfac],
-    }
-  );
+  println!("Variables connect {:?}",&variables.variables_connect);
+
+  let request_body = AddFactors::build_query(variables);
   
   return crate::post_to_nvaapi::<
     add_factors::Variables,

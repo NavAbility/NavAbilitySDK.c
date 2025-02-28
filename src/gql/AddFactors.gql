@@ -20,9 +20,42 @@ fragment factor_full_fields on Factor {
 }
 
 
-mutation AddFactors($factorsToCreate: [FactorCreateInput!]!) {
+mutation AddFactors(
+  $id: ID!,
+  $label: String!,
+  $tags: [String!]!,
+  $_variableOrderSymbols: [String!]!,
+  $timestamp: DateTime!,
+  $nstime: BigInt!,
+  $fnctype: String!,
+  $solvable: Int!,
+  $data: String!,
+  $_version: String! = "0.25",
+  $fg_id: ID!,
+  $variables_connect: JSON!,
+  $blob_entries: JSON
+) {
   addFactors(
-    input: $factorsToCreate
+    input: {
+      id: $id,
+      label: $label,
+      tags: $tags,
+      timestamp: $timestamp,
+      nstime: $nstime,
+      _variableOrderSymbols: $_variableOrderSymbols,
+      fnctype: $fnctype,
+      solvable: $solvable,
+      data: $data,
+      _version: $_version,
+      fg: {
+        connect: {
+          where: {
+            node: {id: $fg_id}
+          }
+        }
+      }
+      variables: $variables_connect
+    }
   ) {
     factors {
       ...factor_skeleton_fields
