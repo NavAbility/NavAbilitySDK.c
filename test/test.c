@@ -69,13 +69,12 @@ int main(void) {
 
 
     // add a variable
-    char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
-    printf("added variable id: %s\n", v);
+    char* v1 = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+    printf("added variable id: %s\n", v1);
 
-    BlobEntry *be = NULL;
-    be = BlobEntry_basic("test_entry","text/plain");
-    printf("getLabel(bentry): %s\n", getLabel(be));
-    freeR(be);
+    // add a variable
+    char* v2 = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+    printf("added variable id: %s\n", v2);
 
     FullNormal *normal = NULL;
     double mn[3] = { 0.0 };
@@ -89,7 +88,7 @@ int main(void) {
     pf = new_Pose3Pose3(normal);  // new_ means must freeR(pf) later
     const char* fid = addFactor(
         nvafg,
-        "x1;x2;",
+        "x0;x1;",
         pf,
         "TESTTAG;", 
         "", 0, 
@@ -97,6 +96,11 @@ int main(void) {
     ); freeR(pf); freeR(normal); // because new_ was used
     printf("Added factor id: %s\n", fid);
 
+
+    BlobEntry *be = NULL;
+    be = BlobEntry_basic("test_entry","text/plain");
+    printf("getLabel(bentry): %s\n", getLabel(be));
+    freeR(be);
 
     printf("About to getVariable with nvafg\n");
     // test getVariable

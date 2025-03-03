@@ -114,11 +114,17 @@ macro_rules! GenFactorDFG_Type {
 
             let mut vvlbls = Vec::new();
             let vlbls = cstr_to_str(_vlbls).to_string();
-            vlbls.split(";").for_each(|t| vvlbls.push(t.to_string()));
+            vlbls.split(";").for_each(|t| {
+                let t_ = t.trim();
+                if !t_.is_empty() { vvlbls.push(t_.to_string()) }
+            });
 
             let mut vtags = Vec::new();
             let tags = cstr_to_str(_tags).to_string();
-            tags.split(";").for_each(|t| vtags.push(t.to_string()));
+            tags.split(";").for_each(|t| {
+                let t_ = t.trim();
+                if !t_.is_empty() { vtags.push(t_.to_string()) }
+            });
             
             // let timestamp = (|ts: String| {
             //     if ts.is_empty() {
