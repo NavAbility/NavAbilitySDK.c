@@ -278,10 +278,20 @@ pub struct AddFactors;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
-    query_path = "src/gql/AddBlobEntryAgent.gql",
+    query_path = "src/gql/AddAgentBlobEntry.gql",
     response_derives = "Debug"
 )]
-pub struct AddBlobEntryAgent;
+pub struct AddAgentBlobEntry;
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/schema.json",
+    query_path = "src/gql/AddVariableBlobEntry.gql",
+    response_derives = "Debug"
+)]
+pub struct AddVariableBlobEntry;
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
@@ -308,10 +318,10 @@ pub struct ConnectGraphAgent;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/schema.json",
-    query_path = "src/gql/AddBlobEntryModel.gql",
+    query_path = "src/gql/AddModelBlobEntry.gql",
     response_derives = "Debug"
 )]
-pub struct AddBlobEntryModel;
+pub struct AddModelBlobEntry;
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]

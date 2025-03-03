@@ -1,16 +1,17 @@
-mutation AddBlobEntryAgent(
-  $agent_label: String!,
+mutation AddVariableBlobEntry(
+  $variable_id: ID!,
   $entry_id: ID!,
   $entry_label: String!,
   $blob_id: ID!,
-  $blobstore: String,
-  $origin: String,
+  $blobstore: String! = "default",
+  $origin: String! = "NvaSDK.rs",
   $mime_type: String,
   $metadata: String!,
   $description: String,
   $hash: String!,
-  $size: BigInt
-  $timestamp: DateTime
+  $size: BigInt,
+  $timestamp: DateTime!,
+  $version: String! = "0.25"
 ) {
     addBlobEntries(
     input: {
@@ -26,13 +27,13 @@ mutation AddBlobEntryAgent(
       hash: $hash,
       size: $size,
       timestamp: $timestamp,
-      _version: "0.25", 
+      _version: $version, 
       parent: {
-        Agent: {
+        Variable: {
           connect: {
             where: {
               node: {
-                label: $agent_label
+                id: $variable_id
               }
             }
           }

@@ -24,11 +24,11 @@ impl GetId for NavAbilityClient {
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 impl NavAbilityClient {
+    #[cfg(any(feature = "tokio", feature = "blocking"))]
     pub fn getOrgId(
         &self
-    ) -> Uuid   {
+    ) -> Uuid {
         if self.user_label.is_empty() {
-            #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
             crate::execute(crate::services::post_org_id(&self))
             .expect(&format!(
                 "Error, unable to get OrgId with NavAbilityClient\napi_url:{}\ntoken:{}\n",
@@ -88,12 +88,17 @@ impl NavAbilityClient {
         };
 
         // also cover wasm case
+        #[cfg(any(feature = "tokio", feature = "blocking", feature = "thread"))]
         let mut oid = org_id.unwrap_or(&"".to_string()).to_string();
+        #[cfg(feature = "wasm")]
+        let oid = org_id.unwrap_or(&"".to_string()).to_string();
+
         #[cfg(any(feature = "tokio", feature = "blocking", feature = "thread"))]
         if org_id.is_none() {
             oid = crate::execute(crate::services::post_org_id(
                 &temp
             )).expect("Error, unable to get OrgId from NavAbilityClient")
+            .orgs[0].id
             .to_string();
         }
     

@@ -26,6 +26,10 @@ use crate::{
   get_agents,
   GraphQLQuery, 
   NavAbilityClient,
+  NavAbilityDFG,
+  GetId,
+  AddAgentBlobEntry,
+  AddVariableBlobEntry,
 };
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
@@ -271,6 +275,199 @@ pub async fn post_update_blobentry_metadata(
     Some(1)
   ).await;
 }
+
+
+// FIXME return Uuid (not string)
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+pub async fn post_add_agent_entry(
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+  entry: &BlobEntry,
+  _legacy: Option<String>,
+) -> Result<String,Box<dyn Error>> {
+  
+  let name = format!("{}{}",&agent_label,&entry.label).to_string();
+  let entry_id = nvacl.getId(&name);
+
+  let mut size_s: Option<String> = None;
+  if let Some(sz) = entry.size {
+    size_s = Some(format!("{}",sz));
+  }
+  let mut metadata = entry.metadata.to_string();
+  if metadata.is_empty() {
+    metadata = "e30=".to_string();
+  }
+  
+  let variables = crate::add_agent_blob_entry::Variables {
+    agent_label: agent_label.to_string(),
+    entry_id: entry_id.to_string(),
+    entry_label: entry.label.to_string(),
+    blob_id: entry.blobId.to_string(),
+    blobstore: Some(entry.blobstore.to_string()),
+    origin: Some(entry.origin.to_string()),
+    mime_type: Some(entry.mimeType.to_string()),
+    metadata: metadata,
+    description: Some(entry.description.to_string()),
+    hash: entry.hash.to_string(),
+    size: size_s,
+    timestamp: Some(entry.timestamp.to_string()),
+  };
+  
+  let request_body = AddAgentBlobEntry::build_query(variables);
+  
+  return post_to_nvaapi::<
+    crate::add_agent_blob_entry::Variables,
+    crate::add_agent_blob_entry::ResponseData,
+    String
+  >(
+    nvacl,
+    request_body, 
+    |s| {
+      s.add_blob_entries.blob_entries[0].id.clone()
+    },
+    Some(1)
+  ).await;
+}
+
+// let gqlentry = add_blob_entries_agent::BlobEntryCreateInput::new(
+//     org_id,
+//     entry,
+//     agent_label.to_string(),
+// );
+// let mut blob_entries = Vec::new();
+// blob_entries.push(gqlentry);
+// let variables = add_blob_entries_agent::Variables {
+//     blob_entries,
+// };
+
+
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+pub async fn q_addAgentBlobEntry(
+  send_into: std::sync::mpsc::Sender<String>,
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+  entry: &BlobEntry,
+) -> Result<(),Box<dyn Error>> {
+  
+  return send_api_result(
+    send_into, 
+    post_add_agent_entry(
+      nvacl, 
+      agent_label,
+      entry,
+      None
+    ).await,
+  );
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn addAgentBlobEntry(
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+  entry: &BlobEntry,
+) -> Result<String, Box<dyn Error>> {
+  return crate::execute(post_add_agent_entry(
+    nvacl,
+    agent_label,
+    entry,
+    None // legacy
+  ));
+}
+
+
+
+// FIXME return Uuid (not string)
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+pub async fn post_add_variable_blobentry(
+  nvafg: &NavAbilityDFG,
+  variable_lbl: &String,
+  entry: &BlobEntry,
+) -> Result<Uuid,Box<dyn Error>> {
+  
+  let entry_id = nvafg.getId(&format!("{}{}",&variable_lbl,&entry.label));
+  
+  let mut size_s: Option<String> = None;
+  if let Some(sz) = entry.size {
+    size_s = Some(format!("{}",sz));
+  }
+  let mut metadata = entry.metadata.to_string();
+  if metadata.is_empty() {
+    metadata = "e30=".to_string();
+  }
+  
+  let variables = crate::add_variable_blob_entry::Variables {
+    variable_id: nvafg.getId(&format!("{}{}",variable_lbl,entry.label)).to_string(),
+    entry_id: entry_id.to_string(),
+    entry_label: entry.label.to_string(),
+    blob_id: entry.blobId.to_string(),
+    blobstore: entry.blobstore.to_string(),
+    origin: entry.origin.to_string(),
+    mime_type: Some(entry.mimeType.to_string()),
+    metadata: metadata,
+    description: Some(entry.description.to_string()),
+    hash: entry.hash.to_string(),
+    size: size_s,
+    timestamp: crate::services::to_string_ISO8601(entry.timestamp),
+    version: entry._version.to_string(),
+  };
+  
+  let request_body = AddVariableBlobEntry::build_query(variables);
+  
+  return post_to_nvaapi::<
+    crate::add_variable_blob_entry::Variables,
+    crate::add_variable_blob_entry::ResponseData,
+    Uuid
+  >(
+    &nvafg.client,
+    request_body, 
+    |s| {
+      Uuid::parse_str(
+        &s.add_blob_entries.blob_entries[0].id
+      ).expect("Unable to parse UUID from add_variable_blobentry response")
+    },
+    Some(1)
+  ).await;
+}
+
+
+
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+pub async fn q_addVariableBlobEntry(
+  send_into: std::sync::mpsc::Sender<Uuid>,
+  nvafg: &NavAbilityDFG,
+  variable_label: &String,
+  bentry: &BlobEntry,
+) -> Result<(),Box<dyn Error>> {
+  
+  return send_api_result(
+    send_into, 
+    post_add_variable_blobentry(
+      nvafg, 
+      variable_label,
+      bentry,
+    ).await,
+  );
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn addVariableBlobEntry(
+  nvafg: &NavAbilityDFG,
+  variable_label: &String,
+  bentry: &BlobEntry,
+) -> Result<Uuid, Box<dyn Error>> {
+  return crate::execute(post_add_variable_blobentry(
+    nvafg,
+    variable_label,
+    bentry,
+  ));
+}
+
+
+
+
+
 
 
 // =============== FUTURE IDEAS ==============
