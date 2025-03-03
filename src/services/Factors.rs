@@ -49,9 +49,10 @@ use crate::entities::ClientDFG::NavAbilityDFG;
 
 
 // helper macro to avoid repetition of "basic" impl Coordinates
+// TODO factors can come from more than just RoME
 #[macro_export]
 macro_rules! GenDistrFactor { 
-  ($T:ident) => {
+  ($T:ident, $fns:literal) => {
     impl<'a, D: Distribution<'a>> crate::FactorType<'a, D> for $T<D> {
       fn new(Z: D) -> Self {
         Self {
@@ -60,21 +61,21 @@ macro_rules! GenDistrFactor {
       }
 
       fn type_str(&self) -> String {
-        return format!("RoME.{}", get_fnc_name(&std::any::type_name::<Self>()));
+        return format!("RoME.{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
       }
     }
   }
 }
 
 
-GenDistrFactor!(PriorPoint2);
-GenDistrFactor!(PriorPoint3);
-GenDistrFactor!(PriorPose2);
-GenDistrFactor!(PriorPose3);
-GenDistrFactor!(Point2Point2);
-GenDistrFactor!(Point3Point3);
-GenDistrFactor!(Pose2Pose2);
-GenDistrFactor!(Pose3Pose3);
+GenDistrFactor!(PriorPoint2, "PriorPoint2");
+GenDistrFactor!(PriorPoint3, "PriorPoint3");
+GenDistrFactor!(PriorPose2, "PriorPose2");
+GenDistrFactor!(PriorPose3, "PriorPose3");
+GenDistrFactor!(Point2Point2, "Point2Point2");
+GenDistrFactor!(Point3Point3, "Point3Point3");
+GenDistrFactor!(Pose2Pose2, "Pose2Pose2");
+GenDistrFactor!(Pose3Pose3, "Pose3Pose3");
 
 
 
@@ -257,7 +258,9 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<Uuid, Box<dyn crate::Error>> {
-    use crate::to_console_error;
+    use std::any::type_name;
+
+    use crate::{to_console_error, type_of};
 
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
@@ -283,7 +286,7 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   }
 
   // DFG.FactorDFG + BlobEntry + ... ~= GQL.FactorCreateInput
-  let variables = add_factors::Variables {
+  let mut variables = add_factors::Variables {
     id,
     label,
     tags: factor.tags,
@@ -296,22 +299,28 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
     variable_order_symbols: variable_order_symbols,
     version: SDK_VERSION.to_string(),
     fg_id: nvafg.getId("").to_string(),
-    variables_connect: connect.to_json(),
-    blob_entries: None
+    variables_connect: None
+    // blob_entries: None
     // _type: "",
   };
-
-  println!("Variables connect {:?}",&variables.variables_connect);
-
-  let request_body = AddFactors::build_query(variables);
   
-  return crate::post_to_nvaapi::<
-    add_factors::Variables,
+  
+  let request_body = AddFactors::build_query(variables);
+  // reverse engineer request body to splice in variables_connect without full types
+  let jstr = serde_json::to_string(&request_body).unwrap();
+  let mut jval: serde_json::Value = serde_json::from_str(&jstr).unwrap();
+  let jcon: serde_json::Value = serde_json::from_str(&serde_json::to_string(&connect).unwrap()).expect("problem with connect");
+  jval["variables"]["variables_connect"] = jcon;
+
+  let nvacl = nvafg.client.clone();
+  let post_req = nvacl.client
+    .post(&nvacl.apiurl)
+    .json(&jval);
+
+  return crate::post_to_nvaapi_cb::<
     add_factors::ResponseData,
     Uuid
   >(
-    &nvafg.client,
-    request_body, 
     |s| {
       if &s.add_factors.factors.len() != &1 {
         to_console_error(&format!("post_add_factor: expected 1 factor in response, got {}", s.add_factors.factors.len()));
@@ -319,7 +328,8 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
       }
       return Uuid::parse_str(&s.add_factors.factors[0].factor_skeleton_fields.id).expect("post_add_variable not able to parse uuid from API response");
     },
-    Some(1)
+    Some(1),
+    post_req
   ).await;
 }
 

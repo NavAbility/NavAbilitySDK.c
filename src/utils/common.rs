@@ -307,35 +307,20 @@ pub fn check_deser<T>(
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 pub async fn post_to_nvaapi_cb<
-  // V: Serialize,
   R: for<'de> Deserialize<'de>,
   T
 >(
-  // nvacl: &crate::NavAbilityClient,
-  // request_body: crate::QueryBody<V>,
   fn_modifier: fn(R) -> T,
   retries: Option<i32>,
   post_req: reqwest::RequestBuilder
-  // post_cb: impl Fn() -> Result<reqwest::Response, reqwest::Error>
 ) -> Result<T, Box<dyn Error>> {
-  
-  // TBD
-  // let query = MyQuery::build_query(my_query::Variables {});
-  // match query {
-  //     Ok(q) => () // println!("Query: {:?}", q),
-  //     Err(e) => eprintln!("Failed to build query: {:?}", e),
-  // }
-  
+  // Note, this function allows request body json splicing for incomplete GQL types
   let mut trycount = retries.unwrap_or(3);
   while 0 < trycount {
 
     let req_res = post_req.try_clone()
     .expect("Unable to clone request")
     .send().await;
-    // let req_res = post_req.try_clone()
-    // .expect("Unable to clone request")
-    // .json(&request_body).send().await;
-
     
     if let Err(re) = req_res {
       let erm = format!("API request error: {:?}", &re);
@@ -373,21 +358,11 @@ pub async fn post_to_nvaapi<
   let post_req = nvacl.client
     .post(&nvacl.apiurl)
     .json(&request_body);
-    // .send();
-  // let cb = || {
-  //     nvacl.client
-  //     .post(&nvacl.apiurl)
-  //     .json(&request_body)
-  //     .send()
-  // };
 
   return post_to_nvaapi_cb::<R,T>(
-    // nvacl,
-    // request_body,
     fn_modifier,
     retries,
     post_req
-    // cb.await
   ).await;
 }
 

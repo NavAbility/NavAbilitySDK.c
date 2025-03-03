@@ -32,8 +32,7 @@ mutation AddFactors(
   $data: String!,
   $_version: String! = "0.25",
   $fg_id: ID!,
-  $variables_connect: JSON!,
-  $blob_entries: JSON
+  $variables_connect: FactorVariablesFieldInput
 ) {
   addFactors(
     input: {
