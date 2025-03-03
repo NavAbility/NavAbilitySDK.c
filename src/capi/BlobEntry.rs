@@ -103,6 +103,32 @@ fn addAgentBlobEntry(
 }
 
 
+#[no_mangle] pub unsafe extern "C" 
+fn addVariableBlobEntry(
+  nvafg_: Option<&crate::NavAbilityDFG>,
+  variable_label: *const c_char,
+  entry_: Option<&crate::BlobEntry>,
+) -> *const c_char {
+  if nvafg_.is_none() {
+    to_console_error("addVariableBlobEntry: provided *NavAbilityDFG is NULL/None");
+    return convert_str("");
+  }
+  
+  match crate::services::addVariableBlobEntry(
+    nvafg_.unwrap(),
+    &cstr_to_str(variable_label).to_string(),
+    entry_.unwrap()
+  ) {
+    Ok(id) => {
+      return convert_str(&id.to_string());
+    }
+    Err(e) => {
+      to_console_error(&format!("NvaSDK.rs error during addVariableBlobEntry: {:?}", e));
+      return convert_str("");
+    }
+  }
+}
+
 
 // TODO upstream the various BlobEntry parent function to services
 #[no_mangle] pub unsafe extern "C" 

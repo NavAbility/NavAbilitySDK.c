@@ -1,8 +1,8 @@
 
 .DEFAULT_GOAL := run-all
 
-#  run-basic-graph
-run-all: run-camera-lidar
+#  
+run-all: run-basic-graph run-camera-lidar
 	@echo "All examples have been run successfully."
 .PHONY: run-all
 
