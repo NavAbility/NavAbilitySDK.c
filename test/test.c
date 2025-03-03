@@ -24,7 +24,7 @@ int main(void) {
         clock_gettime(CLOCK_REALTIME, &start);
 
     NavAbilityClient* nvacl = NULL;
-    nvacl = NavAbilityClient_new(url,atk);
+    nvacl = new_NavAbilityClient(url,atk);
 
         clock_gettime(CLOCK_REALTIME, &end);
         // time_spent = end - start
@@ -47,7 +47,7 @@ int main(void) {
     freeR(agents);
 
     NavAbilityBlobStore *store = NULL;
-    store = NavAbilityBlobStore_new(nvacl, "default");
+    store = new_NavAbilityBlobStore(nvacl, "default");
     printf("getLabel(store): %s\n", getLabel(store));
 
     srand(time(NULL));
@@ -55,7 +55,7 @@ int main(void) {
     char fglbl[30];
     sprintf(fglbl, "FG_%03d", rand());
     printf("fglbl: %s\n", fglbl);
-    nvafg = NavAbilityDFG_new(
+    nvafg = new_NavAbilityDFG(
         nvacl,
         fglbl,
         "BOT_01",
@@ -160,7 +160,7 @@ int main(void) {
     //     return 10;
     // }
 
-    // e = error_new();
+    // e = new_error();
     // const char *msg = error_msg_get(e);
     // if (msg) {
     //     printf("error message = %s\n", msg);

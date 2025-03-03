@@ -15,13 +15,13 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = NavAbilityClient_new(url,atk);
+  nvacl = new_NavAbilityClient(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
   sprintf(fglbl, "FG_%03d", rand());
   printf("fglbl: %s\n", fglbl);
-  nvafg = NavAbilityDFG_new(
+  nvafg = new_NavAbilityDFG(
       nvacl,
       fglbl,
       "BOT_01",

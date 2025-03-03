@@ -15,10 +15,10 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = NavAbilityClient_new(url,atk);
+  nvacl = new_NavAbilityClient(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
-  nvafg = NavAbilityDFG_new(
+  nvafg = new_NavAbilityDFG(
       nvacl,
       "FG001",
       "BOT_01",
@@ -28,19 +28,17 @@ int main(void) {
   ); // must freeR(nvafg) later
 
   NavAbilityBlobStore *store = NULL;
-  store = NavAbilityBlobStore_new(nvacl, "default"); // must freeR(store) later
-
+  store = new_NavAbilityBlobStore(nvacl, "default"); // must freeR(store) later
 
   // BUILD A FACTOR GRAPH with multiple variables
-  VariableDFG* v = NULL;
-  // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  v = addVariable(nvafg, "x0", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x1", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x2", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x3", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x4", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x5", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x6", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
+  // inputs: (nvafg,label,variableType, [_tags,_timestamp,_nstime, _solavble])
+  addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x2", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x3", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x4", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x5", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x6", "Pose2", "TESTTAG;", "", 0, 1);
 
 
   // upload lidar data on x1
@@ -52,7 +50,7 @@ int main(void) {
   printf("Uploaded blobId: %s\n", bid);
   // connect the newly uploaded lidar data to the graph
   BlobEntry *be = NULL;
-  be = BlobEntry_new(    
+  be = new_BlobEntry(    
     blobId,
     "left_lidar.las", // label
     "default", // blobstore
@@ -75,7 +73,7 @@ int main(void) {
   printf("Uploaded blobId: %s\n", bid);
   // connect the newly uploaded lidar data to the graph
   BlobEntry *be = NULL;
-  be = BlobEntry_new(    
+  be = new_BlobEntry(    
     blobId,
     "left_lidar.las", // label
     "default", // blobstore
@@ -103,7 +101,7 @@ int main(void) {
   printf("Uploaded blobId: %s\n", bid);
   // connect the newly uploaded lidar data to the graph
   BlobEntry *be = NULL;
-  be = BlobEntry_new(    
+  be = new_BlobEntry(    
     blobId,
     "center_camera", // label
     "default", // blobstore

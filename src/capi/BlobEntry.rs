@@ -45,7 +45,7 @@ fn BlobEntry_basic(
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn BlobEntry_new(    
+fn new_BlobEntry(
   blobId: *const c_char,
   label: *const c_char,
   blobstore: *const c_char,
