@@ -62,10 +62,10 @@ fn getLabel_NavAbilityBlobStore(
     store: &crate::NavAbilityBlobStore,
 ) -> *const c_char {
     match &store.label {
-        crate::NvaStoreLabel::cloud(label) => {
+        crate::NvaStoreLabel::Cloud(label) => {
             return convert_str(label);
         },
-        crate::NvaStoreLabel::onprem(label) => {
+        crate::NvaStoreLabel::Onprem(label) => {
             return convert_str(label);
         },
     }
