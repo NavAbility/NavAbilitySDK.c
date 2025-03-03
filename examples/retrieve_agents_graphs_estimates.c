@@ -7,6 +7,8 @@
 
 // Sample library usage.
 int main(void) {
+  // change the random seed
+  srand(time(NULL));
 
   // basic setup
   const char* url = getenv ("NVA_API_URL");

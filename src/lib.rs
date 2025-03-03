@@ -436,8 +436,8 @@ genGetLabel!(VariableDFG);
 impl GetLabel for NavAbilityBlobStore {
     fn getLabel(&self) -> &String { 
         match &self.label {
-            NvaStoreLabel::cloud(l) =>  {return l},
-            NvaStoreLabel::onprem(l) => {return l},
+            NvaStoreLabel::Cloud(l) =>  {return l},
+            NvaStoreLabel::Onprem(l) => {return l},
         };
     }
 }

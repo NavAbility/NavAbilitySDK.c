@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>    // for clock_t, clock()
+#include <time.h>
 #include "NavAbilitySDK.h"
 #include <string.h>
 

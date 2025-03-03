@@ -49,7 +49,6 @@ fn new_BlobEntry(
   blobId: *const c_char,
   label: *const c_char,
   blobstore: *const c_char,
-  hash: *const c_char,
   origin: *const c_char,
   size: i64,
   description: *const c_char,
@@ -65,7 +64,7 @@ fn new_BlobEntry(
   be.blobId = Uuid::parse_str(_blobId).expect(&format!("new_BlobEntry unable to parse blobId uuid: {:?}",_blobId));
   be.label = cstr_to_str(label).to_string();
   be.blobstore = cstr_to_str(label).to_string();
-  be.hash = cstr_to_str(hash).to_string();
+  be.hash = "".to_owned();
   be.origin = cstr_to_str(origin).to_string();
   be.size = Some(size);
   be.description = cstr_to_str(description).to_string();
