@@ -1,7 +1,9 @@
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use std::{
   sync::mpsc::Sender,
-  error::Error
+  error::Error,
+  // any::type_name
 };
 
 use serde::Serialize;
@@ -13,25 +15,28 @@ use chrono::{
 };
 
 use base64::{
-  alphabet,
-  engine::{self, general_purpose},
+  // alphabet,
+  engine::general_purpose,
   Engine as _,
 };
 
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use crate::{
+  to_console_error,
+  // type_of,
   GraphQLQuery,
   GetId,
   AddFactors,
   add_factors,
   send_api_result,
+  SDK_VERSION,
+  common_traits::GetLabel,
 };
 
 use crate::{
   entities::Distributions::Distribution, 
   FullNormal, 
-  SDK_VERSION,
-  common_traits::GetLabel,
   entities::Factors::{FactorDFG, FunctionData},
   // FullNormal, 
   Point2Point2, 
@@ -91,15 +96,6 @@ fn assemble_factor_name(ovlb: Vec<String>) -> String {
   flb += &(Uuid::new_v4().to_string()[0..4]);
   
   return flb;
-}
-
-fn get_fnc_name(fnc: &str) -> String {
-  let parts = fnc.split(".");
-  let mut t = "";
-  for part in parts {
-    t = part;
-  }
-  return t.to_owned();
 }
 
 
@@ -258,10 +254,6 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<Uuid, Box<dyn crate::Error>> {
-    use std::any::type_name;
-
-    use crate::{to_console_error, type_of};
-
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
 

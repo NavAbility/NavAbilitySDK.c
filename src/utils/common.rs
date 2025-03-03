@@ -4,14 +4,16 @@
 /// This module provides various utility functions and common tools used throughout the NavAbility SDK,
 /// including functions for type introspection, string parsing, console logging, and handling GraphQL query responses.
 
+use std::fmt;
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use std::{
-  fmt,
   any::type_name,
   convert::TryInto,
   future::Future
 };
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use serde::{Serialize,Deserialize};
 
 // use graphql_client::GraphQLQuery;
@@ -371,7 +373,14 @@ pub async fn post_to_nvaapi<
 // ====================== FUTURE IDEAS ======================
 
 
-
+// fn get_fnc_name(fnc: &str) -> String {
+//   let parts = fnc.split(".");
+//   let mut t = "";
+//   for part in parts {
+//     t = part;
+//   }
+//   return t.to_owned();
+// }
 
 
 // missing traits for generic serde on query types

@@ -1,7 +1,12 @@
 
 use serde::Serialize;
 
-use base64::{Engine as _, engine::{self, general_purpose}, alphabet};
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+use base64::{
+  Engine as _, 
+  engine::general_purpose, 
+  // alphabet
+};
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
@@ -12,7 +17,7 @@ use crate::{
   Response,
   Error,
   Sender,
-  SDK_VERSION,
+  // SDK_VERSION,
   NavAbilityClient,
   NavAbilityBlobStore,
   CreateDownload,
@@ -25,7 +30,7 @@ use crate::{
   delete_blob,
   check_deser,
   send_query_result,
-  to_console_debug,
+  // to_console_debug,
   to_console_error,
 };
 
@@ -301,7 +306,7 @@ pub async fn post_blob_store(
   file_bytes: std::sync::Arc<[u8]>,
 ) {
   match &nvabs.label {
-    crate::NvaStoreLabel::cloud(_store) => {
+    crate::NvaStoreLabel::Cloud(_store) => {
       post_blob_singlepart(
         nvabs,
         blobId,
@@ -311,7 +316,7 @@ pub async fn post_blob_store(
         file_bytes
       ).await;
     }
-    crate::NvaStoreLabel::onprem(_store) => {
+    crate::NvaStoreLabel::Onprem(_store) => {
       post_blob_onprem(
         nvabs,
         blobId,

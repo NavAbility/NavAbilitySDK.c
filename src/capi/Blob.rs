@@ -55,7 +55,7 @@ fn addBlob(
   mime: *const c_char,
   data: *const c_char,
   nbytes: usize,
-) -> *const c_char {
+) -> *mut c_char {
   if nvabs_.is_none() {
     to_console_error("addBlob: the provided *NavAbilityClient is NULL");
     return convert_str("");

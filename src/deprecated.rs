@@ -38,7 +38,7 @@ pub fn send_api_response<T>(
 }
 
 
-pub trait SameBlobEntryFields {
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]pub trait SameBlobEntryFields {
     fn to_gql_blobentry(self) -> get_blob_entry::blobEntry_fields;
 }
 

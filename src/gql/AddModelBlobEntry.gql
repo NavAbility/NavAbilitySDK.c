@@ -1,4 +1,4 @@
-mutation AddBlobEntryModel(
+mutation AddModelBlobEntry(
   $model_label: String!,
   $entry_id: ID!,
   $entry_label: String!,

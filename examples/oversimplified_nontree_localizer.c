@@ -10,7 +10,9 @@
 
 // Sample library usage.
 int main(void) {
-
+  // change the random seed
+  srand(time(NULL));
+  
   // basic setup
   const char* url = getenv ("NVA_API_URL");
   printf("NVA_API_URL: %s\n", (url != NULL) ? "***" : "getenv returned NULL");
@@ -18,10 +20,10 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = NavAbilityClient_new(url,atk);
+  nvacl = new_NavAbilityClient(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
-  nvafg = NavAbilityDFG_new(
+  nvafg = new_NavAbilityDFG(
       nvacl,
       "FG001",
       "BOT_01",
@@ -42,7 +44,7 @@ int main(void) {
     cv[21] = 1.0;
     cv[28] = 1.0;
     cv[35] = 1.0;
-  normal = FullNormal_new(6,mn,cv); // must freeR(normal) later
+  normal = new_FullNormal(6,mn,cv); // must freeR(normal) later
 
   // BUILD A FACTOR GRAPH with multiple variables
   VariableDFG* v = NULL;
@@ -67,7 +69,7 @@ int main(void) {
 
 
   // and prior factor indicating the starting location
-  pf = PriorPose3_new(normal);
+  pf = new_PriorPose3(normal);
     vl[0] = "x0";
     struct FactorDFG_PriorPose2_FullNormal *f = NULL;
   f = addFactor(vl,1,pf); freeR(f);freeR(pf);
@@ -86,7 +88,7 @@ int main(void) {
   X2 = getVariable(nvafg, "x2");
   mn = getMean(X2); cv = getCov(X2);
   // and prior factor indicating the starting location
-  pf = PriorPose3_new(normal);
+  pf = new_PriorPose3(normal);
     vl[0] = "x2";
     struct FactorDFG_PriorPose2_FullNormal *f = NULL;
   f = addFactor(vl,1,pf); freeR(f);freeR(pf);

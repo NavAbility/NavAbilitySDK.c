@@ -3,11 +3,11 @@
 use crate::GetLabel;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
-  Utc,
+  // Utc,
   Uuid,
   Sender,
   GraphQLQuery,
-  Response,
+  // Response,
   Error,
   NavAbilityClient,
   post_to_nvaapi,
@@ -16,9 +16,9 @@ use crate::{
   AddFactorgraph,
   AddFactorgraphBlobEntry,
   add_factorgraph_blob_entry,
-  FindOrgModelGraphs,
-  to_console_debug,
-  to_console_error,
+  // FindOrgModelGraphs,
+  // to_console_debug,
+  // to_console_error,
   SDK_VERSION
 };
 
@@ -181,7 +181,7 @@ pub async fn post_add_graph_entry(
     metadata = "e30=".to_string();
   }
   
-  let variables = crate::add_factorgraph_blob_entry::Variables {
+  let variables = add_factorgraph_blob_entry::Variables {
     fg_label: fg_label.to_string(),
     entry_id: entry_id.to_string(),
     entry_label: entry.label.to_string(),
@@ -199,8 +199,8 @@ pub async fn post_add_graph_entry(
   let request_body = AddFactorgraphBlobEntry::build_query(variables);
   
   return post_to_nvaapi::<
-  crate::add_factorgraph_blob_entry::Variables,
-  crate::add_factorgraph_blob_entry::ResponseData,
+  add_factorgraph_blob_entry::Variables,
+  add_factorgraph_blob_entry::ResponseData,
   String
   >(
     nvacl,

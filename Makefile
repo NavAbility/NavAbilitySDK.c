@@ -53,6 +53,10 @@ test-capi: build-lib
 	cd test && $(MAKE)
 .PHONY: test-capi
 
+build-examples: build-lib
+	cd examples && $(MAKE) build-all
+.PHONY: build-examples
+
 test-examples: build-lib
 	cd examples && $(MAKE)
 .PHONY: test-examples

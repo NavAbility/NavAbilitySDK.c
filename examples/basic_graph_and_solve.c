@@ -1,4 +1,4 @@
-
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +7,8 @@
 
 // Sample library usage.
 int main(void) {
+  // change the random seed
+  srand(time(NULL));
 
   // basic setup
   const char* url = getenv ("NVA_API_URL");
@@ -15,13 +17,13 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = NavAbilityClient_new(url,atk);
+  nvacl = new_NavAbilityClient(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
   sprintf(fglbl, "FG_%03d", rand());
   printf("fglbl: %s\n", fglbl);
-  nvafg = NavAbilityDFG_new(
+  nvafg = new_NavAbilityDFG(
       nvacl,
       fglbl,
       "BOT_01",
@@ -38,6 +40,9 @@ int main(void) {
   cv[0] = 1.0;
   cv[4] = 1.0;
   cv[8] = 1.0;
+
+    // Test that accessor methods use ref not Box<> whereby Rust retakes ownership and drops (leads to segfault)
+    printf("getLabel(nvafg): %s\n", getLabel(nvafg));
 
   // BUILD A FACTOR GRAPH 
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)

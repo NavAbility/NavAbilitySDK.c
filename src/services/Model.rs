@@ -1,28 +1,28 @@
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
-    Utc,
+    // Utc,
     Uuid,
-    Sender,
+    // Sender,
     GraphQLQuery,
     QueryBody,
-    Response,
+    // Response,
     Error,
-    SDK_VERSION,
+    // SDK_VERSION,
     NavAbilityClient,
     BlobEntry,
     ListModels,
     list_models,
     AddModel,
     add_model,
-    AddBlobEntryModel,
-    add_blob_entry_model,
+    AddModelBlobEntry,
+    add_model_blob_entry,
     ListModelsGraphs,
     list_models_graphs,
     GetId,
-    check_deser,
-    to_console_debug,
-    to_console_error,
+    // check_deser,
+    // to_console_debug,
+    // to_console_error,
     post_to_nvaapi,
 };
 
@@ -100,7 +100,7 @@ pub async fn add_entry_model_async(
     nvacl: &NavAbilityClient,
     model_label: &String,
     entry: &BlobEntry,
-) -> Result<add_blob_entry_model::ResponseData, Box<dyn Error>> {
+) -> Result<add_model_blob_entry::ResponseData, Box<dyn Error>> {
     
     let org_id = Uuid::parse_str(&nvacl.user_label).expect("Unable to parse org_id as uuid.");
     let name = format!("{}{}",&model_label,&entry.label).to_string();
@@ -115,7 +115,7 @@ pub async fn add_entry_model_async(
         metadata = "e30=".to_string();
     }
 
-    let variables = add_blob_entry_model::Variables {
+    let variables = add_model_blob_entry::Variables {
         model_label: model_label.to_string(),
         entry_id: entry_id.to_string(),
         entry_label: entry.label.to_string(),
@@ -130,12 +130,12 @@ pub async fn add_entry_model_async(
         timestamp: Some(entry.timestamp.to_string()),
     };
 
-    let request_body = AddBlobEntryModel::build_query(variables);
+    let request_body = AddModelBlobEntry::build_query(variables);
 
     return post_to_nvaapi::<
-        add_blob_entry_model::Variables,
-        add_blob_entry_model::ResponseData,
-        add_blob_entry_model::ResponseData
+        add_model_blob_entry::Variables,
+        add_model_blob_entry::ResponseData,
+        add_model_blob_entry::ResponseData
     >(
         nvacl,
         request_body, 

@@ -1,6 +1,8 @@
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use std::collections::HashMap;
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use crate::{
     Uuid,
     GetId,
@@ -55,29 +57,39 @@ impl NavAbilityDFG {
         };
         let store = NavAbilityBlobStore {
             client: _client.clone(),
-            label: crate::NvaStoreLabel::cloud(storelb.to_owned()),
+            label: crate::NvaStoreLabel::Cloud(storelb.to_owned()),
         };
         let mut blobStores = HashMap::new();
 
         let mut mkey = "".to_owned();
         match &store.label {
-            crate::NvaStoreLabel::cloud(lb) => { mkey = lb.clone();},
-            crate::NvaStoreLabel::onprem(lb) => { mkey = lb.clone();},
+            crate::NvaStoreLabel::Cloud(lb) => { mkey = lb.clone();},
+            crate::NvaStoreLabel::Onprem(lb) => { mkey = lb.clone();},
         }
         blobStores.insert(mkey, store);
 
         // check if fgraph exists
-        let fgs = crate::services::listGraphs(client);
-        if !fgs.is_ok() || !fgs.unwrap().contains(&fgLabel.to_string()) {
-            let _ = crate::services::addFactorgraph(
-                client, 
-                fgLabel,
-                "",
-                "e30="
-            );
+        if addGraphIfAbsent.is_some() && addGraphIfAbsent.unwrap() {
+            let fgs = crate::services::listGraphs(client);
+            if !fgs.is_ok() || !fgs.unwrap().contains(&fgLabel.to_string()) {
+                let _ = crate::services::addFactorgraph(
+                    client, 
+                    fgLabel,
+                    "",
+                    "e30="
+                );
+            }
         }
 
         // check if agent exists
+        if addAgentIfAbsent.is_some() && addAgentIfAbsent.unwrap() {
+            let agents = crate::services::listAgents(client);
+            if !agents.is_ok() || !agents.unwrap().contains(&agentLabel.to_string()) {
+                let _ = crate::services::addAgent(client, &(agentLabel.to_string()));
+            }
+        }
+
+
         let agents = crate::services::listAgents(client);
         if !agents.is_ok() || !agents.unwrap().contains(&agentLabel.to_string()) {
             let _ = crate::services::addAgent(client, &(agentLabel.to_string()));

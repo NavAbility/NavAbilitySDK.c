@@ -79,7 +79,7 @@ fn addVariable(
   _timestamp: *const c_char,
   _nstime: usize,
   _solvable: usize,
-) -> *const c_char {
+) -> *mut c_char {
   if nvafg.is_none() {
     to_console_error("addVariable: provided *NavAbilityDFG is NULL/None");
     return convert_str("");

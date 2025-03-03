@@ -66,7 +66,7 @@ pub struct RVec<T> {
 // ref. https://doc.rust-lang.org/std/boxed/
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn NavAbilityClient_new(
+fn new_NavAbilityClient(
     api_url: *const c_char,
     api_token: *const c_char, 
 ) -> Box<crate::NavAbilityClient> {
@@ -87,7 +87,7 @@ fn NavAbilityClient_new(
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn NavAbilityDFG_new<'a>(
+fn new_NavAbilityDFG<'a>(
     _nvacl: Option<&'a crate::NavAbilityClient>,
     fgLabel: *const c_char,
     agentLabel: *const c_char,
@@ -137,17 +137,17 @@ fn get_apiurl(
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn NavAbilityBlobStore_new(
+fn new_NavAbilityBlobStore(
     nvacl: Option<&crate::NavAbilityClient>,
     label: *const c_char,
 ) -> Option<Box<crate::NavAbilityBlobStore>> {
     if nvacl.is_none() {
-        to_console_error("NavAbilityBlobStore_new: provided *NavAbilityClient is NULL/None");
+        to_console_error("new_NavAbilityBlobStore: provided *NavAbilityClient is NULL/None");
         return None;
     }
     return Some(Box::new(crate::NavAbilityBlobStore {
         client: nvacl.unwrap().clone(),
-        label: crate::NvaStoreLabel::cloud(cstr_to_str(label).to_string())
+        label: crate::NvaStoreLabel::Cloud(cstr_to_str(label).to_string())
     }));
 }
 

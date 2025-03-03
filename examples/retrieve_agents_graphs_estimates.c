@@ -7,6 +7,8 @@
 
 // Sample library usage.
 int main(void) {
+  // change the random seed
+  srand(time(NULL));
 
   // basic setup
   const char* url = getenv ("NVA_API_URL");
@@ -15,7 +17,7 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = NavAbilityClient_new(url,atk);
+  nvacl = new_NavAbilityClient(url,atk);
 
   // list all factor graphs
   RVec_Factorgraphs* fgs = NULL;
@@ -39,7 +41,7 @@ int main(void) {
   // look at a specific factor graph
   char* fglbl = "FG001";
   NavAbilityDFG *nvafg = NULL;
-  nvafg = NavAbilityDFG_new(
+  nvafg = new_NavAbilityDFG(
       nvacl,
       fglbl,
       "BOT_01",

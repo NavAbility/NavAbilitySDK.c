@@ -12,7 +12,7 @@ use std::collections::HashMap;
 use crate::{
   Sender,
   GraphQLQuery,
-  Response,
+  // Response,
   Error,
   SDK_VERSION,
   GetId,
@@ -20,15 +20,8 @@ use crate::{
   to_console_error,
   parse_str_utc,
   NavAbilityClient,
-  NvaNode,
-  Factorgraph,
-  Model,
-  check_deser,
   post_to_nvaapi,
-  send_query_result,
   send_api_result,
-  // send_api_response,
-  check_query_response_data,
   AddAgent,
   add_agent,
   GetAgents, // query vs fn, unique crate::get_agents,
@@ -40,9 +33,6 @@ use crate::{
   get_agent_entries_metadata,
   GetAgentEntriesMetadata,
   UpdateAgentMetadata,
-  AddBlobEntryAgent,
-  // add_blob_entry_agent,
-  GQLRequestError,
 };
 
 
@@ -451,109 +441,6 @@ pub async fn get_agent_entries_metadata_send(
 }
 
 
-// FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-pub async fn post_add_agent_entry(
-  nvacl: &NavAbilityClient,
-  agent_label: &String,
-  entry: &BlobEntry,
-  _legacy: Option<String>,
-) -> Result<String,Box<dyn Error>> {
-  //) -> Result<Response<crate::add_blob_entry_agent::ResponseData>, Box<dyn Error>> {
-  
-  let org_id = Uuid::parse_str(&nvacl.user_label).expect("Unable to parse org_id as uuid.");
-  let name = format!("{}{}",&agent_label,&entry.label).to_string();
-  let entry_id = Uuid::new_v5(&org_id, name.as_bytes());
-  
-  let mut size_s: Option<String> = None;
-  if let Some(sz) = entry.size {
-    size_s = Some(format!("{}",sz));
-  }
-  let mut metadata = entry.metadata.to_string();
-  if metadata.is_empty() {
-    metadata = "e30=".to_string();
-  }
-  
-  let variables = crate::add_blob_entry_agent::Variables {
-    agent_label: agent_label.to_string(),
-    entry_id: entry_id.to_string(),
-    entry_label: entry.label.to_string(),
-    blob_id: entry.blobId.to_string(),
-    blobstore: Some(entry.blobstore.to_string()),
-    origin: Some(entry.origin.to_string()),
-    mime_type: Some(entry.mimeType.to_string()),
-    metadata: metadata,
-    description: Some(entry.description.to_string()),
-    hash: entry.hash.to_string(),
-    size: size_s,
-    timestamp: Some(entry.timestamp.to_string()),
-  };
-  
-  let request_body = AddBlobEntryAgent::build_query(variables);
-  
-  return post_to_nvaapi::<
-  crate::add_blob_entry_agent::Variables,
-  crate::add_blob_entry_agent::ResponseData,
-  String
-  >(
-    nvacl,
-    request_body, 
-    |s| {
-      s.add_blob_entries.blob_entries[0].id.clone()
-    },
-    Some(1)
-  ).await;
-}
-
-// let gqlentry = add_blob_entries_agent::BlobEntryCreateInput::new(
-//     org_id,
-//     entry,
-//     agent_label.to_string(),
-// );
-// let mut blob_entries = Vec::new();
-// blob_entries.push(gqlentry);
-// let variables = add_blob_entries_agent::Variables {
-//     blob_entries,
-// };
-
-
-#[cfg(any(feature = "tokio"))]
-pub async fn add_agent_entry_send(
-  send_into: std::sync::mpsc::Sender<String>,
-  nvacl: &NavAbilityClient,
-  agent_label: &String,
-  entry: &BlobEntry,
-) -> Result<(),Box<dyn Error>> {
-  
-  return send_api_result(
-    send_into, 
-    post_add_agent_entry(
-      nvacl, 
-      agent_label,
-      entry,
-      None
-    ).await,
-  );
-}
-
-
-#[cfg(feature = "tokio")]
-pub fn addAgentBlobEntry(
-  nvacl: &NavAbilityClient,
-  agent_label: &String,
-  entry: &BlobEntry,
-) -> Result<String, Box<dyn Error>> {
-  return tokio::runtime::Builder::new_current_thread()
-  .enable_all()
-  .build()
-  .unwrap()
-  .block_on(post_add_agent_entry(
-    nvacl,
-    agent_label,
-    entry,
-    None // legacy
-  ));
-}
 
 
 

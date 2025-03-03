@@ -45,11 +45,10 @@ fn BlobEntry_basic(
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn BlobEntry_new(    
+fn new_BlobEntry(
   blobId: *const c_char,
   label: *const c_char,
   blobstore: *const c_char,
-  hash: *const c_char,
   origin: *const c_char,
   size: i64,
   description: *const c_char,
@@ -65,7 +64,7 @@ fn BlobEntry_new(
   be.blobId = Uuid::parse_str(_blobId).expect(&format!("new_BlobEntry unable to parse blobId uuid: {:?}",_blobId));
   be.label = cstr_to_str(label).to_string();
   be.blobstore = cstr_to_str(label).to_string();
-  be.hash = cstr_to_str(hash).to_string();
+  be.hash = "".to_owned();
   be.origin = cstr_to_str(origin).to_string();
   be.size = Some(size);
   be.description = cstr_to_str(description).to_string();
@@ -103,6 +102,32 @@ fn addAgentBlobEntry(
   }
 }
 
+
+#[no_mangle] pub unsafe extern "C" 
+fn addVariableBlobEntry(
+  nvafg_: Option<&crate::NavAbilityDFG>,
+  variable_label: *const c_char,
+  entry_: Option<&crate::BlobEntry>,
+) -> *const c_char {
+  if nvafg_.is_none() {
+    to_console_error("addVariableBlobEntry: provided *NavAbilityDFG is NULL/None");
+    return convert_str("");
+  }
+  
+  match crate::services::addVariableBlobEntry(
+    nvafg_.unwrap(),
+    &cstr_to_str(variable_label).to_string(),
+    entry_.unwrap()
+  ) {
+    Ok(id) => {
+      return convert_str(&id.to_string());
+    }
+    Err(e) => {
+      to_console_error(&format!("NvaSDK.rs error during addVariableBlobEntry: {:?}", e));
+      return convert_str("");
+    }
+  }
+}
 
 
 // TODO upstream the various BlobEntry parent function to services

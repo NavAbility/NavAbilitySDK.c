@@ -1,12 +1,13 @@
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use crate::{
-    Utc,
-    Uuid,
+    // Utc,
+    // Uuid,
     Sender,
     GraphQLQuery,
     Response,
     Error,
-    SDK_VERSION,
+    // SDK_VERSION,
     GetURS,
     get_urs,
     to_console_debug,
@@ -90,7 +91,7 @@ pub async fn fetch_urs_async(
 
 
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm")]
 pub async fn fetch_context_web(
     send_into: Sender<Vec<get_urs::GetUrsOrgs>>, 
     client: &NavAbilityClient,

@@ -105,29 +105,6 @@ typedef struct RVec_____c_char {
 
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
-struct BlobEntry *BlobEntry_new(const char *blobId,
-                                const char *label,
-                                const char *blobstore,
-                                const char *hash,
-                                const char *origin,
-                                int64_t size,
-                                const char *description,
-                                const char *mimeType,
-                                const char *metadata,
-                                const char *timestamp);
-
-struct NavAbilityBlobStore *NavAbilityBlobStore_new(const struct NavAbilityClient *nvacl,
-                                                    const char *label);
-
-struct NavAbilityClient *NavAbilityClient_new(const char *api_url, const char *api_token);
-
-struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
-                                        const char *fgLabel,
-                                        const char *agentLabel,
-                                        const char *storeLabel,
-                                        size_t addAgentIfAbsent,
-                                        size_t addGraphIfAbsent);
-
 const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
                               const struct BlobEntry *entry_);
@@ -138,13 +115,17 @@ const char *addBlob(const struct NavAbilityBlobStore *nvabs_,
                     const char *data,
                     size_t nbytes);
 
-const char *addVariable(const struct NavAbilityDFG *nvafg,
-                        const char *label,
-                        const char *variableType,
-                        const char *_tags,
-                        const char *_timestamp,
-                        size_t _nstime,
-                        size_t _solvable);
+char *addVariable(const struct NavAbilityDFG *nvafg,
+                  const char *label,
+                  const char *variableType,
+                  const char *_tags,
+                  const char *_timestamp,
+                  size_t _nstime,
+                  size_t _solvable);
+
+const char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
+                                 const char *variable_label,
+                                 const struct BlobEntry *entry_);
 
 void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                           const char *agent_label,
@@ -226,7 +207,29 @@ char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
 
+struct BlobEntry *new_BlobEntry(const char *blobId,
+                                const char *label,
+                                const char *blobstore,
+                                const char *origin,
+                                int64_t size,
+                                const char *description,
+                                const char *mimeType,
+                                const char *metadata,
+                                const char *timestamp);
+
 struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const double *array_covr);
+
+struct NavAbilityBlobStore *new_NavAbilityBlobStore(const struct NavAbilityClient *nvacl,
+                                                    const char *label);
+
+struct NavAbilityClient *new_NavAbilityClient(const char *api_url, const char *api_token);
+
+struct NavAbilityDFG *new_NavAbilityDFG(const struct NavAbilityClient *_nvacl,
+                                        const char *fgLabel,
+                                        const char *agentLabel,
+                                        const char *storeLabel,
+                                        size_t addAgentIfAbsent,
+                                        size_t addGraphIfAbsent);
 
 struct Point2Point2_FullNormal *new_Point2Point2(const struct FullNormal *Z);
 
@@ -244,11 +247,20 @@ struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
 
-void startWorker_ImageWhitebalance(const struct NavAbilityDFG *nvafg);
+void startWorker_ImageWhitebalance(const struct NavAbilityDFG *nvafg,
+                                   const char *v_lbl,
+                                   const char *be_lbl,
+                                   const char *be_out_lbl);
 
-void startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg);
+void startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg,
+                                   const char *v1_lbl,
+                                   const char *be1_lbl,
+                                   const char *v2_lbl,
+                                   const char *be2_lbl);
 
-void startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg);
+void startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg,
+                                        const char *v_lbl,
+                                        const char *be_lbl);
 
 void startWorker_solveParametric(const struct NavAbilityDFG *nvafg);
 
