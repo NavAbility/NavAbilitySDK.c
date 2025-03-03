@@ -105,29 +105,6 @@ typedef struct RVec_____c_char {
 
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
-struct BlobEntry *BlobEntry_new(const char *blobId,
-                                const char *label,
-                                const char *blobstore,
-                                const char *hash,
-                                const char *origin,
-                                int64_t size,
-                                const char *description,
-                                const char *mimeType,
-                                const char *metadata,
-                                const char *timestamp);
-
-struct NavAbilityBlobStore *NavAbilityBlobStore_new(const struct NavAbilityClient *nvacl,
-                                                    const char *label);
-
-struct NavAbilityClient *NavAbilityClient_new(const char *api_url, const char *api_token);
-
-struct NavAbilityDFG *NavAbilityDFG_new(const struct NavAbilityClient *_nvacl,
-                                        const char *fgLabel,
-                                        const char *agentLabel,
-                                        const char *storeLabel,
-                                        size_t addAgentIfAbsent,
-                                        size_t addGraphIfAbsent);
-
 const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
                               const struct BlobEntry *entry_);
@@ -226,7 +203,30 @@ char *get_apiurl(const struct NavAbilityClient *nvacl);
 
 size_t length(const struct RVec_Agent *rv_agent);
 
+struct BlobEntry *new_BlobEntry(const char *blobId,
+                                const char *label,
+                                const char *blobstore,
+                                const char *hash,
+                                const char *origin,
+                                int64_t size,
+                                const char *description,
+                                const char *mimeType,
+                                const char *metadata,
+                                const char *timestamp);
+
 struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const double *array_covr);
+
+struct NavAbilityBlobStore *new_NavAbilityBlobStore(const struct NavAbilityClient *nvacl,
+                                                    const char *label);
+
+struct NavAbilityClient *new_NavAbilityClient(const char *api_url, const char *api_token);
+
+struct NavAbilityDFG *new_NavAbilityDFG(const struct NavAbilityClient *_nvacl,
+                                        const char *fgLabel,
+                                        const char *agentLabel,
+                                        const char *storeLabel,
+                                        size_t addAgentIfAbsent,
+                                        size_t addGraphIfAbsent);
 
 struct Point2Point2_FullNormal *new_Point2Point2(const struct FullNormal *Z);
 
