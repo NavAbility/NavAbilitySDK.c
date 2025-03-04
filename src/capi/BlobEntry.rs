@@ -148,7 +148,7 @@ fn deleteAgentBlobEntry(
 
   let beid = nvacl.getId(&(aglb.to_string() + belb));
 
-  crate::services::deleteBlobEntry(
+  let _ = crate::services::deleteBlobEntry(
     nvacl,
     beid,
   );

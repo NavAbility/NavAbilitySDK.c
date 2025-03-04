@@ -41,13 +41,12 @@ fn length_RVec_Agent(
 
 
 #[no_mangle] pub unsafe extern "C" 
-fn getIndex_Agent(
+fn getIndex_RVec_Agent(
     rv_agent: &RVec<crate::Agent>,
     index: usize
 ) -> *mut crate::Agent {
     return rv_agent.ptr.wrapping_add(index)
 }
-
 
 
 #[allow(non_snake_case)]
@@ -71,7 +70,7 @@ fn length_RVec_NvaNode_Factorgraph(
 
 
 #[no_mangle] pub unsafe extern "C" 
-fn getIndex_NvaNode_Factorgraph(
+fn getIndex_RVec_NvaNode_Factorgraph(
     rv_fgs: &RVec<NvaNode<Factorgraph>>,
     index: usize
 ) -> *mut NvaNode<Factorgraph> {
@@ -100,6 +99,26 @@ fn getLabel_NvaNode_Factorgraph(
 // }
 
 
+// ------------- Variables -----------------
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_String(
+    rv_s: &RVec<String>
+) -> usize {
+    return rv_s.len
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_RVec_String(
+    rv_s: &RVec<String>,
+    index: usize
+) -> *mut c_char {
+    return convert_str(&(*(rv_s.ptr.wrapping_add(index))));
+}
+
+
+
 // ------------- BlobEntry -----------------
 
 
@@ -110,6 +129,10 @@ fn getLabel_BlobEntry(
 ) -> *const c_char {
     return convert_str(&((*bentry).label));
 }
+
+
+// ------------- BlobStore -----------------
+
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
@@ -125,6 +148,9 @@ fn getLabel_NavAbilityBlobStore(
         },
     }
 }
+
+
+// ------------- Client / DFG -----------------
 
 
 #[allow(non_snake_case)]
@@ -184,6 +210,13 @@ fn free_RVec_NvaNode_Factorgraph (
     rvec: Box<RVec<NvaNode<Factorgraph>>>
 ) {
     free_rvec::<NvaNode<Factorgraph>>(*rvec)
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn free_RVec_String (
+    rvec: Box<RVec<String>>
+) {
+    free_rvec::<String>(*rvec)
 }
 
 

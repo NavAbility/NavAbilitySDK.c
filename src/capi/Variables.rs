@@ -7,36 +7,16 @@ use std::{
       c_char,
       // c_void, 
   },
-  // ffi::{
-  //     CString,
-  //     CStr
-  // },
 };
 
-// use ::core::slice;
 
-// use ::libc::{
-//     // size_t,
-//     // c_char, 
-//     // c_double,
-// };
-
-// use ffi_convert::{
-//     CReprOf,
-//     CDrop,
-//     // CArray,
-//     // AsRust,
-//     // CReprOfError,
-// };
 
 use crate::{
   cstr_to_str,
   convert_str,
-  // parse_str_utc, 
-  // RVec,
-  // vec_to_ffi,
+  RVec,
+  vec_to_ffi,
   to_console_error, 
-  // Agent,
 };
 
 
@@ -68,6 +48,29 @@ fn getVariable(
     }
   }
 }
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn listVariables(
+    _nvafg: Option<&crate::NavAbilityDFG>,
+) -> Option<Box<RVec<String>>> {
+  if _nvafg.is_none() {
+    to_console_error("listVariables: provided *NavAbilityDFG is NULL/None");
+    return None;
+  }
+
+  match crate::services::listVariables(_nvafg.unwrap()) {
+    Ok(vari) => {
+      return Some(Box::new(crate::vec_to_ffi(vari)));
+    },
+    Err(e) => {
+      to_console_error(&format!("Problem with listVariables {:?}",e));
+      return None;
+    }
+  }
+}
+
 
 
 #[allow(non_snake_case)]

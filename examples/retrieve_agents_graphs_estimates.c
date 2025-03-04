@@ -56,15 +56,15 @@ int main(void) {
 
 
   // list all variables in the 
-  // RVec_String variables = NULL;
-  // variables = listVariables(nvafg); // must freeR(nvafg) later
-  // printf("Factorgraph %s has %ld variables\n", fglbl, length(agents));
-  // for (int i = 0; i < 10; i++) {
-  //   if i < length(variables) {
-  //     printf("variable label: %s\n", getIndex(variables,i));
-  //   }
-  // }
-  // freeR(variables);
+  RVec_String *variables = NULL;
+  variables = listVariables(nvafg); // must freeR(nvafg) later
+  printf("Factorgraph %s has %ld variables\n", fglbl, length(variables));
+  for (int i = 0; i < 10; i++) {
+    if (i < length(variables)) {
+      printf("variable label: %s\n", getIndex(variables,i));
+    }
+  }
+  freeR(variables);
 
   // // get one specific variable
   // VariableDFG* X1 = NULL;
