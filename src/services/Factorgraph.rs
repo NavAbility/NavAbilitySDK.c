@@ -23,7 +23,7 @@ use crate::{
   AddFactorgraph,
   AddFactorgraphBlobEntry,
   add_factorgraph_blob_entry,
-  GetGraphs,
+  GetFactorgraphs,
   GraphFieldImportersSkeleton,
   Graph_importers_skeleton,
   SDK_VERSION
@@ -31,7 +31,7 @@ use crate::{
 
 
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-use crate::get_graphs::graph_fields_skeleton as GGs_GraphFieldsSkeleton;
+use crate::get_factorgraphs::graph_fields_skeleton as GGs_GraphFieldsSkeleton;
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 Graph_importers_skeleton!(GGs_GraphFieldsSkeleton);
 
@@ -128,16 +128,16 @@ pub async fn post_get_factorgraphs(
 ) -> Result<Vec<NvaNode<Factorgraph>>, Box<dyn Error>> {
 
   // https://github.com/graphql-rust/graphql-client/blob/3090e0add5504ed31df74c32c2bda203793a890a/examples/github/examples/github.rs#L45C1-L48C7
-  let variables = crate::get_graphs::Variables {
+  let variables = crate::get_factorgraphs::Variables {
     org_id: nvacl.user_label.to_string(),
     label_contains, // "" returns all, None/null returns empty list -- go figure.
   };
   
-  let request_body = GetGraphs::build_query(variables);
+  let request_body = GetFactorgraphs::build_query(variables);
   
   return post_to_nvaapi::<
-    crate::get_graphs::Variables,
-    crate::get_graphs::ResponseData,
+    crate::get_factorgraphs::Variables,
+    crate::get_factorgraphs::ResponseData,
     Vec<NvaNode<Factorgraph>>
   >(
     nvacl,
@@ -145,7 +145,7 @@ pub async fn post_get_factorgraphs(
     |s| {
       let mut fgs = Vec::new();
       for a in s.factorgraphs {
-        let mut fg = NvaNode::<Factorgraph>::from_gql_skeleton(&a.graph_fields_skeleton);
+        let mut fg = NvaNode::<Factorgraph>::from_gql_skeleton(&a);
         fgs.push(fg);
       };
       return fgs;
