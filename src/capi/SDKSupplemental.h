@@ -52,8 +52,9 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 
 #define length(obj)                                           \
     _Generic(obj,                                             \
-        RVec_String*:               length_RVec_String,             \
-        RVec_Agent*:                length_RVec_Agent,             \
+        RVec_f64*:                  length_RVec_f64,          \
+        RVec_String*:               length_RVec_String,       \
+        RVec_Agent*:                length_RVec_Agent,        \
         RVec_NvaNode_Factorgraph*:  length_RVec_NvaNode_Factorgraph \
     ) (obj)
 
@@ -70,8 +71,9 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
     
 #define getIndex(obj,i)                                       \
     _Generic(obj,                                             \
+        RVec_f64*:                  getIndex_RVec_f64,        \
         RVec_String*:               getIndex_RVec_String,     \
-        RVec_Agent*:                getIndex_RVec_Agent,           \
+        RVec_Agent*:                getIndex_RVec_Agent,      \
         RVec_NvaNode_Factorgraph*:  getIndex_RVec_NvaNode_Factorgraph \
     ) (obj,i)
 
@@ -80,6 +82,7 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
     _Generic(obj,                                             \
         char*:                    free_cstr,                  \
         Agent*:                   free_Agent,                 \
+        RVec_f64*:                free_RVec_f64,              \
         RVec_String*:             free_RVec_String,           \
         RVec_Agent*:              free_RVec_Agent,            \
         RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \

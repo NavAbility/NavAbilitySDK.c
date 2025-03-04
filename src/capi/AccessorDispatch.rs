@@ -5,7 +5,7 @@ use std::{
     // ptr,
     os::raw::{
         c_char,
-        // c_void, 
+        c_double, 
     },
     ffi::{
         CString,
@@ -63,9 +63,12 @@ fn getLabel_Agent(
 
 #[no_mangle] pub unsafe extern "C" 
 fn length_RVec_NvaNode_Factorgraph(
-    rv_fgs: &RVec<NvaNode<Factorgraph>>
+    rv_fgs: Option<&RVec<NvaNode<Factorgraph>>>
 ) -> usize {
-    return rv_fgs.len
+    if rv_fgs.is_none() {
+        return 0;
+    }
+    return rv_fgs.unwrap().len
 }
 
 
@@ -85,7 +88,6 @@ fn getLabel_NvaNode_Factorgraph(
     input: &NvaNode<Factorgraph>,
 ) -> *const c_char {
     convert_str(&input.getLabel())
-    // return convert_str(&((*input).label));
 }
 
 
@@ -104,9 +106,12 @@ fn getLabel_NvaNode_Factorgraph(
 
 #[no_mangle] pub unsafe extern "C" 
 fn length_RVec_String(
-    rv_s: &RVec<String>
+    rv_s: Option<&RVec<String>>
 ) -> usize {
-    return rv_s.len
+    if rv_s.is_none() {
+        return 0;
+    }
+    return rv_s.unwrap().len
 }
 
 #[no_mangle] pub unsafe extern "C" 
@@ -115,6 +120,25 @@ fn getIndex_RVec_String(
     index: usize
 ) -> *mut c_char {
     return convert_str(&(*(rv_s.ptr.wrapping_add(index))));
+}
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_f64(
+    rv_s: Option<&RVec<c_double>>
+) -> usize {
+    if rv_s.is_none() {
+        return 0;
+    }
+    return rv_s.unwrap().len;
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_RVec_f64(
+    rv_s: &RVec<f64>,
+    index: usize
+) -> *const c_double {
+    return rv_s.ptr.wrapping_add(index);
 }
 
 
@@ -213,12 +237,24 @@ fn free_RVec_NvaNode_Factorgraph (
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn free_RVec_String (
-    rvec: Box<RVec<String>>
+fn free_RVec_f64 (
+    rvec: Option<Box<RVec<f64>>>
 ) {
-    free_rvec::<String>(*rvec)
+    if rvec.is_none() {
+        return;
+    }
+    free_rvec::<f64>(*(rvec.unwrap()))
 }
 
+#[no_mangle] pub unsafe extern "C" 
+fn free_RVec_String (
+    rvec: Option<Box<RVec<String>>>
+) {
+    if rvec.is_none() {
+        return;
+    }
+    free_rvec::<String>(*(rvec.unwrap()))
+}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]

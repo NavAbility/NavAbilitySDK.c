@@ -110,6 +110,11 @@ typedef struct RVec_String {
   size_t len;
 } RVec_String;
 
+typedef struct RVec_f64 {
+  double *ptr;
+  size_t len;
+} RVec_f64;
+
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
 const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
@@ -190,6 +195,8 @@ void free_RVec_NvaNode_Factorgraph(struct RVec_NvaNode_Factorgraph *rvec);
 
 void free_RVec_String(struct RVec_String *rvec);
 
+void free_RVec_f64(struct RVec_f64 *rvec);
+
 void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
@@ -206,6 +213,8 @@ struct NvaNode_Factorgraph *getIndex_RVec_NvaNode_Factorgraph(const struct RVec_
 
 char *getIndex_RVec_String(const struct RVec_String *rv_s, size_t index);
 
+const double *getIndex_RVec_f64(const struct RVec_f64 *rv_s, size_t index);
+
 const char *getLabel_Agent(const struct Agent *agent);
 
 const char *getLabel_BlobEntry(const struct BlobEntry *bentry);
@@ -218,6 +227,10 @@ const char *getLabel_NavAbilityDFG(const struct NavAbilityDFG *input);
 
 const char *getLabel_NvaNode_Factorgraph(const struct NvaNode_Factorgraph *input);
 
+struct RVec_f64 *getPPECov(const struct VariableDFG *vari_, const char *solveKey);
+
+struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *solveKey);
+
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
@@ -227,6 +240,8 @@ size_t length_RVec_Agent(const struct RVec_Agent *rv_agent);
 size_t length_RVec_NvaNode_Factorgraph(const struct RVec_NvaNode_Factorgraph *rv_fgs);
 
 size_t length_RVec_String(const struct RVec_String *rv_s);
+
+size_t length_RVec_f64(const struct RVec_f64 *rv_s);
 
 struct RVec_String *listVariables(const struct NavAbilityDFG *_nvafg);
 
@@ -344,8 +359,9 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 
 #define length(obj)                                           \
     _Generic(obj,                                             \
-        RVec_String*:               length_RVec_String,             \
-        RVec_Agent*:                length_RVec_Agent,             \
+        RVec_f64*:                  length_RVec_f64,          \
+        RVec_String*:               length_RVec_String,       \
+        RVec_Agent*:                length_RVec_Agent,        \
         RVec_NvaNode_Factorgraph*:  length_RVec_NvaNode_Factorgraph \
     ) (obj)
 
@@ -362,8 +378,9 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
     
 #define getIndex(obj,i)                                       \
     _Generic(obj,                                             \
+        RVec_f64*:                  getIndex_RVec_f64,        \
         RVec_String*:               getIndex_RVec_String,     \
-        RVec_Agent*:                getIndex_RVec_Agent,           \
+        RVec_Agent*:                getIndex_RVec_Agent,      \
         RVec_NvaNode_Factorgraph*:  getIndex_RVec_NvaNode_Factorgraph \
     ) (obj,i)
 
@@ -372,6 +389,7 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
     _Generic(obj,                                             \
         char*:                    free_cstr,                  \
         Agent*:                   free_Agent,                 \
+        RVec_f64*:                free_RVec_f64,              \
         RVec_String*:             free_RVec_String,           \
         RVec_Agent*:              free_RVec_Agent,            \
         RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \
