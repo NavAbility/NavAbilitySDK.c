@@ -28,6 +28,17 @@ use crate::{
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
+fn deleteFactorById(
+  nvafg: Option<&crate::NavAbilityDFG>,
+  fid: *const c_char,
+) {
+  println!("deleteFactorById, Work in progress");
+}
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
 fn new_PriorPoint2<'a>(
     Z: &crate::FullNormal<'a>,
 ) -> Box<crate::PriorPoint2<crate::FullNormal<'a>>> {

@@ -115,6 +115,10 @@ fn getPPECov(
     return None;
   }
   let vari = vari_.unwrap();
+
+  println!("getPPECov: work in progress");
+  return None;
+
   let ppec = crate::services::getPPECov(
     vari,
     &cstr_to_str(solveKey),
@@ -175,4 +179,14 @@ fn addVariable(
       return convert_str("");
     }
   }
+}
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn deleteVariable(
+  nvafg: Option<&crate::NavAbilityDFG>,
+  label: *const c_char,
+) {
+  println!("deleteVariable, Work in progress");
 }

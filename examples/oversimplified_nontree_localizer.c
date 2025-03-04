@@ -50,8 +50,7 @@ int main(void) {
   normal = new_FullNormal(6,mn,cv); // must freeR(normal) later
 
   // BUILD A FACTOR GRAPH with multiple variables
-  VariableDFG* v = NULL;
-  FactorDFG* f = NULL;
+  // reusable pointers
   PriorPose3_FullNormal *pf = NULL;
   Pose3Pose3_FullNormal *rf = NULL;
 
@@ -59,36 +58,36 @@ int main(void) {
   addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
   addVariable(nvafg, "x1", "Pose2", "", "", 0, 1);
   rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
-  char* fid = addFactor(
+  char* fid1 = addFactor(
       nvafg,
       "x0;x1;",
       rf,
       "", 
       "", 0, 
       1
-  ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor id: %s\n", fid);
+  );
+  printf("Added factor id: %s\n", fid1);
   
   addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
-  fid = addFactor(
+  char* fid2 = addFactor(
     nvafg,
     "x1;x2;",
     rf,
     "", 
     "", 0, 
     1
-  ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor id: %s\n", fid);
+  );
+  printf("Added factor id: %s\n", fid2);
 
   addVariable(nvafg, "x3", "Pose2", "", "", 0, 1);
-  fid = addFactor(
+  char* fid = addFactor(
     nvafg,
     "x2;x3;",
     rf,
     "", 
     "", 0, 
     1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
   printf("Added factor id: %s\n", fid);
 
   addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
@@ -99,9 +98,8 @@ int main(void) {
     "", 
     "", 0, 
     1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
   printf("Added factor id: %s\n", fid);
-
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
@@ -112,7 +110,7 @@ int main(void) {
       "", 
       "", 0, 
       1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
   printf("Added factor id: %s\n", fid);
 
   // Solve the basic graph
@@ -121,14 +119,19 @@ int main(void) {
   // wait for solve to finish (THIS IS THE OVERSIMPLEFIED PART)
 
   // delete variables now marginalized out
+  deleteFactorById(nvafg, fid1);
+  deleteFactorById(nvafg, fid2);
   deleteVariable(nvafg, "x0");
   deleteVariable(nvafg, "x1");
-  deleteFactor(nvafg, /*LABEL HERE*/);
 
   // GET MEAN AND COV OF X2 AND USE AS PRIOR
+  VariableDFG* X2 = NULL;
   X2 = getVariable(nvafg, "x2");
-  mn = getMean(X2); cv = getCov(X2);
-  // and prior factor indicating the starting location
+  RVec_f64* mn_ = getPPEMean(X2, "parametric"); 
+  RVec_f64* cv_ = getPPECov(X2, "parametric");
+  // and prior factor by reusing the existing estimate for the oldest variable left in the graph
+  freeR(normal); freeR(pf);
+  normal = new_FullNormal(6,mn,cv); // FIXME fix, use mn_, cv_ instead
   pf = new_PriorPose3(normal);
   fid = addFactor(
       nvafg,
@@ -137,7 +140,7 @@ int main(void) {
       "", 
       "", 0, 
       1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
   printf("Added factor id: %s\n", fid);
 
   addVariable(nvafg, "x5", "Pose2", "", "", 0, 1);
@@ -148,7 +151,7 @@ int main(void) {
     "", 
     "", 0, 
     1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
   addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
   fid = addFactor(
     nvafg,
@@ -157,14 +160,14 @@ int main(void) {
     "", 
     "", 0, 
     1
-  ); freeR(f2); freeR(normal); // because new_ was used
+  );
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);
 
   // See other examples for combining other data including IMU, Camera, Lidar
 
-  freeR(nvafg); freeR(nvacl);
+  freeR(pf); freeR(rf); freeR(normal); freeR(X2); freeR(nvafg); freeR(nvacl);
   printf("All done.\n");
   return 0;
 }
