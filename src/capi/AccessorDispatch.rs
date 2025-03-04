@@ -5,7 +5,7 @@ use std::{
     // ptr,
     os::raw::{
         c_char,
-        // c_void, 
+        c_double, 
     },
     ffi::{
         CString,
@@ -17,6 +17,8 @@ use crate::{
     RVec,
     Agent, 
     BlobEntry,
+    NvaNode,
+    Factorgraph,
     NavAbilityBlobStore,
     NavAbilityDFG,
     GetLabel,
@@ -26,13 +28,20 @@ use crate::{
 
 // ========================= Accessors =======================
 
+
+// ------------- Agent -----------------
+
+
 #[no_mangle] pub unsafe extern "C" 
-fn length(rv_agent: &RVec<crate::Agent>) -> usize {
+fn length_RVec_Agent(
+    rv_agent: &RVec<crate::Agent>
+) -> usize {
     return rv_agent.len
 }
 
+
 #[no_mangle] pub unsafe extern "C" 
-fn getIndex_Agent(
+fn getIndex_RVec_Agent(
     rv_agent: &RVec<crate::Agent>,
     index: usize
 ) -> *mut crate::Agent {
@@ -48,6 +57,95 @@ fn getLabel_Agent(
     return convert_str(&((*agent).label));
 }
 
+
+// ------------- Factorgraph -----------------
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_NvaNode_Factorgraph(
+    rv_fgs: Option<&RVec<NvaNode<Factorgraph>>>
+) -> usize {
+    if rv_fgs.is_none() {
+        return 0;
+    }
+    return rv_fgs.unwrap().len
+}
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_RVec_NvaNode_Factorgraph(
+    rv_fgs: &RVec<NvaNode<Factorgraph>>,
+    index: usize
+) -> *mut NvaNode<Factorgraph> {
+    return rv_fgs.ptr.wrapping_add(index)
+}
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getLabel_NvaNode_Factorgraph(
+    input: &NvaNode<Factorgraph>,
+) -> *const c_char {
+    convert_str(&input.getLabel())
+}
+
+
+// TODO see if this can be used with macro _Generic
+// #[allow(non_snake_case)]
+// #[no_mangle] pub unsafe extern "C" 
+// fn getLabel_NvaNode<T>(
+//     input: &NvaNode<T>,
+// ) -> *const c_char {
+//     convert_str(&input.getLabel())
+// }
+
+
+// ------------- Variables -----------------
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_String(
+    rv_s: Option<&RVec<String>>
+) -> usize {
+    if rv_s.is_none() {
+        return 0;
+    }
+    return rv_s.unwrap().len
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_RVec_String(
+    rv_s: &RVec<String>,
+    index: usize
+) -> *mut c_char {
+    return convert_str(&(*(rv_s.ptr.wrapping_add(index))));
+}
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_f64(
+    rv_s: Option<&RVec<c_double>>
+) -> usize {
+    if rv_s.is_none() {
+        return 0;
+    }
+    return rv_s.unwrap().len;
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_RVec_f64(
+    rv_s: &RVec<f64>,
+    index: usize
+) -> *const c_double {
+    return rv_s.ptr.wrapping_add(index);
+}
+
+
+
+// ------------- BlobEntry -----------------
+
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn getLabel_BlobEntry(
@@ -55,6 +153,10 @@ fn getLabel_BlobEntry(
 ) -> *const c_char {
     return convert_str(&((*bentry).label));
 }
+
+
+// ------------- BlobStore -----------------
+
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
@@ -72,6 +174,9 @@ fn getLabel_NavAbilityBlobStore(
 }
 
 
+// ------------- Client / DFG -----------------
+
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn getLabel_NavAbilityClient(
@@ -80,13 +185,6 @@ fn getLabel_NavAbilityClient(
     convert_str(&input.label)
 }
 
-#[allow(non_snake_case)]
-#[no_mangle] pub unsafe extern "C" 
-fn getLabel_NvaNode<T>(
-    input: &crate::NvaNode<T>,
-) -> *const c_char {
-    convert_str(&input.getLabel())
-}
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
@@ -132,12 +230,31 @@ fn free_RVec_Agent (
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn free_RVec_ListGraphs (
-    rvec: Box<RVec<*mut c_char>>
+fn free_RVec_NvaNode_Factorgraph (
+    rvec: Box<RVec<NvaNode<Factorgraph>>>
 ) {
-    free_rvec::<*mut c_char>(*rvec)
+    free_rvec::<NvaNode<Factorgraph>>(*rvec)
 }
 
+#[no_mangle] pub unsafe extern "C" 
+fn free_RVec_f64 (
+    rvec: Option<Box<RVec<f64>>>
+) {
+    if rvec.is_none() {
+        return;
+    }
+    free_rvec::<f64>(*(rvec.unwrap()))
+}
+
+#[no_mangle] pub unsafe extern "C" 
+fn free_RVec_String (
+    rvec: Option<Box<RVec<String>>>
+) {
+    if rvec.is_none() {
+        return;
+    }
+    free_rvec::<String>(*(rvec.unwrap()))
+}
 
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]

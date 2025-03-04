@@ -5,43 +5,48 @@ use std::{
   ptr,
   os::raw::{
       c_char,
+      c_double
       // c_void, 
   },
-  // ffi::{
-  //     CString,
-  //     CStr
-  // },
 };
 
-// use ::core::slice;
-
-// use ::libc::{
-//     // size_t,
-//     // c_char, 
-//     // c_double,
-// };
-
-// use ffi_convert::{
-//     CReprOf,
-//     CDrop,
-//     // CArray,
-//     // AsRust,
-//     // CReprOfError,
-// };
+// use ffi_convert::CArray;
 
 use crate::{
   cstr_to_str,
   convert_str,
-  // parse_str_utc, 
-  // RVec,
-  // vec_to_ffi,
+  RVec,
+  vec_to_ffi,
   to_console_error, 
-  // Agent,
+  GetLabel,
 };
 
 
 
 
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn listVariables(
+    _nvafg: Option<&crate::NavAbilityDFG>,
+) -> Option<Box<RVec<String>>> {
+  if _nvafg.is_none() {
+    to_console_error("listVariables: provided *NavAbilityDFG is NULL/None");
+    return None;
+  }
+
+  match crate::services::listVariables(_nvafg.unwrap()) {
+    Ok(vari) => {
+      return Some(Box::new(crate::vec_to_ffi(vari)));
+    },
+    Err(e) => {
+      to_console_error(&format!("Problem with listVariables {:?}",e));
+      return None;
+    }
+  }
+}
+
+
+#[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn getVariable(
   nvafg: Option<&crate::NavAbilityDFG>,
@@ -67,6 +72,64 @@ fn getVariable(
       return None
     }
   }
+}
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getPPEMean(
+  vari_: Option<&crate::VariableDFG>,
+  solveKey: *const c_char
+) -> Option<Box<RVec<c_double>>> {
+  if vari_.is_none() {
+    to_console_error("getPPEMean: provided *VariableDFG is NULL/None");
+    return None;
+  }
+  let vari = vari_.unwrap();
+  let ppem = crate::services::getPPEMean(
+    vari,
+    &cstr_to_str(solveKey),
+  );
+
+  if ppem.is_empty() {
+    to_console_error(&format!("getPPEMean: for VariableDFG {} is empty", &vari.getLabel()));
+    return None;
+  }
+  
+  return Some(
+    Box::new(
+      vec_to_ffi(ppem)
+    )
+  );
+}
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getPPECov(
+  vari_: Option<&crate::VariableDFG>,
+  solveKey: *const c_char
+) -> Option<Box<RVec<c_double>>> {
+  if vari_.is_none() {
+    to_console_error("getPPECov: provided *VariableDFG is NULL/None");
+    return None;
+  }
+  let vari = vari_.unwrap();
+  let ppec = crate::services::getPPECov(
+    vari,
+    &cstr_to_str(solveKey),
+  );
+
+  if ppec.is_empty() {
+    to_console_error(&format!("getPPECov: for VariableDFG {} is empty", &vari.getLabel()));
+    return None;
+  }
+  
+  return Some(
+    Box::new(
+      vec_to_ffi(ppec)
+    )
+  );
 }
 
 

@@ -80,7 +80,7 @@ macro_rules! Agent_importers_summary {
         return self.version.to_string();
       }
 
-      fn createdTimestamp(&self) -> chrono::DateTime<Utc> {
+      fn createdTimestamp(&self) -> chrono::DateTime<chrono::Utc> {
         let timestamp = &self.created_timestamp;
         match parse_str_utc(timestamp.clone()) {
           Ok(tms) => { 

@@ -46,18 +46,20 @@ use crate::{
 #[no_mangle] pub unsafe extern "C" 
 fn getAgents(
     _nvacl: Option<&crate::NavAbilityClient>,
+    label_contains: *const c_char,
 ) -> Option<Box<RVec<crate::Agent>>> {
     if _nvacl.is_none() {
         to_console_error("getAgents: provided *NavAbilityClient is NULL/None");
         return None;
     }
 
-    match crate::services::getAgents(_nvacl.unwrap(), "".into()) {
+    let lbl_cont = cstr_to_str(label_contains);
+    match crate::services::getAgents(_nvacl.unwrap(), lbl_cont.into()) {
         Ok(agents) => {
             return Some(Box::new(vec_to_ffi(agents)))
         }
         Err(e) => {
-            to_console_error(&format!("NvaSDK.rs error during getAgents: {:?}", e));
+            to_console_error(&format!("NvaSDK.c error during getAgents: {:?}", e));
             // return None;
             return Some(Box::new(RVec::<crate::Agent> { 
                 ptr: ptr::null_mut(), 
@@ -90,7 +92,7 @@ fn updateAgentMetadata(
             return convert_str(&metadata);
         }
         Err(e) => {
-            to_console_error(&format!("NvaSDK.rs error during updateAgentMetadata: {:?}", e));
+            to_console_error(&format!("NvaSDK.c error during updateAgentMetadata: {:?}", e));
             return convert_str("");
         }
     }

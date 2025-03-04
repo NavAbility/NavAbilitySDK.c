@@ -108,7 +108,7 @@ fn addVariableBlobEntry(
   nvafg_: Option<&crate::NavAbilityDFG>,
   variable_label: *const c_char,
   entry_: Option<&crate::BlobEntry>,
-) -> *const c_char {
+) -> *mut c_char {
   if nvafg_.is_none() {
     to_console_error("addVariableBlobEntry: provided *NavAbilityDFG is NULL/None");
     return convert_str("");
@@ -148,7 +148,7 @@ fn deleteAgentBlobEntry(
 
   let beid = nvacl.getId(&(aglb.to_string() + belb));
 
-  crate::services::deleteBlobEntry(
+  let _ = crate::services::deleteBlobEntry(
     nvacl,
     beid,
   );

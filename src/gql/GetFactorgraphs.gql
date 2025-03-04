@@ -1,0 +1,20 @@
+fragment graph_fields_skeleton on Factorgraph {
+  id
+  label
+  lastUpdatedTimestamp
+  namespace
+}
+
+query GetFactorgraphs(
+  $org_id: ID!,
+  $label_contains: String!
+) {
+  factorgraphs(
+    where: {
+      org: {id: $org_id},
+      label_CONTAINS: $label_contains 
+    }
+  ) {
+    ...graph_fields_skeleton
+  }
+}

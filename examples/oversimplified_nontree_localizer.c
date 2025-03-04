@@ -23,13 +23,16 @@ int main(void) {
   nvacl = new_NavAbilityClient(url,atk);
 
   NavAbilityDFG *nvafg = NULL;
+  char fglbl[30];
+  sprintf(fglbl, "FG_%03d", rand());
+  printf("fglbl: %s\n", fglbl);
   nvafg = new_NavAbilityDFG(
       nvacl,
-      "FG001",
+      fglbl,
       "BOT_01",
       NULL,
-      true,  // addAgentIfAbsent
-      true   // addGraphIfAbsent
+      1,  // addAgentIfAbsent
+      1   // addGraphIfAbsent
   ); // must freeR(nvafg) later
 
 
@@ -50,29 +53,67 @@ int main(void) {
   VariableDFG* v = NULL;
   FactorDFG* f = NULL;
   PriorPose3_FullNormal *pf = NULL;
-  const char *vl[2]; 
+  Pose3Pose3_FullNormal *rf = NULL;
 
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  v = addVariable(nvafg, "x0", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  v = addVariable(nvafg, "x1", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x0"; vl[1] = "x1";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
-  v = addVariable(nvafg, "x2", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x1"; vl[1] = "x2";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
-  v = addVariable(nvafg, "x3", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x2"; vl[1] = "x3";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
-  v = addVariable(nvafg, "x4", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x3"; vl[1] = "x4";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
+  addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x1", "Pose2", "", "", 0, 1);
+  rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
+  char* fid = addFactor(
+      nvafg,
+      "x0;x1;",
+      rf,
+      "", 
+      "", 0, 
+      1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
+  
+  addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
+  fid = addFactor(
+    nvafg,
+    "x1;x2;",
+    rf,
+    "", 
+    "", 0, 
+    1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
+
+  addVariable(nvafg, "x3", "Pose2", "", "", 0, 1);
+  fid = addFactor(
+    nvafg,
+    "x2;x3;",
+    rf,
+    "", 
+    "", 0, 
+    1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
+
+  addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
+  fid = addFactor(
+    nvafg,
+    "x3;x4;",
+    rf,
+    "", 
+    "", 0, 
+    1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
 
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
-    vl[0] = "x0";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,1,pf); freeR(f);freeR(pf);
+  fid = addFactor(
+      nvafg,
+      "x0;",
+      pf,
+      "", 
+      "", 0, 
+      1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);
@@ -89,16 +130,34 @@ int main(void) {
   mn = getMean(X2); cv = getCov(X2);
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
-    vl[0] = "x2";
-    struct FactorDFG_PriorPose2_FullNormal *f = NULL;
-  f = addFactor(vl,1,pf); freeR(f);freeR(pf);
+  fid = addFactor(
+      nvafg,
+      "x2;",
+      pf,
+      "", 
+      "", 0, 
+      1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  printf("Added factor id: %s\n", fid);
 
-  v = addVariable(nvafg, "x5", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x4"; vl[1] = "x5";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
-  v = addVariable(nvafg, "x6", "Pose2",  NULL, NULL, NULL, NULL, NULL); freeR(v);
-  vl[0] = "x5"; vl[1] = "x6";
-  f = addFactor(nvafg, vl, 2, Pose3Pose3,  NULL, NULL, NULL, NULL, NULL); freeR(f);
+  addVariable(nvafg, "x5", "Pose2", "", "", 0, 1);
+  fid = addFactor(
+    nvafg,
+    "x4;x5;",
+    rf,
+    "", 
+    "", 0, 
+    1
+  ); freeR(f2); freeR(normal); // because new_ was used
+  addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
+  fid = addFactor(
+    nvafg,
+    "x5;x6;",
+    rf,
+    "", 
+    "", 0, 
+    1
+  ); freeR(f2); freeR(normal); // because new_ was used
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);

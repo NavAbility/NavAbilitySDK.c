@@ -10,7 +10,7 @@
 // #define SArr3(a, b, c) strcat(strcat(strcat(strcat(strcat("",a),";"),b),";"),";")
 
 
-// typedef struct FactorDFG_##FNCTYPE ##FNCTYPE; \
+// typedef struct FactorDFG_##FNCTYPE ##FNCTYPE;
 
 #define GEN_ADD_FACTOR(FNCTYPE) \
     struct FactorDFG_##FNCTYPE *add_FactorDFG_##FNCTYPE( \
@@ -37,42 +37,6 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 //     const struct PriorPoint2_FullNormal *fnc
 // );
 
-// struct FactorDFG_PriorPoint3_FullNormal *add_FactorDFG_PriorPoint3_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPoint3_FullNormal *fnc
-// );
-
-// struct FactorDFG_PriorPose2_FullNormal *add_FactorDFG_PriorPose2_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPose2_FullNormal *fnc
-// );
-
-// struct FactorDFG_PriorPose3_FullNormal *add_FactorDFG_PriorPose3_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPose3_FullNormal *fnc
-// );
-
-// struct FactorDFG_Point2Point2_FullNormal *add_FactorDFG_Point2Point2_FullNormal(
-//     const char *varlbls,
-//     const struct Point2Point2_FullNormal *fnc
-// );
-
-// struct FactorDFG_Point3Point3_FullNormal *add_FactorDFG_Point3Point3_FullNormal(
-//     const char *varlbls,
-//     const struct Point3Point3_FullNormal *fnc
-// );
-
-// struct FactorDFG_Pose2Pose2_FullNormal *add_FactorDFG_Pose2Pose2_FullNormal(
-//     const char *varlbls,
-//     const struct Pose2Pose2_FullNormal *fnc
-// );
-
-// struct FactorDFG_Pose3Pose3_FullNormal *add_FactorDFG_Pose3Pose3_FullNormal(
-//     const char *varlbls,
-//     const struct Pose3Pose3_FullNormal *fnc
-// );
-
-
 
 
 
@@ -86,18 +50,31 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 // printf("[%s] @ line [%d]: \n", #obj, __LINE__);  
 
 
+#define length(obj)                                           \
+    _Generic(obj,                                             \
+        RVec_f64*:                  length_RVec_f64,          \
+        RVec_String*:               length_RVec_String,       \
+        RVec_Agent*:                length_RVec_Agent,        \
+        RVec_NvaNode_Factorgraph*:  length_RVec_NvaNode_Factorgraph \
+    ) (obj)
+
+
 #define getLabel(obj)                                         \
     _Generic(obj,                                             \
         Agent*:                getLabel_Agent,                \
         BlobEntry*:            getLabel_BlobEntry,            \
         NavAbilityBlobStore*:  getLabel_NavAbilityBlobStore,  \
-        NavAbilityDFG*:        getLabel_NavAbilityDFG        \
+        NavAbilityDFG*:        getLabel_NavAbilityDFG,        \
+        struct NvaNode_Factorgraph*:  getLabel_NvaNode_Factorgraph \
     ) (obj)
 
     
 #define getIndex(obj,i)                                       \
     _Generic(obj,                                             \
-        RVec_Agent*:                getIndex_Agent           \
+        RVec_f64*:                  getIndex_RVec_f64,        \
+        RVec_String*:               getIndex_RVec_String,     \
+        RVec_Agent*:                getIndex_RVec_Agent,      \
+        RVec_NvaNode_Factorgraph*:  getIndex_RVec_NvaNode_Factorgraph \
     ) (obj,i)
 
 
@@ -105,19 +82,22 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
     _Generic(obj,                                             \
         char*:                    free_cstr,                  \
         Agent*:                   free_Agent,                 \
+        RVec_f64*:                free_RVec_f64,              \
+        RVec_String*:             free_RVec_String,           \
         RVec_Agent*:              free_RVec_Agent,            \
+        RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \
         BlobEntry*:               free_BlobEntry,             \
         NavAbilityClient*:        free_NavAbilityClient,      \
         NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \
         NavAbilityDFG*:           free_NavAbilityDFG,         \
         VariableDFG*:             free_VariableDFG,           \
         FullNormal*:              free_FullNormal,            \
-        PriorPoint2_FullNormal*:   free_PriorPoint2,          \
-        PriorPoint3_FullNormal*:   free_PriorPoint3,          \
+        PriorPoint2_FullNormal*:  free_PriorPoint2,          \
+        PriorPoint3_FullNormal*:  free_PriorPoint3,          \
         PriorPose2_FullNormal*:   free_PriorPose2,            \
         PriorPose3_FullNormal*:   free_PriorPose3,            \
-        Point2Point2_FullNormal*:   free_Point2Point2,        \
-        Point3Point3_FullNormal*:   free_Point3Point3,        \
+        Point2Point2_FullNormal*: free_Point2Point2,        \
+        Point3Point3_FullNormal*: free_Point3Point3,        \
         Pose2Pose2_FullNormal*:   free_Pose2Pose2,            \
         Pose3Pose3_FullNormal*:   free_Pose3Pose3,            \
         struct FactorDFG_PriorPoint2_FullNormal*:    free_FactorDFG_PriorPoint2_FullNormal,              \

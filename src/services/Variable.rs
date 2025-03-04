@@ -269,6 +269,37 @@ impl PackedVariableNodeData {
 }
 
 
+#[cfg(any(feature = "tokio", feature = "blocking", feature = "wasm"))]
+pub fn getPPEMean(
+    vari: &VariableDFG,
+    solveKey: &str
+) -> Vec<f64> {
+
+    for ppe in vari.ppes.iter() {
+        if ppe.solveKey.eq(solveKey) {
+            return ppe.mean.clone();
+        }
+    }
+    return Vec::new();
+}
+
+
+#[cfg(any(feature = "tokio", feature = "blocking", feature = "wasm"))]
+pub fn getPPECov(
+    vari: &VariableDFG,
+    solveKey: &str
+) -> Vec<f64> {
+
+    todo!("getPPECov, TODO extract from solverData.val -- see JuliaRobotics/DistributedFactorGraphs.jl#535");
+    // for ppe in vari.ppes.iter() {
+    //     if ppe.solveKey.eq(solveKey) {
+    //         return ppe.cov.clone();
+    //     }
+    // }
+    return Vec::new();
+}
+
+
 // ===================== Queries =========================
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
@@ -305,7 +336,6 @@ pub async fn post_get_variable(
     ).await;
 }
 
-
 #[cfg(feature = "tokio")]
 #[allow(non_snake_case)]
 pub fn getVariable(
@@ -313,17 +343,12 @@ pub fn getVariable(
     label: &str,
     fields_full: bool,
 ) -> Option<VariableDFG> {
-    let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap();
-    let result = rt.block_on(async { 
-        post_get_variable(
-            nvafg,
-            label,
-            fields_full,
-        ).await
-    });
+    // TODO why not returning Result like others, did something force this to Option?
+    let result = crate::execute(post_get_variable(
+        nvafg,
+        label,
+        fields_full,
+    ));
 
     if let Ok(variable) = result {
         return variable;
