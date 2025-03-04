@@ -69,6 +69,7 @@ fn getVariable(
   }
 }
 
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn addVariable(
@@ -89,14 +90,7 @@ fn addVariable(
   let tags = cstr_to_str(_tags).to_string();
   tags.split(";").for_each(|t| vtags.push(t.to_string()));
 
-  let timestamp = (|ts: String| {
-    if ts.is_empty() {
-      return None;
-    } else {
-      return Some(crate::parse_str_utc(ts)
-        .expect("addVariable not able to parse timestamp string"));
-    }
-  })(cstr_to_str(_timestamp).to_string());
+  let timestamp = crate::parse_utc_or_none(cstr_to_str(_timestamp).to_string());
 
   let vari = crate::services::addVariable(
     nvafg.unwrap(), 
