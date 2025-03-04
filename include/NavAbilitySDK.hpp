@@ -145,6 +145,10 @@ void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
 
 void deleteBlob(const struct NavAbilityClient *nvacl_, const char *blob_id, const char *store);
 
+void deleteFactorById(const struct NavAbilityDFG *nvafg, const char *fid);
+
+void deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
+
 void free_Agent(struct Agent*);
 
 void free_BlobEntry(struct BlobEntry*);

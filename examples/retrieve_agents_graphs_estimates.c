@@ -84,7 +84,7 @@ int main(void) {
 
   // and a covariance estimate
   RVec_f64* ppec = NULL;
-  // ppec = getPPECov(X1, "parametric"); // WORK IN PROGRESS
+  ppec = getPPECov(X1, "parametric");
   
   freeR(ppem); freeR(ppec);
   freeR(X1);
