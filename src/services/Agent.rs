@@ -1,18 +1,16 @@
 
-use crate::{
-  Uuid,
-  Utc,
-  Agent,
-};
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use std::collections::HashMap;
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[macro_use]
 use crate::{
+  Uuid,
+  Utc,
+  Agent,
   Sender,
   GraphQLQuery,
-  // Response,
   Error,
   SDK_VERSION,
   GetId,
@@ -202,16 +200,6 @@ pub async fn post_get_agents(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
-pub fn getAgents(
-  nvacl: &NavAbilityClient,
-  label_contains: String,
-) -> Result<Vec<Agent>, Box<dyn Error>> {
-  return crate::execute(post_get_agents(nvacl, label_contains));
-}
-
-
-
 #[cfg(any(feature = "tokio", feature = "thread"))] 
 pub fn q_getAgents(
   send_into: Sender<Vec<Agent>>, 
@@ -243,6 +231,16 @@ pub fn q_getAgents(
 //     );
 //   });
 // }
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn getAgents(
+  nvacl: &NavAbilityClient,
+  label_contains: String,
+) -> Result<Vec<Agent>, Box<dyn Error>> {
+  return crate::execute(post_get_agents(nvacl, label_contains));
+}
+
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]

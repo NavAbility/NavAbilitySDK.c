@@ -1,26 +1,55 @@
 
 
-use crate::GetLabel;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
+#[macro_use]
 use crate::{
-  // Utc,
   Uuid,
+  Utc,
   Sender,
-  GraphQLQuery,
-  // Response,
+  Agent,
   Error,
+  GraphQLQuery,
   NavAbilityClient,
+  GetLabel,
+  NvaNode,
+  Factorgraph,
   post_to_nvaapi,
+  send_api_result,
+  parse_str_utc,
+  to_console_debug,
+  to_console_error,
   ListGraphs,
   list_graphs,
   AddFactorgraph,
   AddFactorgraphBlobEntry,
   add_factorgraph_blob_entry,
-  // FindOrgModelGraphs,
-  // to_console_debug,
-  // to_console_error,
+  GetGraphs,
+  GraphFieldImportersSkeleton,
+  Graph_importers_skeleton,
   SDK_VERSION
 };
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+use crate::get_graphs::graph_fields_skeleton as GGs_GraphFieldsSkeleton;
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+Graph_importers_skeleton!(GGs_GraphFieldsSkeleton);
+
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+impl NvaNode<Factorgraph> {
+  pub fn from_gql_skeleton(
+    gql: &impl GraphFieldImportersSkeleton,
+  ) -> Self {
+    let mut obj = NvaNode::<Factorgraph>::default();
+    obj.label = gql.label();
+    obj.namespace = gql.namespace();
+    // obj.last_updated_timestamp = gql.lastUpdatedTimestamp();
+    
+    return obj;
+  }
+}
 
 
 
@@ -61,7 +90,7 @@ pub fn q_listGraphs(
   nvacl: &NavAbilityClient,
 ) -> Result<(), Box<dyn Error>> {
   crate::execute(async {
-    return crate::send_api_result(
+    return send_api_result(
       send_into, 
       post_list_graphs(&nvacl).await,
     );
@@ -77,7 +106,7 @@ pub fn q_listGraphs(
   let nvacl_ = nvacl.clone();
   let send_into_ = send_into.clone();
   crate::execute(async move {
-    let _ = crate::send_api_result(
+    let _ = send_api_result(
       send_into_, 
       post_list_graphs(&nvacl_).await,
     );
@@ -89,6 +118,83 @@ pub fn listGraphs(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
   return crate::execute(post_list_graphs(nvacl));
+}
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+pub async fn post_get_factorgraphs(
+  nvacl: &NavAbilityClient,
+  label_contains: String
+) -> Result<Vec<NvaNode<Factorgraph>>, Box<dyn Error>> {
+
+  // https://github.com/graphql-rust/graphql-client/blob/3090e0add5504ed31df74c32c2bda203793a890a/examples/github/examples/github.rs#L45C1-L48C7
+  let variables = crate::get_graphs::Variables {
+    org_id: nvacl.user_label.to_string(),
+    label_contains, // "" returns all, None/null returns empty list -- go figure.
+  };
+  
+  let request_body = GetGraphs::build_query(variables);
+  
+  return post_to_nvaapi::<
+    crate::get_graphs::Variables,
+    crate::get_graphs::ResponseData,
+    Vec<NvaNode<Factorgraph>>
+  >(
+    nvacl,
+    request_body, 
+    |s| {
+      let mut fgs = Vec::new();
+      for a in s.factorgraphs {
+        let mut fg = NvaNode::<Factorgraph>::from_gql_skeleton(&a.graph_fields_skeleton);
+        fgs.push(fg);
+      };
+      return fgs;
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))] 
+pub fn q_getFactorgraphs(
+  send_into: Sender<Vec<NvaNode<Factorgraph>>>, 
+  nvacl: &NavAbilityClient,
+  label_contains: String,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_get_factorgraphs(&nvacl, label_contains).await,
+    );
+  })
+}
+
+
+#[cfg(feature = "wasm")]
+pub fn q_getFactorgraphs(
+  send_into: Sender<Vec<NvaNode<Factorgraph>>>, 
+  nvacl: &NavAbilityClient,
+  label_contains: String,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  let label_contains_ = label_contains.clone();
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into_, 
+      post_get_factorgraphs(&nvacl_, label_contains_).await,
+    );
+  });
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn getFactorgraphs(
+  nvacl: &NavAbilityClient,
+  label_contains: String,
+) -> Result<Vec<NvaNode<Factorgraph>>, Box<dyn Error>> {
+  return crate::execute(post_get_factorgraphs(nvacl, label_contains));
 }
 
 
@@ -132,7 +238,7 @@ pub async fn add_factorgraph_send(
   description: &str,
   metadata: &str,
 ) -> Result<(), Box<dyn Error>> {
-  return crate::send_api_result(
+  return send_api_result(
     send_into, 
     post_add_factorgraph(nvacl, label, description, metadata).await,
   );
@@ -297,7 +403,7 @@ pub async fn find_org_model_fgs_send(
   model_label_contains: Option<String>,
   fg_label_contains: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
-  return crate::send_api_result(
+  return send_api_result(
     send_into, 
     post_find_org_model_fgs(
       nvacl, 
