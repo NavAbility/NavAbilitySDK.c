@@ -38,13 +38,13 @@ int main(void) {
   // BUILD A FACTOR GRAPH with multiple variables
   // inputs: (nvafg,label,variableType, [_tags,_timestamp,_nstime, _solavble])
 
-  addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
-  addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
-  addVariable(nvafg, "x2", "Pose2", "TESTTAG;", "", 0, 1);
-  addVariable(nvafg, "x3", "Pose2", "TESTTAG;", "", 0, 1);
-  addVariable(nvafg, "x4", "Pose2", "TESTTAG;", "", 0, 1);
-  addVariable(nvafg, "x5", "Pose2", "TESTTAG;", "", 0, 1);
-  char* v = addVariable(nvafg, "x6", "Pose2", "TESTTAG;", "", 0, 1);
+  addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x1", "Pose2", "DEMO_LIDAR;", "", 0, 1);
+  addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x3", "Pose2", "DEMO_CAM;", "", 0, 1);
+  addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x5", "Pose2", "DEMO_LIDAR;", "", 0, 1);
+  char* v = addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
   printf("added last variable with return id: %s\n", v);
 
 
