@@ -38,25 +38,24 @@ int main(void) {
 
   NvaNode_Factorgraph* fgi = NULL;
   for (int i = 0; i < length(fgs); i++) {
-    fgi = getIndex(fgs,i);
-    printf("factor graph label: %s\n", getLabel(fgi));
+    printf("factor graph label: %s\n", getLabel(getIndex(fgs,i)));
   }
-  freeR(fgs);
+
+  // look at a specific factor graph
+  char* fglbl = getLabel(getIndex(fgs,length(fgs)-1));   freeR(fgs);
+
+  NavAbilityDFG *nvafg = NULL;
+  nvafg = new_NavAbilityDFG(
+      nvacl,
+      fglbl,
+      "BOT_01",
+      NULL,
+      0,  // addAgentIfAbsent
+      0   // addGraphIfAbsent
+  ); // must freeR(nvafg) later
 
 
-  // // look at a specific factor graph
-  // char* fglbl = "FG001";
-  // NavAbilityDFG *nvafg = NULL;
-  // nvafg = new_NavAbilityDFG(
-  //     nvacl,
-  //     fglbl,
-  //     "BOT_01",
-  //     NULL,
-  //     false,  // addAgentIfAbsent
-  //     false   // addGraphIfAbsent
-  // ); // must freeR(nvafg) later
-
-  // // list all variables in the 
+  // list all variables in the 
   // RVec_String variables = NULL;
   // variables = listVariables(nvafg); // must freeR(nvafg) later
   // printf("Factorgraph %s has %ld variables\n", fglbl, length(agents));
@@ -81,9 +80,9 @@ int main(void) {
   //   freeR(x1_ppe);
   //   freeR(X1);
 
-  // // See other examples for more concurrent usage, adding camera or lidar, launching more compute
+  // See other examples for more concurrent usage, adding camera or lidar, launching more compute
 
-  //   freeR(nvafg);  freeR(nvacl);
+  freeR(nvafg);  freeR(nvacl);
   printf("All done.\n");
   return 0;
 }
