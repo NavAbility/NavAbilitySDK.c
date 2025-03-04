@@ -36,7 +36,7 @@ int main(void) {
     printf("nvacl.apiurl = %s\n", "***");
 
     RVec_Agent* agents = NULL;
-    agents = getAgents(nvacl);
+    agents = getAgents(nvacl, "");
 
     printf("get agents length: %ld\n", length(agents));
     int i;
@@ -137,7 +137,7 @@ int main(void) {
 
     printf("check for NullPtr arg handling\n");
     get_apiurl(NULL);
-    getAgents(NULL); 
+    getAgents(NULL, ""); 
     getVariable(NULL,"");
 
 

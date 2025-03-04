@@ -17,6 +17,8 @@ use crate::{
     RVec,
     Agent, 
     BlobEntry,
+    NvaNode,
+    Factorgraph,
     NavAbilityBlobStore,
     NavAbilityDFG,
     GetLabel,
@@ -26,10 +28,17 @@ use crate::{
 
 // ========================= Accessors =======================
 
+
+// ------------- Agent -----------------
+
+
 #[no_mangle] pub unsafe extern "C" 
-fn length(rv_agent: &RVec<crate::Agent>) -> usize {
+fn length_RVec_Agent(
+    rv_agent: &RVec<crate::Agent>
+) -> usize {
     return rv_agent.len
 }
+
 
 #[no_mangle] pub unsafe extern "C" 
 fn getIndex_Agent(
@@ -40,6 +49,7 @@ fn getIndex_Agent(
 }
 
 
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn getLabel_Agent(
@@ -47,6 +57,51 @@ fn getLabel_Agent(
 ) -> *const c_char {
     return convert_str(&((*agent).label));
 }
+
+
+// ------------- Factorgraph -----------------
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn length_RVec_NvaNode_Factorgraph(
+    rv_fgs: &RVec<NvaNode<Factorgraph>>
+) -> usize {
+    return rv_fgs.len
+}
+
+
+#[no_mangle] pub unsafe extern "C" 
+fn getIndex_NvaNode_Factorgraph(
+    rv_fgs: &RVec<NvaNode<Factorgraph>>,
+    index: usize
+) -> *mut NvaNode<Factorgraph> {
+    return rv_fgs.ptr.wrapping_add(index)
+}
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getLabel_NvaNode_Factorgraph(
+    input: &NvaNode<Factorgraph>,
+) -> *const c_char {
+    convert_str(&input.getLabel())
+    // return convert_str(&((*input).label));
+}
+
+
+// TODO see if this can be used with macro _Generic
+// #[allow(non_snake_case)]
+// #[no_mangle] pub unsafe extern "C" 
+// fn getLabel_NvaNode<T>(
+//     input: &NvaNode<T>,
+// ) -> *const c_char {
+//     convert_str(&input.getLabel())
+// }
+
+
+// ------------- BlobEntry -----------------
+
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
@@ -80,13 +135,6 @@ fn getLabel_NavAbilityClient(
     convert_str(&input.label)
 }
 
-#[allow(non_snake_case)]
-#[no_mangle] pub unsafe extern "C" 
-fn getLabel_NvaNode<T>(
-    input: &crate::NvaNode<T>,
-) -> *const c_char {
-    convert_str(&input.getLabel())
-}
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
@@ -132,10 +180,10 @@ fn free_RVec_Agent (
 }
 
 #[no_mangle] pub unsafe extern "C" 
-fn free_RVec_ListGraphs (
-    rvec: Box<RVec<*mut c_char>>
+fn free_RVec_NvaNode_Factorgraph (
+    rvec: Box<RVec<NvaNode<Factorgraph>>>
 ) {
-    free_rvec::<*mut c_char>(*rvec)
+    free_rvec::<NvaNode<Factorgraph>>(*rvec)
 }
 
 

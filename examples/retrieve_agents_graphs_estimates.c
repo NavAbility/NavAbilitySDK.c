@@ -22,7 +22,7 @@ int main(void) {
 
   // list all agents
   RVec_Agent* agents = NULL;
-  agents = getAgents(nvacl); // must freeR(agents) later
+  agents = getAgents(nvacl, ""); // must freeR(agents) later
   printf("get agents length: %ld\n", length(agents));
   for (int i = 0; i < length(agents); i++) {
     printf("agent label: %s\n", getLabel(getIndex(agents,i)));
@@ -31,14 +31,17 @@ int main(void) {
 
 
   // // list all factor graphs
-  RVec_Factorgraphs* fgs = NULL;
-  // fgs = listGraphs(nvacl); // must freeR(fgs) later
+  RVec_NvaNode_Factorgraph* fgs = NULL;
+  fgs = getFactorgraphs(nvacl, ""); // must freeR(fgs) later
 
-  // printf("listGraphs length: %ld\n", length(fgs));
-  // for (int i = 0; i < length(fgs); i++) {
-  //   printf("factor graph label: %s\n", getLabel(getIndex(fgs,i)));
-  // }
-  // freeR(fgs);
+  printf("getFactorgraphs length: %ld\n", length(fgs));
+
+  NvaNode_Factorgraph* fgi = NULL;
+  for (int i = 0; i < length(fgs); i++) {
+    fgi = getIndex(fgs,i);
+    printf("factor graph label: %s\n", getLabel(fgi));
+  }
+  freeR(fgs);
 
 
   // // look at a specific factor graph

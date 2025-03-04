@@ -46,7 +46,7 @@ typedef struct NavAbilityClient NavAbilityClient;
 
 typedef struct NavAbilityDFG NavAbilityDFG;
 
-typedef struct NvaNode_T NvaNode_T;
+typedef struct NvaNode_Factorgraph NvaNode_Factorgraph;
 
 typedef struct Point2Point2_FullNormal Point2Point2_FullNormal;
 
@@ -98,10 +98,10 @@ typedef struct RVec_Agent {
   size_t len;
 } RVec_Agent;
 
-typedef struct RVec_____c_char {
-  char **ptr;
+typedef struct RVec_NvaNode_Factorgraph {
+  struct NvaNode_Factorgraph *ptr;
   size_t len;
-} RVec_____c_char;
+} RVec_NvaNode_Factorgraph;
 
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
@@ -179,15 +179,21 @@ void free_PriorPose3(struct PriorPose3_FullNormal*);
 
 void free_RVec_Agent(struct RVec_Agent *rvec);
 
-void free_RVec_ListGraphs(struct RVec_____c_char *rvec);
+void free_RVec_NvaNode_Factorgraph(struct RVec_NvaNode_Factorgraph *rvec);
 
 void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
 
-struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl);
+struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl, const char *label_contains);
+
+struct RVec_NvaNode_Factorgraph *getFactorgraphs(const struct NavAbilityClient *_nvacl,
+                                                 const char *label_contains);
 
 struct Agent *getIndex_Agent(const struct RVec_Agent *rv_agent, size_t index);
+
+struct NvaNode_Factorgraph *getIndex_NvaNode_Factorgraph(const struct RVec_NvaNode_Factorgraph *rv_fgs,
+                                                         size_t index);
 
 const char *getLabel_Agent(const struct Agent *agent);
 
@@ -199,13 +205,15 @@ const char *getLabel_NavAbilityClient(const struct Agent *input);
 
 const char *getLabel_NavAbilityDFG(const struct NavAbilityDFG *input);
 
-const char *getLabel_NvaNode(const struct NvaNode_T *input);
+const char *getLabel_NvaNode_Factorgraph(const struct NvaNode_Factorgraph *input);
 
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 
-size_t length(const struct RVec_Agent *rv_agent);
+size_t length_RVec_Agent(const struct RVec_Agent *rv_agent);
+
+size_t length_RVec_NvaNode_Factorgraph(const struct RVec_NvaNode_Factorgraph *rv_fgs);
 
 struct BlobEntry *new_BlobEntry(const char *blobId,
                                 const char *label,
@@ -279,7 +287,7 @@ const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
 // #define SArr3(a, b, c) strcat(strcat(strcat(strcat(strcat("",a),";"),b),";"),";")
 
 
-// typedef struct FactorDFG_##FNCTYPE ##FNCTYPE; \
+// typedef struct FactorDFG_##FNCTYPE ##FNCTYPE;
 
 #define GEN_ADD_FACTOR(FNCTYPE) \
     struct FactorDFG_##FNCTYPE *add_FactorDFG_##FNCTYPE( \
@@ -306,42 +314,6 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 //     const struct PriorPoint2_FullNormal *fnc
 // );
 
-// struct FactorDFG_PriorPoint3_FullNormal *add_FactorDFG_PriorPoint3_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPoint3_FullNormal *fnc
-// );
-
-// struct FactorDFG_PriorPose2_FullNormal *add_FactorDFG_PriorPose2_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPose2_FullNormal *fnc
-// );
-
-// struct FactorDFG_PriorPose3_FullNormal *add_FactorDFG_PriorPose3_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPose3_FullNormal *fnc
-// );
-
-// struct FactorDFG_Point2Point2_FullNormal *add_FactorDFG_Point2Point2_FullNormal(
-//     const char *varlbls,
-//     const struct Point2Point2_FullNormal *fnc
-// );
-
-// struct FactorDFG_Point3Point3_FullNormal *add_FactorDFG_Point3Point3_FullNormal(
-//     const char *varlbls,
-//     const struct Point3Point3_FullNormal *fnc
-// );
-
-// struct FactorDFG_Pose2Pose2_FullNormal *add_FactorDFG_Pose2Pose2_FullNormal(
-//     const char *varlbls,
-//     const struct Pose2Pose2_FullNormal *fnc
-// );
-
-// struct FactorDFG_Pose3Pose3_FullNormal *add_FactorDFG_Pose3Pose3_FullNormal(
-//     const char *varlbls,
-//     const struct Pose3Pose3_FullNormal *fnc
-// );
-
-
 
 
 
@@ -355,18 +327,27 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 // printf("[%s] @ line [%d]: \n", #obj, __LINE__);  
 
 
+#define length(obj)                                           \
+    _Generic(obj,                                             \
+        RVec_Agent*:                length_RVec_Agent,             \
+        RVec_NvaNode_Factorgraph*:  length_RVec_NvaNode_Factorgraph \
+    ) (obj)
+
+
 #define getLabel(obj)                                         \
     _Generic(obj,                                             \
         Agent*:                getLabel_Agent,                \
         BlobEntry*:            getLabel_BlobEntry,            \
         NavAbilityBlobStore*:  getLabel_NavAbilityBlobStore,  \
-        NavAbilityDFG*:        getLabel_NavAbilityDFG        \
+        NavAbilityDFG*:        getLabel_NavAbilityDFG,        \
+        struct NvaNode_Factorgraph*:  getLabel_NvaNode_Factorgraph \
     ) (obj)
 
     
 #define getIndex(obj,i)                                       \
     _Generic(obj,                                             \
-        RVec_Agent*:                getIndex_Agent           \
+        RVec_Agent*:                getIndex_Agent,           \
+        RVec_NvaNode_Factorgraph*:  getIndex_NvaNode_Factorgraph \
     ) (obj,i)
 
 
@@ -375,6 +356,7 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
         char*:                    free_cstr,                  \
         Agent*:                   free_Agent,                 \
         RVec_Agent*:              free_RVec_Agent,            \
+        RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \
         BlobEntry*:               free_BlobEntry,             \
         NavAbilityClient*:        free_NavAbilityClient,      \
         NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \

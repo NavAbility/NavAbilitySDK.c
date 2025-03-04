@@ -55,7 +55,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
   PriorPose2_FullNormal *f1 = NULL;
   f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
-  const char* fid1 = addFactor(
+  char* fid1 = addFactor(
       nvafg,
       "x1;",
       f1,
@@ -75,7 +75,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv);
   Pose2Pose2_FullNormal *f2 = NULL;
   f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
-  const char* fid2 = addFactor(
+  char* fid2 = addFactor(
       nvafg,
       "x1;x2;",
       f2,
