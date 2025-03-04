@@ -193,6 +193,16 @@ pub unsafe fn cstr_to_str(c_buf: *const i8) -> &'static str {
     return cstr.to_str().expect("bad *const c_char encoding");
 }
 
+pub fn parse_utc_or_none(
+    utcstr: String
+  ) -> Option<chrono::DateTime<chrono::Utc>> {
+    return if utcstr.is_empty() {
+      return None;
+    } else {
+      return Some(crate::parse_str_utc(utcstr.clone())
+        .expect(&format!("parse_utc_or_none not able to parse timestamp string {:?}", &utcstr)));
+    }
+}
 
 // pub unsafe fn convert_arr_ptrchar(
 //     varlbls: *const *const c_char,

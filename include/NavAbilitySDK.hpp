@@ -109,11 +109,11 @@ const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
                               const struct BlobEntry *entry_);
 
-const char *addBlob(const struct NavAbilityBlobStore *nvabs_,
-                    const char *filename,
-                    const char *mime,
-                    const char *data,
-                    size_t nbytes);
+char *addBlob(const struct NavAbilityBlobStore *nvabs_,
+              const char *filename,
+              const char *mime,
+              const char *data,
+              size_t nbytes);
 
 char *addVariable(const struct NavAbilityDFG *nvafg,
                   const char *label,
@@ -247,22 +247,22 @@ struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
 
-void startWorker_ImageWhitebalance(const struct NavAbilityDFG *nvafg,
-                                   const char *v_lbl,
-                                   const char *be_lbl,
-                                   const char *be_out_lbl);
+char *startWorker_ImageWhitebalance(const struct NavAbilityDFG *nvafg,
+                                    const char *v_lbl,
+                                    const char *be_lbl,
+                                    const char *be_out_lbl);
 
-void startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg,
-                                   const char *v1_lbl,
-                                   const char *be1_lbl,
-                                   const char *v2_lbl,
-                                   const char *be2_lbl);
+char *startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg,
+                                    const char *v1_lbl,
+                                    const char *be1_lbl,
+                                    const char *v2_lbl,
+                                    const char *be2_lbl);
 
-void startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg,
-                                        const char *v_lbl,
-                                        const char *be_lbl);
+char *startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg,
+                                         const char *v_lbl,
+                                         const char *be_lbl);
 
-void startWorker_solveParametric(const struct NavAbilityDFG *nvafg);
+char *startWorker_solveParametric(const struct NavAbilityDFG *nvafg);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,

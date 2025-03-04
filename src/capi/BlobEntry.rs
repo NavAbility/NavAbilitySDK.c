@@ -58,7 +58,7 @@ fn new_BlobEntry(
 ) -> Box<crate::BlobEntry> {
   // let _id = cstr_to_str(id);
   let _blobId = cstr_to_str(blobId);
-  let _timestamp = cstr_to_str(timestamp).to_string();
+  let _timestamp = crate::parse_utc_or_none(cstr_to_str(timestamp).to_string()).unwrap_or(chrono::Utc::now());
   
   let mut be = crate::BlobEntry::new();
   be.blobId = Uuid::parse_str(_blobId).expect(&format!("new_BlobEntry unable to parse blobId uuid: {:?}",_blobId));
@@ -70,7 +70,7 @@ fn new_BlobEntry(
   be.description = cstr_to_str(description).to_string();
   be.mimeType = cstr_to_str(mimeType).to_string();
   be.metadata = cstr_to_str(metadata).to_string();
-  be.timestamp = parse_str_utc(_timestamp.clone()).expect(&format!("new_BlobEntry unable to parse timestamp {:?}",_timestamp));
+  be.timestamp = _timestamp;
   return Box::new(be)
 }
 
