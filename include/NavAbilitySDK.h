@@ -123,9 +123,9 @@ char *addVariable(const struct NavAbilityDFG *nvafg,
                   size_t _nstime,
                   size_t _solvable);
 
-const char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
-                                 const char *variable_label,
-                                 const struct BlobEntry *entry_);
+char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
+                           const char *variable_label,
+                           const struct BlobEntry *entry_);
 
 void deleteAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                           const char *agent_label,
