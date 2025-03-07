@@ -29,6 +29,8 @@ use crate::{
   DeleteBlob,
   delete_blob,
   check_deser,
+  post_to_nvaapi,
+  send_api_result,
   send_query_result,
   // to_console_debug,
   to_console_error,
@@ -38,10 +40,10 @@ use crate::{
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_create_download(
-  nvacl: NavAbilityClient,
+  nvacl: &NavAbilityClient,
   blob_id: Uuid,
   store: Option<String>,
-) -> Result<Response<create_download::ResponseData>, Box<dyn Error>> {
+) -> Result<create_download::ResponseData, Box<dyn Error>> {
   
   let variables = create_download::Variables {
     blob_id: blob_id.to_string(),
@@ -49,34 +51,43 @@ pub async fn post_create_download(
   };
   
   let request_body = CreateDownload::build_query(variables);
-  
-  let req_res = nvacl.client
-  .post(&nvacl.apiurl)
-  .json(&request_body)
-  .send().await;
-  
-  if let Err(ref re) = req_res {
-    to_console_error(&format!("API request error: {:?}", re));
-  }
-  
-  return check_deser::<create_download::ResponseData>(
-    req_res?.json().await
-  )
+
+  return post_to_nvaapi::<
+    create_download::Variables,
+    create_download::ResponseData,
+    create_download::ResponseData
+  >(
+    nvacl,
+    request_body, 
+    |s| s,
+    Some(1)
+  ).await;
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-pub async fn create_download_send(
-  send_into: Sender<create_download::ResponseData>,
-  nvacl: NavAbilityClient,
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn q_createDownload(
+  send_into: Sender<create_download::ResponseData>, 
+  nvacl: &NavAbilityClient,
   blob_id: Uuid,
   store: Option<String>
 ) {
-  let resp = post_create_download(nvacl,blob_id,store).await;
-  let _ = send_query_result::<
-  create_download::ResponseData,
-  create_download::ResponseData
-  >(send_into,resp,|s| {s});
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  let blob_id_ = blob_id.clone();
+  let store_ = store.clone();
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into_, 
+      post_create_download(
+        &nvacl_,
+        blob_id_,
+        store_
+      ).await,
+    );
+  });
 }
 
 
@@ -87,7 +98,7 @@ pub async fn post_create_upload(
   // blob_size: i64,
   blob_id: Uuid,
   parts: Option<i64>,
-) -> Result<Response<create_upload::ResponseData>, Box<dyn Error>> {
+) -> Result<create_upload::ResponseData, Box<dyn Error>> {
   
   let variables = create_upload::Variables {
     // label: label.to_string(),
@@ -96,37 +107,67 @@ pub async fn post_create_upload(
   };
   
   let request_body = CreateUpload::build_query(variables);
-  
-  let req_res = nvacl.client
-  .post(&nvacl.apiurl)
-  .json(&request_body)
-  .send().await;
-  
-  if let Err(ref re) = req_res {
-    to_console_error(&format!("API request error: {:?}", re));
-  }
-  
-  return check_deser::<create_upload::ResponseData>(
-    req_res?.json().await
-  )
+
+  return post_to_nvaapi::<
+    create_upload::Variables,
+    create_upload::ResponseData,
+    create_upload::ResponseData
+  >(
+    &nvacl,
+    request_body, 
+    |s| s,
+    Some(1)
+  ).await;
 }
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-pub async fn create_upload_send(
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+pub fn q_createUpload(
   send_into: Sender<create_upload::ResponseData>, 
-  client: &NavAbilityClient,
+  nvacl: &NavAbilityClient,
+  filename: &String,
+  blob_size: i64,
+  nparts: Option<i64>,
+  blob_id: Option<Uuid>, // doenst work yet, leave None
+) -> Result<(), Box<dyn Error>> {
+  return crate::execute(async { send_api_result(
+      send_into, 
+      post_create_upload(
+          nvacl.clone(),
+          blob_id.expect("Must provide blob_id to create_upload_send"),
+          nparts
+      ).await,
+    )
+  });
+}
+
+#[cfg(feature = "wasm")]
+pub fn q_createUpload(
+  send_into: Sender<create_upload::ResponseData>, 
+  nvacl: &NavAbilityClient,
   filename: &String,
   blob_size: i64,
   nparts: Option<i64>,
   blob_id: Option<Uuid>, // doenst work yet, leave None
 ) {
-  let result = post_create_upload(
-    client.clone(), 
-    blob_id.expect("Must provide blob_id to create_upload_send"),
-    nparts,
-  ).await;
-  let _ = send_query_result(send_into, result, |s| {s});
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = (*nvacl).clone();
+  let send_into_ = send_into.clone();
+  let blob_id_ = blob_id.clone();
+  let nparts_ = nparts.clone();
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into_, 
+      post_create_upload(
+        nvacl_.clone(),
+        blob_id_.expect("Must provide blob_id to create_upload_send"),
+        nparts_
+      ).await,
+    );
+  });
 }
+
+
 
 
 // TODO update to new query/mutation pattern
@@ -198,7 +239,7 @@ pub async fn post_blob_singlepart(
   ).await;
   
   // send the single part blob
-  let upld = upl.unwrap().data.unwrap();
+  let upld = upl.unwrap();
   if let Some(crup) = upld.create_upload {
     let uploadId = &crup.upload_id.to_string();
     if let Some(st_url) = &crup.parts[0] {

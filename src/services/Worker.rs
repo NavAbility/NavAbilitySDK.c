@@ -21,7 +21,7 @@ use crate::{
 pub async fn post_start_worker(
   nvacl: &NavAbilityClient,
   input: &str,
-  worker_label: crate::start_worker::mutationInput_post_startWorker_workerLabel
+  worker_label: crate::start_worker::mutationInput_post_run_workerLabel
 ) -> Result<String, Box<dyn Error>> {
   
   let variables = crate::start_worker::Variables {

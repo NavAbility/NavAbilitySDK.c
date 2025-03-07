@@ -40,26 +40,6 @@ fragment blobEntry_fields on BlobEntry {
 }
 
 
-## already defined via earlier call
-# fragment blobEntry_fields on BlobEntry {
-#     id
-#     blobId
-#     originId
-#     label
-#     blobstore
-#     hash
-#     origin
-#     size
-#     description
-#     mimeType
-#     metadata
-#     timestamp
-#     createdTimestamp
-#     lastUpdatedTimestamp
-#     _version
-# }
-
-
 fragment variable_summary_fields on Variable {
     timestamp
     nstime
