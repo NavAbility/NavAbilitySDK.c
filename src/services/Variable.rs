@@ -17,17 +17,13 @@ use crate::{
     Sender, 
     // Response, 
     NavAbilityDFG,
-    // check_deser,
-    // send_query_result,
     send_api_result,
     post_to_nvaapi,
-    // send_api_response,
     GetVariable, 
     GraphQLQuery,
     ListVariables,
     AddVariable,
     GetId,
-    // check_query_response_data,
     get_variable::{
         self, 
         ppe_fields

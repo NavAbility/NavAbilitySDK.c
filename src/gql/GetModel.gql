@@ -1,0 +1,45 @@
+fragment agent_fields_summary on Agent {
+  id
+  label
+  description
+  tags
+  _version
+  createdTimestamp
+  lastUpdatedTimestamp
+}
+
+fragment blobEntry_fields_summary on BlobEntry {
+  id
+  label
+  size
+  mimeType
+  lastUpdatedTimestamp
+}
+
+fragment graph_fields_skeleton on Factorgraph {
+  id
+  label
+  lastUpdatedTimestamp
+  namespace
+}
+
+query GetModel($label: String!) {
+  models(where: {label: $label}) {
+    id
+    label
+    lastUpdatedTimestamp
+    metadata
+    tags
+    blobEntries {
+      ...blobEntry_fields_summary
+    }
+    fgs {
+      ...graph_fields_skeleton
+      numVariables
+      numFactors
+      agents {
+        ...agent_fields_summary
+      }
+    }
+  }
+}

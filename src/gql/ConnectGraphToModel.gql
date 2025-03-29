@@ -1,0 +1,26 @@
+
+mutation ConnectGraphModel(
+  $fgId: ID!
+  $modelId: ID!, 
+) {
+  updateModels(
+    where: { 
+      id: $modelId 
+    }
+    update: { 
+      fgs: { 
+        connect: { 
+          where: { 
+            node: { 
+              id: $fgId 
+            } 
+          } 
+        } 
+      } 
+    }
+  ) {
+    info {
+      relationshipsCreated
+    }
+  }
+}

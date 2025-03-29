@@ -278,7 +278,7 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   }
 
   // DFG.FactorDFG + BlobEntry + ... ~= GQL.FactorCreateInput
-  let mut variables = add_factors::Variables {
+  let variables = add_factors::Variables {
     id,
     label,
     tags: factor.tags,
@@ -300,6 +300,7 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   let request_body = AddFactors::build_query(variables);
   // reverse engineer request body to splice in variables_connect without full types
   let jstr = serde_json::to_string(&request_body).unwrap();
+  // FIXME just use serde_json::to_value as simpler route
   let mut jval: serde_json::Value = serde_json::from_str(&jstr).unwrap();
   let jcon: serde_json::Value = serde_json::from_str(&serde_json::to_string(&connect).unwrap()).expect("problem with connect");
   jval["variables"]["variables_connect"] = jcon;

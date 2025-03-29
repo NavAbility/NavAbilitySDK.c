@@ -4,15 +4,12 @@
 use crate::{
     // Uuid,
     Error,
-    // Response,
     GraphQLQuery,
     // QueryBody,
     GetOrg,
-    get_org,
     post_to_nvaapi,
-    // to_console_debug,
+    to_console_debug,
     to_console_error,
-    // check_deser,
     NavAbilityClient,
 };
 
@@ -20,14 +17,14 @@ use crate::{
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_org_id(
     nvacl: &NavAbilityClient,
-) -> Result<get_org::ResponseData, Box<dyn Error>> {
+) -> Result<crate::get_org::ResponseData, Box<dyn Error>> {
     
-    let request_body = GetOrg::build_query(get_org::Variables {});
+    let request_body = GetOrg::build_query(crate::get_org::Variables {});
 
     return post_to_nvaapi::<
-        get_org::Variables,
-        get_org::ResponseData,
-        get_org::ResponseData
+        crate::get_org::Variables,
+        crate::get_org::ResponseData,
+        crate::get_org::ResponseData
     >(
         nvacl,
         request_body, 

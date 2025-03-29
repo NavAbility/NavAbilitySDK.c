@@ -5,9 +5,11 @@ use serde::Serialize;
 use base64::{
   Engine as _, 
   engine::general_purpose, 
+  read
   // alphabet
 };
 
+// use std::os::linux::raw;
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
@@ -28,10 +30,8 @@ use crate::{
   complete_upload,
   DeleteBlob,
   delete_blob,
-  check_deser,
   post_to_nvaapi,
   send_api_result,
-  send_query_result,
   // to_console_debug,
   to_console_error,
 };
@@ -178,7 +178,7 @@ pub async fn post_complete_upload(
   upload_id: String,
   etags: Vec<String>,
   // completed_upload: complete_upload::CompletedUploadInput,
-) -> Result<Response<complete_upload::ResponseData>, Box<dyn Error>> {
+) -> Result<complete_upload::ResponseData, Box<dyn Error>> {
   let mut parts: Vec<Option<complete_upload::CompletedUploadPartInput>> = vec![];
   for (i,et) in etags.iter().enumerate() {
     parts.push(
@@ -203,18 +203,16 @@ pub async fn post_complete_upload(
   
   let request_body = CompleteUpload::build_query(variables);
   
-  let req_res = nvacl.client
-  .post(&nvacl.apiurl)
-  .json(&request_body)
-  .send().await;
-  
-  if let Err(ref re) = req_res {
-    to_console_error(&format!("API request error: {:?}", re));
-  }
-  
-  return check_deser::<complete_upload::ResponseData>(
-    req_res?.json().await
-  )
+  return crate::post_to_nvaapi::<
+    complete_upload::Variables,
+    complete_upload::ResponseData,
+    complete_upload::ResponseData
+  >(
+    &nvacl,
+    request_body, 
+    |s| s,
+    Some(3)
+  ).await;
 }
 
 
@@ -228,9 +226,9 @@ pub async fn post_blob_singlepart(
   blobId: Uuid,
   filename: &str,
   file_mime: &str,
-  file_timestamp: &chrono::DateTime<Utc>,
+  file_timestamp: Option<&chrono::DateTime<Utc>>,
   file_bytes: std::sync::Arc<[u8]>,
-) {
+) -> Result<(), Box<dyn Error>> {
   let _nvacl = &nvabs.client;
   let upl = post_create_upload(
     _nvacl.clone(), // change to allow borrow 
@@ -257,7 +255,8 @@ pub async fn post_blob_singlepart(
       );
       let upload_result = fu.upload_file(
         bytes,
-        url
+        url,
+        file_mime.to_string(),
       ).await;
       
       let mut etags = Vec::new();
@@ -278,6 +277,7 @@ pub async fn post_blob_singlepart(
       ).await;
     }
   }
+  return Ok(());
 }
 
 
@@ -297,9 +297,9 @@ pub async fn post_blob_onprem(
   blobId: Uuid,
   filename: &str,
   file_mime: &str,
-  file_timestamp: &chrono::DateTime<Utc>,
+  file_timestamp: Option<&chrono::DateTime<Utc>>,
   file_bytes: std::sync::Arc<[u8]>,
-) {
+) -> Result<(), Box<dyn Error>> {
 
   let input = general_purpose::STANDARD.encode(file_bytes.to_vec());
   let request_body = crate::QueryBody::<PostOnPrem> {
@@ -321,6 +321,8 @@ pub async fn post_blob_onprem(
     to_console_error(&format!("Error in upload request to NavAbilityBlobStoreOnPrem: {:?}", re));
   }
   // TODO extract blobId from response and better error handling
+
+  return Ok(());
 }
 // b64blob = base64encode(blob)
 // response = NvaSDK.GQL.mutate(
@@ -345,25 +347,25 @@ pub async fn post_blob_store(
   file_mime: &str,
   file_timestamp: &chrono::DateTime<Utc>,
   file_bytes: std::sync::Arc<[u8]>,
-) {
+) -> Result<(), Box<dyn Error>> {
   match &nvabs.label {
     crate::NvaStoreLabel::Cloud(_store) => {
-      post_blob_singlepart(
+      return post_blob_singlepart(
         nvabs,
         blobId,
         filename,
         file_mime,
-        file_timestamp,
+        Some(file_timestamp),
         file_bytes
       ).await;
     }
     crate::NvaStoreLabel::Onprem(_store) => {
-      post_blob_onprem(
+      return post_blob_onprem(
         nvabs,
         blobId,
         filename,
         file_mime,
-        file_timestamp,
+        Some(file_timestamp),
         file_bytes
       ).await;
     }
@@ -393,7 +395,7 @@ pub fn addBlob(
   bytes.resize(nbytes, 0x00);
   bytes[..nbytes].clone_from_slice(&file_bytes);
 
-  crate::execute(crate::services::post_blob_store(
+  let _ = crate::execute(crate::services::post_blob_store(
     &nvabs_,
     blobId_.clone(),
     &filename_,
@@ -480,3 +482,35 @@ pub fn deleteBlob(
   );
 }
 
+
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+pub async fn download_blob(
+  // nvacl: &NavAbilityClient,
+  url: String
+  // blob_id: Uuid,
+  // store: Option<String>,
+) -> Result<Vec<u8>, Box<dyn Error>> {
+  
+  // let dwurl  =post_create_download(nvacl, blob_id, store).await;
+  let mut headers = reqwest::header::HeaderMap::new();
+  headers.insert(reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN, reqwest::header::HeaderValue::from_static("*.amazonaws.com"));
+  // headers.insert(CONTENT_TYPE, reqwest::header::HeaderValue::from_static("image/png"));
+
+  // if let Ok(dw) = dwurl {
+  //   if let Some(url) = dw.create_download {
+    let client = reqwest::Client::new();
+    let req_res = client
+    .get(url)
+    .headers(headers)
+    // .header("Access-Control-Allow-Origin", "*.amazonaws.com")
+    .send()
+    .await;
+    if let Err(ref re) = req_res {
+      to_console_error(&format!("Error in download request from NavAbilityBlobStore: {:?}", re));
+    }
+    let bytes = req_res?.bytes().await?;
+    return Ok(bytes.to_vec());
+  //   }
+  // }
+  return Err("Error in download request from NavAbilityBlobStore".into());
+}

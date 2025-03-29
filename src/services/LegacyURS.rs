@@ -83,7 +83,7 @@ pub async fn fetch_urs_async(
         to_console_error(&format!("API request error: {:?}", re));
     }
 
-    return check_deser::<get_urs::ResponseData>(
+    return crate::check_deser::<get_urs::ResponseData>(
         req_res?.json().await
     )
 }
@@ -99,18 +99,17 @@ pub async fn fetch_context_web(
     session_label: String,
 ) { // -> Vec<get_robots::GetRobotsUsers> {
     let result = fetch_urs_async(&client).await;
-    // FIXME use send_query_result instead, refactor .orgs part
-    // send_query_result(send_into, result);
+    // FIXME use new common query functions refactor .orgs part
     if let Ok(response_body) = result {
         let res_errs = response_body.errors;
         match res_errs {
             Some(ref err) => {
-                to_console_error(&format!("fetch_context_web has response errors {:?}",&res_errs));
+                to_console_error(&format!("fetch_context_web has response errors {:?}",&err));
             },
             None => {
                 let urs_data = response_body.data;
                 match urs_data {
-                    None => to_console_debug(&"NvaSDK.rs, GQL response_body.data is empty"),
+                    None => to_console_debug(&"GQL response_body.data is empty"),
                     Some(resdata) => {
                         let urs_data = resdata.orgs;
                         let res_len = urs_data.len();

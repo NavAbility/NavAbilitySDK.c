@@ -9,13 +9,15 @@ NVA_API_URL ?= "https://api.navability.io/graphql"
 NVA_PWA_URL ?= "https://app.navability.io"
 WHICHBROWSER=$(shell xdg-settings get default-web-browser)
 
+NVA_API_SCHEMA_PATH := "src/gql/schema.json"
+
 default: help ;
 .PHONY: default
 
 clean:
 	cargo clean
 	rm -rf test/build
-	rm -f src/schema.json
+	rm -f src/gql/schema.json
 .PHONY: clean
 
 build-tokio:
@@ -25,8 +27,14 @@ build-tokio:
 build-lib: build-tokio generate-cbindgen-c generate-cbindgen-cpp
 
 fetch-schema:
-	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/schema.json $(NVA_API_URL)
+	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/gql/schema.json $(NVA_API_URL)
 .PHONY: fetch-schema
+
+graphql-codegen:
+	@echo "Generating Rust code from GraphQL schema..."
+	mkdir -p target/debug/gql
+	@graphql-client generate --output-directory target/debug/gql $(query_path) --schema-path $(NVA_API_SCHEMA_PATH)
+.PHONY: graphql-codegen
 
 install-sys-deps:
 	sudo apt install curl pkg-config libssl-dev xclip -y

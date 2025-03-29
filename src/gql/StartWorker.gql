@@ -1,6 +1,6 @@
 mutation StartWorker(
-  $input: JSON! = "", 
-  $workerLabel: mutationInput_post_run_workerLabel!
+  $input: JSON!, 
+  $workerLabel: WorkerLabelEnum!
 ) {
   startWorker(
     input: $input, 
