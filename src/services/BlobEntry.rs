@@ -46,20 +46,9 @@ use crate::{
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use get_blob_entry::blobEntry_fields as GB_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-use get_variable::blobEntry_fields as GV_BlobEntryFields;
-
 // duplication in blobEntry_fields GQL fragments in different queries
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 BlobEntry_importers!(GB_BlobEntryFields);
-
-
-// #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-// use get_blob_entry::blobEntry_fields_summary as GB_BlobEntrySummary;
-// // duplication in blobEntry_fields GQL fragments in different queries
-// #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-// BlobEntry_importers_summary!(GB_BlobEntrySummary);
-
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
