@@ -436,7 +436,7 @@ pub async fn post_add_model_blobentry(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub async fn post_add_variable_blobentry(
   nvafg: &NavAbilityDFG,
   variable_lbl: &String,

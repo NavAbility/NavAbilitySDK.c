@@ -197,7 +197,7 @@ pub unsafe fn cstr_to_str(c_buf: *const i8) -> &'static str {
 
 pub fn parse_utc_or_none(
     utcstr: String
-  ) -> Option<chrono::DateTime<chrono::Utc>> {
+) -> Option<chrono::DateTime<chrono::Utc>> {
     return if utcstr.is_empty() {
       return None;
     } else {
