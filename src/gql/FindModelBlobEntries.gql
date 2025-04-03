@@ -1,0 +1,29 @@
+fragment blobEntry_fields on BlobEntry {
+  id
+  blobId
+  originId
+  label
+  blobstore
+  hash
+  origin
+  size
+  description
+  mimeType
+  metadata
+  timestamp
+  createdTimestamp
+  lastUpdatedTimestamp
+  _version
+  _type
+}
+
+query FindModelBlobEntries(
+  $model_label: String = "",
+  $be_label_CONTAINS: String = ""
+) {
+  models(where: {label: $model_label}) {
+    blobEntries(where: {label_CONTAINS: $be_label_CONTAINS}) {
+      ...blobEntry_fields
+    }
+  }
+}

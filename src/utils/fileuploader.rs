@@ -49,17 +49,18 @@ impl<T> FileUploader<T> {
     pub async fn upload_file(
         &mut self,
         content: Vec<u8>,
-        url_endpoint: String
+        url_endpoint: String,
+        content_type: String,
     ) -> Result<String, Box<dyn std::error::Error>> {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert(
             reqwest::header::CONTENT_LENGTH, 
             reqwest::header::HeaderValue::from(content.len())
         );
-        // headers.insert(
-        //     reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-        //     reqwest::header::HeaderValue::from("https://_mySendIP???_")
-        // );
+        headers.insert(
+            reqwest::header::CONTENT_TYPE, 
+            reqwest::header::HeaderValue::from_str(&content_type).unwrap()
+        );
         
         // PUT POST OPTIONS CORS: https://aws.amazon.com/blogs/media/deep-dive-into-cors-configs-on-aws-s3-how-to/
         let response = Client::new()

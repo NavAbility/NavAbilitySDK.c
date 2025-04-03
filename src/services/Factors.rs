@@ -140,13 +140,14 @@ where
   /// * `FactorDFG` - a new factor
   /// # Example
   /// ```
-  /// use navabilitysdk::services::Factors;
+  /// use navabilitysdk::{services::Factors,FullNormal,Distribution,Pose2Pose2,FactorType,FactorDFG};
   /// use chrono::{DateTime, Utc};
-  /// let f = Factors::new(
-  ///   vec!["x1", "x2"], 
+  /// let f = FactorDFG::new(
+  ///   vec!["x1".to_owned(), "x2".to_owned()], 
   ///   Pose2Pose2::new(FullNormal::new(vec![&[1.0, 2.0, 3.0], &[0.01, 0.01, 0.01]])),
-  ///   vec!["ODOMETRY","BODY_MOTION"], 
-  ///   Some(Utc::now())
+  ///   vec!["ODOMETRY".to_owned(),"BODY_MOTION".to_owned()], 
+  ///   Some(Utc::now()),
+  ///   None
   /// );
   /// ```
   /// # Note
@@ -278,7 +279,7 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   }
 
   // DFG.FactorDFG + BlobEntry + ... ~= GQL.FactorCreateInput
-  let mut variables = add_factors::Variables {
+  let variables = add_factors::Variables {
     id,
     label,
     tags: factor.tags,
@@ -300,6 +301,7 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   let request_body = AddFactors::build_query(variables);
   // reverse engineer request body to splice in variables_connect without full types
   let jstr = serde_json::to_string(&request_body).unwrap();
+  // FIXME just use serde_json::to_value as simpler route
   let mut jval: serde_json::Value = serde_json::from_str(&jstr).unwrap();
   let jcon: serde_json::Value = serde_json::from_str(&serde_json::to_string(&connect).unwrap()).expect("problem with connect");
   jval["variables"]["variables_connect"] = jcon;

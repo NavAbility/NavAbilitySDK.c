@@ -60,9 +60,9 @@ pub use crate::services::{
     post_get_agent_entries_metadata,
     post_add_agent_entry,
     list_models_query,
-    fetch_list_models,
+    post_list_models,
     add_model_async,
-    add_entry_model_async,
+    post_add_model_blobentry,
     post_list_model_graphs,
     post_list_graphs,
 };
@@ -96,7 +96,7 @@ type Longitude = f64;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -106,7 +106,7 @@ pub struct GetBlobEntry;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ListAgents.gql",
     response_derives = "Debug"
 )]
@@ -116,7 +116,7 @@ pub struct ListAgents;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/UpdateAgent.gql",
     response_derives = "Debug"
 )]
@@ -126,7 +126,7 @@ pub struct UpdateAgentMetadata;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetAgents.gql",
     response_derives = "Debug"
 )]
@@ -136,7 +136,7 @@ pub struct GetAgents;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetAgent.gql",
     response_derives = "Debug"
 )]
@@ -146,7 +146,7 @@ pub struct GetAgent;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetFactorgraphs.gql",
     response_derives = "Debug"
 )]
@@ -156,7 +156,7 @@ pub struct GetFactorgraphs;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetURS.gql",
     response_derives = "Debug"
 )]
@@ -166,7 +166,7 @@ pub struct GetURS;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ListModels.gql",
     response_derives = "Debug"
 )]
@@ -176,7 +176,17 @@ pub struct ListModels;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/GetModel.gql",
+    response_derives = "Debug"
+)]
+pub struct GetModel;
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ListModelsGraphs.gql",
     response_derives = "Debug"
 )]
@@ -184,9 +194,19 @@ pub struct ListModelsGraphs;
 
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
+#[derive(GraphQLQuery, Clone)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/FindModelBlobEntries.gql",
+    response_derives = "Debug"
+)]
+pub struct FindModelBlobEntries;
+
+
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddFactorgraph.gql",
     response_derives = "Debug"
 )]
@@ -196,7 +216,7 @@ pub struct AddFactorgraph;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetAgentEntriesMetadata.gql",
     response_derives = "Debug"
 )]
@@ -206,7 +226,7 @@ pub struct GetAgentEntriesMetadata;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/CreateDownload.gql",
     response_derives = "Debug"
 )]
@@ -216,7 +236,7 @@ pub struct CreateDownload;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/CreateUpload.gql",
     response_derives = "Debug"
 )]
@@ -226,7 +246,7 @@ pub struct CreateUpload;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/CompleteUpload.gql",
     response_derives = "Debug"
 )]
@@ -236,7 +256,7 @@ pub struct CompleteUpload;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/StartWorker.gql",
     response_derives = "Debug"
 )]
@@ -246,7 +266,7 @@ pub struct StartWorker;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetVariable.gql",
     response_derives = "Debug"
 )]
@@ -256,7 +276,7 @@ pub struct GetVariable;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ListVariables.gql",
     response_derives = "Debug"
 )]
@@ -267,7 +287,7 @@ pub struct ListVariables;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddVariable.gql",
     response_derives = "Debug"
 )]
@@ -277,7 +297,7 @@ pub struct AddVariable;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddFactors.gql",
     response_derives = "Debug"
 )]
@@ -287,7 +307,7 @@ pub struct AddFactors;
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddAgentBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -297,7 +317,7 @@ pub struct AddAgentBlobEntry;
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddVariableBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -307,7 +327,7 @@ pub struct AddVariableBlobEntry;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddFactorgraphBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -317,7 +337,7 @@ pub struct AddFactorgraphBlobEntry;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ConnectGraphToAgent.gql",
     response_derives = "Debug"
 )]
@@ -327,7 +347,17 @@ pub struct ConnectGraphAgent;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/ConnectGraphToModel.gql",
+    response_derives = "Debug"
+)]
+pub struct ConnectGraphModel;
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddModelBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -337,7 +367,7 @@ pub struct AddModelBlobEntry;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/DeleteBlobEntry.gql",
     response_derives = "Debug"
 )]
@@ -346,7 +376,7 @@ pub struct DeleteBlobEntry;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/DeleteBlob.gql",
     response_derives = "Debug"
 )]
@@ -355,7 +385,7 @@ pub struct DeleteBlob;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetOrg.gql",
     response_derives = "Debug"
 )]
@@ -365,7 +395,7 @@ pub struct GetOrg;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/ListGraphs.gql",
     response_derives = "Debug"
 )]
@@ -375,7 +405,7 @@ pub struct ListGraphs;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/FindOrgModelGraphs.gql",
     response_derives = "Debug"
 )]
@@ -385,7 +415,17 @@ pub struct FindOrgModelGraphs;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/FindFactorgraphBlobEntries.gql",
+    response_derives = "Debug"
+)]
+pub struct FindFactorgraphBlobEntries;
+
+
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddAgent.gql",
     response_derives = "Debug"
 )]
@@ -394,7 +434,7 @@ pub struct AddAgent;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddModel.gql",
     response_derives = "Debug"
 )]
@@ -403,7 +443,7 @@ pub struct AddModel;
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
-    schema_path = "src/schema.json",
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/UpdateBlobentryMetadata.gql",
     response_derives = "Debug"
 )]

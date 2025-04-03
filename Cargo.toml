@@ -1,8 +1,11 @@
 [package]
 name = "navabilitysdk"
-version = "0.1.0-b4"
+version = "0.1.0-rc4"
 authors = ["NavAbility™ by WhereWhen.ai Technologies Inc."]
 edition = "2021"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -13,7 +16,7 @@ serde_json = "^1.0"
 base64 = "^0.22"
 chrono = "^0.4"
 log = "^0.4"
-# hyper-util = "^0.1.3"
+regex = "^1.8"
 uuid = { version ="^1.15", features = ["v4","v5"] }
 wasm-bindgen-futures = { version = "^0.4", optional = true }
 graphql_client = "^0.14"
@@ -35,19 +38,18 @@ libc = { version = "^0.2", default-features = false, optional=true}
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 gloo-console = { version = "^0.3", optional = true }
 
+[build-dependencies]
+graphql_client_cli = "^0.14"
 
 [features]
 tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
 blocking = ["graphql_client/reqwest","graphql_client/reqwest-blocking"]
 thread = []
 
-[profile.release]
-opt-level = 'z' # fast and small wasm
-lto = true
-
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]
 opt-level = 2
 
-[build-dependencies]
-graphql_client_cli = "^0.14"
+[profile.release]
+opt-level = 'z' # fast and small wasm
+lto = true

@@ -48,7 +48,8 @@ int main(void) {
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", "", 0, 1);
+  char* time_utc = "2020-01-01 06:30:01.250 UTC";
+  char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", time_utc, 0, 1);
   printf("added variable id: %s\n", v);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
@@ -67,7 +68,8 @@ int main(void) {
   
 
   // ROBOT MOVES TO (10,0,0)
-  v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", "", 0, 1);
+  char* time_z = "2020-01-01T06:30:08.500Z";
+  v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", time_z, 0, 1);
   printf("added variable id: %s\n", v);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction

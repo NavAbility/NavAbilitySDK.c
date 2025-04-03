@@ -1,0 +1,29 @@
+fragment blobEntry_fields on BlobEntry {
+  id
+  blobId
+  originId
+  label
+  blobstore
+  hash
+  origin
+  size
+  description
+  mimeType
+  metadata
+  timestamp
+  createdTimestamp
+  lastUpdatedTimestamp
+  _version
+  _type
+}
+
+query FindFactorgraphBlobEntries(
+  $label: String = "",
+  $be_label_CONTAINS: String = ""
+) {
+  factorgraphs(where: {label: $label}) {
+    blobEntries(where: {label_CONTAINS: $be_label_CONTAINS}) {
+      ...blobEntry_fields
+    }
+  }
+}

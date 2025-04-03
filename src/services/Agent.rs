@@ -57,6 +57,11 @@ use crate::get_agent::agent_fields_full as GA_AgentFieldsFull;
 Agent_importers_full!(GA_AgentFieldsFull);
 
 
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+use crate::get_model::agent_fields_summary as GM_AgentFieldsSummary;
+#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+Agent_importers_summary!(GM_AgentFieldsSummary);
+
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 impl Agent {

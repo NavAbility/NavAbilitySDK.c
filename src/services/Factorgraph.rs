@@ -37,6 +37,7 @@ Graph_importers_skeleton!(GGs_GraphFieldsSkeleton);
 
 
 
+
 #[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 impl NvaNode<Factorgraph> {
   pub fn from_gql_skeleton(
@@ -145,7 +146,7 @@ pub async fn post_get_factorgraphs(
     |s| {
       let mut fgs = Vec::new();
       for a in s.factorgraphs {
-        let mut fg = NvaNode::<Factorgraph>::from_gql_skeleton(&a);
+        let fg = NvaNode::<Factorgraph>::from_gql_skeleton(&a);
         fgs.push(fg);
       };
       return fgs;

@@ -150,7 +150,7 @@ pub struct GQLResponseEmptyError {
 
 impl fmt::Display for GQLResponseEmptyError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "API response empty error {:?}", self.details)
+    write!(f, "NvaSDK, GQLResponseEmptyError {:?}", self.details)
   }
 }
 
@@ -163,7 +163,7 @@ pub struct GQLResponseErrors {
 
 impl fmt::Display for GQLResponseErrors {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "API response has error {:?}", self.details)
+    write!(f, "NvaSDK, GQLResponseErrors {:?}", self.details)
   }
 }
 
@@ -176,11 +176,26 @@ pub struct GQLRequestError {
 
 impl fmt::Display for GQLRequestError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "NvaSDK, API request error {}", self.details)
+    write!(f, "NvaSDK, GQLRequestError {}", self.details)
   }
 }
 
 impl Error for GQLRequestError {}
+
+
+#[derive(Debug)]
+pub struct GQLResponseUnfamiliar {
+  pub body: String,
+  pub error: String,
+}
+
+impl fmt::Display for GQLResponseUnfamiliar {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "NvaSDK, GQLResponseUnfamiliar error: {:?}\nbody: {}", self.error, self.body)
+  }
+}
+
+impl Error for GQLResponseUnfamiliar {}
 
 
 /// Checks the ResponseData: F of a GraphQL query and applies a user specified modifier callback.
@@ -226,31 +241,6 @@ pub fn check_query_response_data<F,T>(
   }
 }
 
-/// Sends the result of a GraphQL query to a given sender.
-///
-/// # Arguments
-///
-/// * `send_into` - A sender to which the query result will be sent.
-/// * `response_body` - A `Result` containing the response body of the GraphQL query.
-pub fn send_query_result<F,T>(
-  send_into: Sender<T>,
-  response_body: Result<Response<F>,Box<dyn Error>>,
-  fn_modifier: fn(F) -> T,
-) -> Result<(),Box<dyn Error>> {
-  match check_query_response_data(response_body, fn_modifier) {
-    Ok(data) => {
-      // let _ = send_into.send(data);
-      if let Err(e) = send_into.send(data) {
-        to_console_error(&format!("Error sending data on channel: {:?}", e));
-      };
-      return Ok(())
-    },
-    Err(e) => {
-      return Err(e)
-    }
-  }
-}
-
 
 pub fn send_api_result<T>(
   send_into: Sender<T>,
@@ -283,27 +273,6 @@ pub fn send_api_result<T>(
 
 
 
-/// Checks the deserialization result of a GraphQL query response.
-///
-/// # Arguments
-///
-/// * `serde_res` - A `Result` containing the deserialization result of the response.
-///
-/// # Returns
-///
-/// * `Result<Response<T>, Box<dyn Error>>` - A `Result` containing the deserialized response or an error.
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-pub fn check_deser<T>(
-  serde_res: Result<Response<T>,reqwest::Error>
-) -> Result<Response<T>,Box<dyn Error>> {
-  
-  if let Err(ref e) = serde_res {
-    to_console_error(&format!("JSON unpack failure from possibly good API response: {:?}", &e));
-  }
-  
-  return Ok(serde_res?)
-}
-
 
 
 
@@ -317,24 +286,41 @@ pub async fn post_to_nvaapi_cb<
   post_req: reqwest::RequestBuilder
 ) -> Result<T, Box<dyn Error>> {
   // Note, this function allows request body json splicing for incomplete GQL types
+
   let mut trycount = retries.unwrap_or(3);
   while 0 < trycount {
 
-    let req_res = post_req.try_clone()
+    let request_response = post_req.try_clone()
     .expect("Unable to clone request")
     .send().await;
     
-    if let Err(re) = req_res {
-      let erm = format!("API request error: {:?}", &re);
-      to_console_error(&erm);
-    } else {
-      // generic transport and serde error checks
-      let response_body = check_deser::<R>(
-        req_res?.json().await
-      );
-      
-      // query response during error checks
-      return check_query_response_data(response_body, fn_modifier);
+    match request_response { 
+      Err(re) => {
+        let erm = format!("API request error: {:?}", &re);
+        to_console_error(&erm);
+      },
+      Ok(request_response_) => {
+        // generic transport and serde error checks
+        // https://docs.rs/reqwest/latest/src/reqwest/async_impl/response.rs.html#267-271
+        let response_bytes = request_response_.bytes().await?;
+        let response_body = serde_json::from_slice(&response_bytes); //.map_err(reqwest::error::decode);
+        // let response_body: Result<Response<R>, reqwest::Error> = request_response_.json().await;
+        if let Err(ref e) = response_body {
+          let err = format!("JSON unpack failure from possibly good API response, maybe check response type scalar definition: {:?}", &e);
+          let body = String::from_utf8_lossy(&response_bytes);
+          to_console_error(&err);
+          return Err(Box::new(crate::GQLResponseUnfamiliar {
+            body: format!("{}", body.to_string()),
+            error: err.to_string()
+          }));
+        }
+
+        // query response during error checks
+        return check_query_response_data(
+          response_body.map_err(|e| Box::new(e) as Box<dyn Error>), // changing reqwest error unnecessarily, consolidation artifact, TODO simplify
+          fn_modifier
+        );
+      }
     }
     trycount -= 1;
   }
@@ -382,33 +368,3 @@ pub async fn post_to_nvaapi<
 //   return t.to_owned();
 // }
 
-
-// missing traits for generic serde on query types
-// async fn post_query_serde<V,R>(
-//     nvacl: NavAbilityClient,
-//     request_body: QueryBody<V>,
-// ) -> Result<R,Box<dyn Error>> {
-//     let req_res = nvacl.client
-//     .post(&nvacl.apiurl)
-//     .json(&request_body)
-//     .send().await;
-
-//     match req_res {
-//         Err(re) => {
-//             to_console_error(&format!("API request error: {:?}", re));
-//             return Err(Box::new(re));
-//         },
-//         Ok(res) => {
-//             let serde_res = res.json().await;
-//             match serde_res {
-//                 Ok(response_body) => {
-//                     return Ok(response_body)
-//                 },
-//                 Err(e) => {
-//                     to_console_error(&format!("JSON unpack of API response failed: {:?}", &e));
-//                     return Err(Box::new(e));
-//                 }
-//             }
-//         }
-//     }
-// }
