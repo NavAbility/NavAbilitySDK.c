@@ -9,7 +9,9 @@ NVA_API_URL ?= "https://api.navability.io/graphql"
 NVA_PWA_URL ?= "https://app.navability.io"
 WHICHBROWSER=$(shell xdg-settings get default-web-browser)
 
-NVA_API_SCHEMA_PATH := "src/gql/schema.json"
+NVA_API_SCHEMA_PATH := src/gql/schema.json
+
+CXX := gcc
 
 default: help ;
 .PHONY: default
@@ -18,16 +20,20 @@ clean:
 	cargo clean
 	rm -rf test/build
 	rm -f src/gql/schema.json
+	cd examples && $(MAKE) clean
 .PHONY: clean
 
-build-tokio:
+build-tokio: $(NVA_API_SCHEMA_PATH)
 	cargo build -F tokio
 .PHONY: build-tokio
 
-build-lib: build-tokio generate-cbindgen-c generate-cbindgen-cpp
+build-lib: build-tokio generate-cbindgen-c
 
-fetch-schema:
+$(NVA_API_SCHEMA_PATH):
+	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
 	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/gql/schema.json $(NVA_API_URL)
+
+fetch-schema: $(NVA_API_SCHEMA_PATH) ;
 .PHONY: fetch-schema
 
 graphql-codegen:
@@ -49,13 +55,21 @@ install-rust-deps:
 	cargo install cbindgen
 .PHONY: install-rust-deps
 
-generate-cbindgen-cpp:
-	cbindgen  --config cbindgen.toml --crate navabilitysdk --output include/NavAbilitySDK.hpp
-	cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.hpp
-
 generate-cbindgen-c:
-	cbindgen  --config cbindgen.toml --lang c --crate navabilitysdk --output include/NavAbilitySDK.h
-	cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.h
+	cbindgen  --config cbindgen.toml --lang c --crate navabilitysdk --output include/NavAbilitySDK.h.tmp
+	@echo "#ifdef __cplusplus" > include/NavAbilitySDK.h
+	@echo "extern \"C\" {" >> include/NavAbilitySDK.h
+	@echo "#endif" >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@cat include/NavAbilitySDK.h.tmp >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@echo "#ifdef __cplusplus" >> include/NavAbilitySDK.h
+	@echo "}" >> include/NavAbilitySDK.h
+	@echo "#endif" >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@rm -f include/NavAbilitySDK.h.tmp
+	@cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.h
+	@echo "Generated C header file: include/NavAbilitySDK.h"
 
 test-capi: build-lib
 	cd test && $(MAKE)
@@ -66,7 +80,7 @@ build-examples: build-lib
 .PHONY: build-examples
 
 test-examples: build-lib
-	cd examples && $(MAKE)
+	cd examples && $(MAKE) CXX=$(CXX)
 .PHONY: test-examples
 
 update-api-token: default-browser-firefox-api default-browser-chromium-api default-browser-gchrome-api

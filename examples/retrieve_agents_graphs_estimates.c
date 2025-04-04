@@ -42,7 +42,7 @@ int main(void) {
   }
 
   // look at a specific factor graph
-  char* fglbl = getLabel(getIndex(fgs,length(fgs)-1));   freeR(fgs);
+  const char* fglbl = getLabel(getIndex(fgs,length(fgs)-1));   freeR(fgs);
 
   NavAbilityDFG *nvafg = NULL;
   nvafg = new_NavAbilityDFG(
@@ -75,8 +75,9 @@ int main(void) {
   ppem = getPPEMean(X1, "parametric");
   if (0 < length(ppem)) {
     printf(
-      "x1_ppe, body pose in world frame x,y,th:\n %d, %d, %d\n", 
-      getIndex(ppem, 0), getIndex(ppem, 1), getIndex(ppem, 2)
+      "x1_ppe, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s", 
+      *getIndex(ppem, 0), *getIndex(ppem, 1), *getIndex(ppem, 2),
+      "TODO_id"
     );
   } else {
     printf("x1 has no PPE mean yet, requires numerical operations such as a solve or prediction.\n"); 
