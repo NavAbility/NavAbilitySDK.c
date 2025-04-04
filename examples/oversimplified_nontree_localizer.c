@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "NavAbilitySDK.h"
 
 
@@ -58,7 +59,7 @@ int main(void) {
   addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
   addVariable(nvafg, "x1", "Pose2", "", "", 0, 1);
   rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
-  char* fid1 = addFactor(
+  const char* fid1 = addFactor(
       nvafg,
       "x0;x1;",
       rf,
@@ -69,7 +70,7 @@ int main(void) {
   printf("Added factor id: %s\n", fid1);
   
   addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
-  char* fid2 = addFactor(
+  const char* fid2 = addFactor(
     nvafg,
     "x1;x2;",
     rf,
@@ -80,7 +81,7 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
   addVariable(nvafg, "x3", "Pose2", "", "", 0, 1);
-  char* fid = addFactor(
+  const char* fid3 = addFactor(
     nvafg,
     "x2;x3;",
     rf,
@@ -88,10 +89,10 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", fid);
+  printf("Added factor id: %s\n", fid3);
 
   addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
-  fid = addFactor(
+  const char* fid4 = addFactor(
     nvafg,
     "x3;x4;",
     rf,
@@ -99,11 +100,11 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", fid);
+  printf("Added factor id: %s\n", fid4);
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
-  fid = addFactor(
+  const char* fid5 = addFactor(
       nvafg,
       "x0;",
       pf,
@@ -111,7 +112,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", fid);
+  printf("Added factor id: %s\n", fid5);
 
   // Solve the basic graph
   startWorker_solveParametric(nvafg);
@@ -133,7 +134,7 @@ int main(void) {
   freeR(normal); freeR(pf);
   normal = new_FullNormal(6,mn,cv); // FIXME fix, use mn_, cv_ instead
   pf = new_PriorPose3(normal);
-  fid = addFactor(
+  const char* fid6 = addFactor(
       nvafg,
       "x2;",
       pf,
@@ -141,10 +142,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", fid);
+  printf("Added factor id: %s\n", fid6);
 
   addVariable(nvafg, "x5", "Pose2", "", "", 0, 1);
-  fid = addFactor(
+  const char* fid7 = addFactor(
     nvafg,
     "x4;x5;",
     rf,
@@ -153,7 +154,7 @@ int main(void) {
     1
   );
   addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
-  fid = addFactor(
+  const char* fid8 = addFactor(
     nvafg,
     "x5;x6;",
     rf,

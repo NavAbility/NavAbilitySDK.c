@@ -52,7 +52,7 @@ int main(void) {
   // Async versions of these calls are also available
   // char* bid = NULL;
   char* buffer = "add x1 lidar data here, e.g. from a .las file";
-  char* mimetype = "application/octet-stream;ext=las";
+  const char* mimetype = "application/octet-stream;ext=las";
   char* bid = addBlob(store, "testdata", mimetype, buffer, strlen(buffer)); 
   printf("Uploaded blobId: %s, size %ld\n", bid, strlen(buffer));
 
@@ -105,7 +105,7 @@ int main(void) {
   // upload lidar data on x1
   // Async versions of these calls are also available
   buffer = "add x3 camera data here, e.g. from a .jpg file";
-  mimetype = "image/jpeg";
+  const char* mimetype2 = "image/jpeg";
   bid = addBlob(store, "testdata", mimetype, buffer, strlen(buffer)); 
   printf("Uploaded blobId: %s\n", bid);
   // connect the newly uploaded lidar data to the graph
@@ -116,7 +116,7 @@ int main(void) {
     "SDK.c Lidar Camera Example", // origin
     strlen(buffer),               // blob size
     "",                           // description
-    mimetype,                     // data mimetype
+    mimetype2,                     // data mimetype
     "",                           // metadata
     ""                            // timestamp UTC
   );
