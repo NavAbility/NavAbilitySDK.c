@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -312,7 +316,16 @@ const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,
                                 const char *metadata);
 
+#ifdef __cplusplus
+}
+#endif
+
+
 // manually define the prototypes for the FactorDFG functions we need
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // // FIXME -- DONT USE YET
 // #define GET_MACRO(_1, _2, _3, NAME, ...) NAME
@@ -346,14 +359,14 @@ GEN_ADD_FACTOR(Point3Point3_FullNormal);
 GEN_ADD_FACTOR(Pose2Pose2_FullNormal);
 GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
 
-// struct FactorDFG_PriorPoint2_FullNormal *add_FactorDFG_PriorPoint2_FullNormal(
-//     const char *varlbls,
-//     const struct PriorPoint2_FullNormal *fnc
-// );
+
+#ifdef __cplusplus
+}
+#endif
+
 
 
 #ifndef __cplusplus
-
 
 // Overloading via C macros using _Generic
 

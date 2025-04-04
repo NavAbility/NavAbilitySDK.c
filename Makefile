@@ -27,7 +27,7 @@ build-tokio: $(NVA_API_SCHEMA_PATH)
 	cargo build -F tokio
 .PHONY: build-tokio
 
-build-lib: build-tokio generate-cbindgen-c generate-cbindgen-cpp
+build-lib: build-tokio generate-cbindgen-c
 
 $(NVA_API_SCHEMA_PATH):
 	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
@@ -55,13 +55,21 @@ install-rust-deps:
 	cargo install cbindgen
 .PHONY: install-rust-deps
 
-generate-cbindgen-cpp:
-	cbindgen  --config cbindgen.toml --crate navabilitysdk --output include/NavAbilitySDK.hpp
-	cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.hpp
-
 generate-cbindgen-c:
-	cbindgen  --config cbindgen.toml --lang c --crate navabilitysdk --output include/NavAbilitySDK.h
-	cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.h
+	cbindgen  --config cbindgen.toml --lang c --crate navabilitysdk --output include/NavAbilitySDK.h.tmp
+	@echo "#ifdef __cplusplus" > include/NavAbilitySDK.h
+	@echo "extern \"C\" {" >> include/NavAbilitySDK.h
+	@echo "#endif" >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@cat include/NavAbilitySDK.h.tmp >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@echo "#ifdef __cplusplus" >> include/NavAbilitySDK.h
+	@echo "}" >> include/NavAbilitySDK.h
+	@echo "#endif" >> include/NavAbilitySDK.h
+	@echo "" >> include/NavAbilitySDK.h
+	@rm -f include/NavAbilitySDK.h.tmp
+	@cat src/capi/SDKSupplemental.h >> include/NavAbilitySDK.h
+	@echo "Generated C header file: include/NavAbilitySDK.h"
 
 test-capi: build-lib
 	cd test && $(MAKE)
