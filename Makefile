@@ -11,6 +11,8 @@ WHICHBROWSER=$(shell xdg-settings get default-web-browser)
 
 NVA_API_SCHEMA_PATH := src/gql/schema.json
 
+CXX := gcc
+
 default: help ;
 .PHONY: default
 
@@ -20,10 +22,6 @@ clean:
 	rm -f src/gql/schema.json
 	cd examples && $(MAKE) clean
 .PHONY: clean
-
-test-tokio: build-tokio
-	cargo test -F tokio
-.PHONY: test-tokio
 
 build-tokio: $(NVA_API_SCHEMA_PATH)
 	cargo build -F tokio
