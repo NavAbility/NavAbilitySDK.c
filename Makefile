@@ -9,7 +9,7 @@ NVA_API_URL ?= "https://api.navability.io/graphql"
 NVA_PWA_URL ?= "https://app.navability.io"
 WHICHBROWSER=$(shell xdg-settings get default-web-browser)
 
-NVA_API_SCHEMA_PATH := "src/gql/schema.json"
+NVA_API_SCHEMA_PATH := src/gql/schema.json
 
 default: help ;
 .PHONY: default
@@ -21,14 +21,21 @@ clean:
 	cd examples && $(MAKE) clean
 .PHONY: clean
 
-build-tokio:
+test-tokio: build-tokio
+	cargo test -F tokio
+.PHONY: test-tokio
+
+build-tokio: $(NVA_API_SCHEMA_PATH)
 	cargo build -F tokio
 .PHONY: build-tokio
 
 build-lib: build-tokio generate-cbindgen-c generate-cbindgen-cpp
 
-fetch-schema:
+$(NVA_API_SCHEMA_PATH):
+	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
 	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/gql/schema.json $(NVA_API_URL)
+
+fetch-schema: $(NVA_API_SCHEMA_PATH) ;
 .PHONY: fetch-schema
 
 graphql-codegen:
