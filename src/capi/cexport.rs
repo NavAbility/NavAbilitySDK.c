@@ -63,6 +63,12 @@ pub struct RVec<T> {
 // ================================ STATE ENTITY STRUCTS =================================
 
 
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn new_uuid4() -> *mut c_char {
+    return convert_str(&Uuid::new_v4().to_string())
+}
+
 // ref. https://doc.rust-lang.org/std/boxed/
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 

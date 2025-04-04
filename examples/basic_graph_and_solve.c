@@ -48,7 +48,7 @@ int main(void) {
   // ROBOT STARTS ITS JOURNEY AT (0,0,0)
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  char* time_utc = "2020-01-01 06:30:01.250 UTC";
+  const char* time_utc = "2020-01-01 06:30:01.250 UTC";
   char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", time_utc, 0, 1);
   printf("added variable id: %s\n", v);
 
@@ -56,7 +56,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
   PriorPose2_FullNormal *f1 = NULL;
   f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
-  char* fid1 = addFactor(
+  const char* fid1 = addFactor(
       nvafg,
       "x1;",
       f1,
@@ -68,7 +68,7 @@ int main(void) {
   
 
   // ROBOT MOVES TO (10,0,0)
-  char* time_z = "2020-01-01T06:30:08.500Z";
+  const char* time_z = "2020-01-01T06:30:08.500Z";
   v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", time_z, 0, 1);
   printf("added variable id: %s\n", v);
   
@@ -77,7 +77,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv);
   Pose2Pose2_FullNormal *f2 = NULL;
   f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
-  char* fid2 = addFactor(
+  const char* fid2 = addFactor(
       nvafg,
       "x1;x2;",
       f2,

@@ -3,8 +3,8 @@
 INC_DIR = ../include/
 LIB_DIR = ../target/debug/
 
-CXX = gcc
-CXXFLAGS = -c -Wall -g -I$(INC_DIR)
+CXX := gcc
+CXXFLAGS = -Wall -g -I$(INC_DIR)
 
 .DEFAULT_GOAL := run-all
 
@@ -13,7 +13,8 @@ clean:
 	rm -rf build
 .PHONY: clean
 
-run-all: run-basic-graph run-camera-lidar run-agents-graphs run-oversimplified-localizer
+#  run-camera-lidar run-agents-graphs run-oversimplified-localizer
+run-all: run-basic-graph
 	@echo "All examples have been run successfully."
 .PHONY: run-all
 

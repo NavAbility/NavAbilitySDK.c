@@ -18,6 +18,7 @@ clean:
 	cargo clean
 	rm -rf test/build
 	rm -f src/gql/schema.json
+	cd examples && $(MAKE) clean
 .PHONY: clean
 
 build-tokio:
@@ -66,7 +67,7 @@ build-examples: build-lib
 .PHONY: build-examples
 
 test-examples: build-lib
-	cd examples && $(MAKE)
+	cd examples && $(MAKE) CXX=$(CXX)
 .PHONY: test-examples
 
 update-api-token: default-browser-firefox-api default-browser-chromium-api default-browser-gchrome-api
