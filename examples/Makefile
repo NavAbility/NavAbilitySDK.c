@@ -13,8 +13,7 @@ clean:
 	rm -rf build
 .PHONY: clean
 
-#  run-camera-lidar run-agents-graphs run-oversimplified-localizer
-run-all: run-basic-graph
+run-all: run-basic-graph run-camera-lidar run-agents-graphs run-oversimplified-localizer
 	@echo "All examples have been run successfully."
 .PHONY: run-all
 
