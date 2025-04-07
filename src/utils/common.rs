@@ -197,6 +197,17 @@ impl fmt::Display for GQLResponseUnfamiliar {
 
 impl Error for GQLResponseUnfamiliar {}
 
+#[derive(Debug)]
+pub struct GQLUnauthenticated;
+
+impl fmt::Display for GQLUnauthenticated {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "NvaSDK, GQLUnauthenticated")
+  }
+}
+
+impl Error for GQLUnauthenticated {}
+
 
 /// Checks the ResponseData: F of a GraphQL query and applies a user specified modifier callback.
 ///
@@ -227,9 +238,21 @@ pub fn check_query_response_data<F,T>(
         }
       } else {
         to_console_error(&format!("API post query error: response errors exist: {:?}", &resbody.errors));
+        let details = resbody.errors.as_ref().unwrap();
+        let errs = details
+          .iter()
+          .map(|e| e.to_string())
+          .collect::<Vec<String>>();
+        if errs.len() == 1 {
+          if errs[0].to_uppercase().eq("UNAUTHENTICATED") {
+            // Special case for unauthenticated error
+            to_console_error("API post query error: UNAUTHENTICATED");
+            return Err(Box::new(GQLUnauthenticated {}));
+          }
+        }
         return Err(Box::new(
           GQLResponseErrors {
-            details: resbody.errors.unwrap()
+            details: details.to_vec()
           }
         ));
       }
