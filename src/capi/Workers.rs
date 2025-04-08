@@ -23,6 +23,7 @@ fn solveGraphParametric(
 ) -> *mut c_char {
   
   let mut map = serde_json::Map::<String,serde_json::Value>::new();
+  map.insert("lambda".to_string(), serde_json::json!("solveGraphParametricConnected!"));
   map.insert("agentLabel".to_string(), serde_json::json!(nvafg.unwrap().agent.label));
   map.insert("graphLabel".to_string(), serde_json::json!(nvafg.unwrap().fg.label));
   map.insert("variableLabel".to_string(), serde_json::json!(cstr_to_str(variableLabel)));
@@ -31,7 +32,7 @@ fn solveGraphParametric(
   let wrk_id = crate::services::startWorker(
       &nvafg.unwrap().client.clone(),
       map,
-      crate::start_worker::WorkerLabelEnum::solveGraphParametric_Wkr,
+      crate::start_worker::WorkerLabelEnum::rome,
   );
 
   return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
