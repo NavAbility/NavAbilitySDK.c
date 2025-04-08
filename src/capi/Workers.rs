@@ -76,6 +76,8 @@ fn addAffordance_kNNvisual(
   nvafg: Option<&NavAbilityDFG>,
   variableLabel: *const c_char,
   mapsessions: *const c_char,
+  n_matches: usize,
+  total_n_matches: usize,
 ) -> *mut c_char {
 
   let mapsessions = cstr_to_str(mapsessions).split(";").collect::<Vec<&str>>();
@@ -85,8 +87,8 @@ fn addAffordance_kNNvisual(
   map.insert("sessionLabel".to_string(), serde_json::json!(nvafg.unwrap().fg.label));
   map.insert("variableLabel".to_string(), serde_json::json!(cstr_to_str(variableLabel)));
   map.insert("latest".to_string(), serde_json::json!("true"));
-  map.insert("n_matches".to_string(), serde_json::json!(5));
-  map.insert("total_n_matches".to_string(), serde_json::json!(5));
+  map.insert("n_matches".to_string(), serde_json::json!(n_matches));
+  map.insert("total_n_matches".to_string(), serde_json::json!(total_n_matches));
   map.insert("mapSessionLabels".to_string(), serde_json::json!(mapsessions));
   map.insert("auth_token".to_string(), serde_json::json!(nvafg.unwrap().client.nva_api_token));
 

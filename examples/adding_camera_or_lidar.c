@@ -128,7 +128,7 @@ int main(void) {
   printf("received worker id: %s\n", wid);
 
   // compute visual priors on image data
-  wid = addAffordance_kNNvisual(nvafg, "x3", "map01;map02;");
+  wid = addAffordance_kNNvisual(nvafg, "x3", "map01;map02;", 5, 5);
   printf("received worker id: %s\n", wid);
 
   // See other example for different usage of the same agent/graph/model

@@ -123,7 +123,9 @@ struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
 char *addAffordance_kNNvisual(const struct NavAbilityDFG *nvafg,
                               const char *variableLabel,
-                              const char *mapsessions);
+                              const char *mapsessions,
+                              size_t n_matches,
+                              size_t total_n_matches);
 
 const char *addAgentBlobEntry(const struct NavAbilityClient *nvacl_,
                               const char *agent_label,
