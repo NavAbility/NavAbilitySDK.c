@@ -34,7 +34,6 @@ fn startWorker_solveParametric(
       crate::start_worker::WorkerLabelEnum::solveGraphParametric_Wkr,
   );
 
-  println!("startWorker_solveParametric called, under construction, id: {:?}", &wrk_id);
   return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
 }
 
@@ -96,6 +95,5 @@ fn startWorker_VisualAffordancePriors(
       crate::start_worker::WorkerLabelEnum::addAffordance_kNNvisual,
   );
 
-  println!("startWorker_solveParametric called, under construction, id: {:?}", &wrk_id);
   return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
 }
