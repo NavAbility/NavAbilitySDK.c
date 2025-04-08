@@ -3,11 +3,13 @@
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     // Uuid,
+    Sender,
     Error,
     GraphQLQuery,
     // QueryBody,
     GetOrg,
     post_to_nvaapi,
+    send_api_result,
     to_console_debug,
     to_console_error,
     NavAbilityClient,
@@ -37,5 +39,37 @@ pub async fn post_org_id(
         // },
         Some(3)
     ).await;
+}
+
+
+#[cfg(any(feature = "tokio", feature = "blocking"))]
+pub fn q_getOrgId(
+  send_into: Sender<crate::get_org::ResponseData>, 
+  nvacl: &NavAbilityClient,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into, 
+      post_org_id(&nvacl).await,
+    );
+  });
+}
+
+
+#[cfg(feature = "wasm")]
+pub fn q_getOrgId(
+  send_into: Sender<crate::get_org::ResponseData>, 
+  nvacl: &NavAbilityClient,
+) {
+  // wasmbindgen limitation?  overcome +'static requirement
+  let nvacl_ = nvacl.clone();
+  let send_into_ = send_into.clone();
+  crate::execute(async move {
+    let _ = send_api_result(
+      send_into_, 
+      post_org_id(&nvacl_).await,
+    );
+  });
 }
 

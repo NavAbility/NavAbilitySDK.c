@@ -98,7 +98,7 @@ int main(void) {
   printf("added variable blob entry with return id: %s\n", vbe);
 
   // compute registration between two lidar pointclouds
-  char* wid = startWorker_LidarRegistration(nvafg, "x1", "left_lidar.las", "x5", "left_lidar.las");
+  char* wid = computeLidarRegistration(nvafg, "x1", "left_lidar.las", "x5", "left_lidar.las");
   printf("received worker id: %s\n", wid);
 
   // Add camera data to x3
@@ -124,11 +124,11 @@ int main(void) {
   printf("added variable blob entry with return id: %s\n", vbe);
 
   // compute registration between two lidar pointclouds
-  wid = startWorker_ImageWhitebalance(nvafg, "x3", "center_camera", "center_camera_whitebalanced");
+  wid = computeImageWhitebalance(nvafg, "x3", "center_camera", "center_camera_whitebalanced");
   printf("received worker id: %s\n", wid);
 
   // compute visual priors on image data
-  wid = startWorker_VisualAffordancePriors(nvafg, "x3", "center_camera_whitebalanced");
+  wid = addAffordance_kNNvisual(nvafg, "x3", "map01;map02;", 5, 5);
   printf("received worker id: %s\n", wid);
 
   // See other example for different usage of the same agent/graph/model

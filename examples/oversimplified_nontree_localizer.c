@@ -115,7 +115,7 @@ int main(void) {
   printf("Added factor id: %s\n", fid5);
 
   // Solve the basic graph
-  startWorker_solveParametric(nvafg);
+  solveGraphParametric(nvafg, "x0");
 
   // wait for solve to finish (THIS IS THE OVERSIMPLEFIED PART)
 
@@ -164,7 +164,7 @@ int main(void) {
   );
 
   // Solve the basic graph
-  startWorker_solveParametric(nvafg);
+  solveGraphParametric(nvafg, "x6");
 
   // See other examples for combining other data including IMU, Camera, Lidar
 

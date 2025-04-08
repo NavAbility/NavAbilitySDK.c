@@ -73,6 +73,7 @@ pub mod LegacyURS;
 #[allow(non_snake_case)]
 pub use LegacyURS::*;
 
+#[allow(non_snake_case)]
 pub mod Worker;
+#[allow(non_snake_case)]
 pub use Worker::*;
-// pub mod StartWorker;
