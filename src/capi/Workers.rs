@@ -17,7 +17,7 @@ use crate::{
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn startWorker_solveParametric(
+fn solveGraphParametric(
   nvafg: Option<&NavAbilityDFG>,
   variableLabel: *const c_char,
 ) -> *mut c_char {
@@ -41,7 +41,7 @@ fn startWorker_solveParametric(
 // startWorker_LidarRegistration(nvafg, "x1", "left_lidar.las", "x5", "left_lidar.las");
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn startWorker_LidarRegistration(
+fn computeLidarRegistration(
   nvafg: Option<&NavAbilityDFG>,
   v1_lbl: *const c_char,
   be1_lbl: *const c_char,
@@ -50,13 +50,13 @@ fn startWorker_LidarRegistration(
 ) -> *mut c_char {
   // see navabilitysdk::startWorker(args) for details
   let wrk_id = Uuid::new_v4();
-  println!("startWorker_LidarRegistration called, under construction, id: {:?}", &wrk_id);
+  println!("computeLidarRegistration called, under construction, id: {:?}", &wrk_id);
   return convert_str(&wrk_id.to_string());
 }
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn startWorker_ImageWhitebalance(
+fn computeImageWhitebalance(
   nvafg: Option<&NavAbilityDFG>,
   v_lbl: *const c_char,
   be_lbl: *const c_char,
@@ -64,14 +64,14 @@ fn startWorker_ImageWhitebalance(
 ) -> *mut c_char {
   // see navabilitysdk::startWorker(args) for details
   let wrk_id = Uuid::new_v4();
-  println!("startWorker_ImageWhitebalance called, under construction, id: {:?}", &wrk_id);
+  println!("computeImageWhitebalance called, under construction, id: {:?}", &wrk_id);
   return convert_str(&wrk_id.to_string());
 }
 
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn startWorker_VisualAffordancePriors(
+fn addAffordance_kNNvisual(
   nvafg: Option<&NavAbilityDFG>,
   variableLabel: *const c_char,
   mapsessions: *const c_char,

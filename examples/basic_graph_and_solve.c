@@ -88,7 +88,7 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
   // Solve the basic graph
-  startWorker_solveParametric(nvafg, "x1");
+  solveGraphParametric(nvafg, "x1");
 
   // Also see deleteFactor and deleteVariable
 
