@@ -98,3 +98,24 @@ fn addAffordance_kNNvisual(
 
   return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
 }
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn deriveRobotConfig(
+  nvafg: Option<&NavAbilityDFG>,
+) -> *mut c_char {
+  
+  let mut map = serde_json::Map::<String,serde_json::Value>::new();
+  map.insert("lambda".to_string(), serde_json::json!("updateAgentMetadata_Kalibr"));
+  map.insert("agentLabel".to_string(), serde_json::json!(nvafg.unwrap().agent.label));
+  map.insert("auth_token".to_string(), serde_json::json!(nvafg.unwrap().client.nva_api_token));
+
+  let wrk_id = crate::services::startWorker(
+    &nvafg.unwrap().client.clone(),
+    map,
+    crate::start_worker::WorkerLabelEnum::accel,
+  );
+
+  return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
+}

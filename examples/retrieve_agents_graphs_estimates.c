@@ -75,7 +75,7 @@ int main(void) {
   ppem = getPPEMean(X1, "parametric");
   if (0 < length(ppem)) {
     printf(
-      "x1_ppe, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s", 
+      "x1_ppe, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s\n", 
       *getIndex(ppem, 0), *getIndex(ppem, 1), *getIndex(ppem, 2),
       "TODO_id"
     );

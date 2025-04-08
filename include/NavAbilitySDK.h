@@ -168,6 +168,8 @@ void deleteFactorById(const struct NavAbilityDFG *nvafg, const char *fid);
 
 void deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
+char *deriveRobotConfig(const struct NavAbilityDFG *nvafg);
+
 void free_Agent(struct Agent*);
 
 void free_BlobEntry(struct BlobEntry*);
