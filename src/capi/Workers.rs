@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 use crate::{
   convert_str,
+  cstr_to_str,
   NavAbilityDFG,
 };
 
@@ -18,11 +19,23 @@ use crate::{
 #[no_mangle] pub unsafe extern "C" 
 fn startWorker_solveParametric(
   nvafg: Option<&NavAbilityDFG>,
+  variableLabel: *const c_char,
 ) -> *mut c_char {
-  // see navabilitysdk::startWorker(args) for details
-  let wrk_id = Uuid::new_v4();
+  
+  let mut map = serde_json::Map::<String,serde_json::Value>::new();
+  map.insert("agentLabel".to_string(), serde_json::json!(nvafg.unwrap().agent.label));
+  map.insert("graphLabel".to_string(), serde_json::json!(nvafg.unwrap().fg.label));
+  map.insert("variableLabel".to_string(), serde_json::json!(cstr_to_str(variableLabel)));
+  map.insert("auth_token".to_string(), serde_json::json!(nvafg.unwrap().client.nva_api_token));
+
+  let wrk_id = crate::services::startWorker(
+      &nvafg.unwrap().client.clone(),
+      map,
+      crate::start_worker::WorkerLabelEnum::solveGraphParametric_Wkr,
+  );
+
   println!("startWorker_solveParametric called, under construction, id: {:?}", &wrk_id);
-  return convert_str(&wrk_id.to_string());
+  return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
 }
 
 
@@ -61,11 +74,28 @@ fn startWorker_ImageWhitebalance(
 #[no_mangle] pub unsafe extern "C" 
 fn startWorker_VisualAffordancePriors(
   nvafg: Option<&NavAbilityDFG>,
-  v_lbl: *const c_char,
-  be_lbl: *const c_char,
+  variableLabel: *const c_char,
+  mapsessions: *const c_char,
 ) -> *mut c_char {
-  // see navabilitysdk::startWorker(args) for details
-  let wrk_id = Uuid::new_v4();
-  println!("startWorker_VisualAffordancePriors called, but not implemented");
-  return convert_str(&wrk_id.to_string());
+
+  let mapsessions = cstr_to_str(mapsessions).split(";").collect::<Vec<&str>>();
+  
+  let mut map = serde_json::Map::<String,serde_json::Value>::new();
+  map.insert("robotLabel".to_string(), serde_json::json!(nvafg.unwrap().agent.label));
+  map.insert("sessionLabel".to_string(), serde_json::json!(nvafg.unwrap().fg.label));
+  map.insert("variableLabel".to_string(), serde_json::json!(cstr_to_str(variableLabel)));
+  map.insert("latest".to_string(), serde_json::json!("true"));
+  map.insert("n_matches".to_string(), serde_json::json!(5));
+  map.insert("total_n_matches".to_string(), serde_json::json!(5));
+  map.insert("mapSessionLabels".to_string(), serde_json::json!(mapsessions));
+  map.insert("auth_token".to_string(), serde_json::json!(nvafg.unwrap().client.nva_api_token));
+
+  let wrk_id = crate::services::startWorker(
+      &nvafg.unwrap().client.clone(),
+      map,
+      crate::start_worker::WorkerLabelEnum::addAffordance_kNNvisual,
+  );
+
+  println!("startWorker_solveParametric called, under construction, id: {:?}", &wrk_id);
+  return convert_str(&wrk_id.expect("start worker failed to return a uuid").to_string());
 }

@@ -307,10 +307,10 @@ char *startWorker_LidarRegistration(const struct NavAbilityDFG *nvafg,
                                     const char *be2_lbl);
 
 char *startWorker_VisualAffordancePriors(const struct NavAbilityDFG *nvafg,
-                                         const char *v_lbl,
-                                         const char *be_lbl);
+                                         const char *variableLabel,
+                                         const char *mapsessions);
 
-char *startWorker_solveParametric(const struct NavAbilityDFG *nvafg);
+char *startWorker_solveParametric(const struct NavAbilityDFG *nvafg, const char *variableLabel);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,

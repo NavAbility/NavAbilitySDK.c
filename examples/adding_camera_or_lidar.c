@@ -128,7 +128,7 @@ int main(void) {
   printf("received worker id: %s\n", wid);
 
   // compute visual priors on image data
-  wid = startWorker_VisualAffordancePriors(nvafg, "x3", "center_camera_whitebalanced");
+  wid = startWorker_VisualAffordancePriors(nvafg, "x3", "map01;map02;");
   printf("received worker id: %s\n", wid);
 
   // See other example for different usage of the same agent/graph/model
