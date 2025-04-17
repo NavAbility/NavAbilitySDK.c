@@ -16,24 +16,33 @@ CXX := gcc
 default: help ;
 .PHONY: default
 
-clean:
+clean: delete-schema
+	@echo "Cleaning up..."
 	cargo clean
 	rm -rf test/build
-	rm -f src/gql/schema.json
-	cd examples && $(MAKE) clean
 .PHONY: clean
 
-build-tokio: $(NVA_API_SCHEMA_PATH)
+delete-schema:
+	@echo "Deleting GraphQL schema..."
+	rm -f $(NVA_API_SCHEMA_PATH)
+
+test-tokio: build-tokio
+	cargo test -F tokio
+.PHONY: test-tokio
+
+test-tokio-unsafe: build-tokio
+	cargo test -F tokio -- --nocapture
+.PHONY: test-tokio
+
+build-tokio: 
 	cargo build -F tokio
 .PHONY: build-tokio
-
-build-lib: build-tokio generate-cbindgen-c
 
 $(NVA_API_SCHEMA_PATH):
 	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
 	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/gql/schema.json $(NVA_API_URL)
 
-fetch-schema: $(NVA_API_SCHEMA_PATH) ;
+fetch-schema: delete-schema $(NVA_API_SCHEMA_PATH) ;
 .PHONY: fetch-schema
 
 graphql-codegen:

@@ -13,8 +13,14 @@ use std::{
   future::Future
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
 use serde::{Serialize,Deserialize};
+
+use serde_json::{
+  Map,
+  Value
+};
+
+use base64::{Engine as _, engine::{self, general_purpose}, alphabet};
 
 // use graphql_client::GraphQLQuery;
 use crate::{
@@ -376,6 +382,77 @@ pub async fn post_to_nvaapi<
     post_req
   ).await;
 }
+
+
+
+// ====================== NodeMetadata ======================
+
+
+#[derive(Default, Clone, Serialize, Deserialize, Debug)]
+pub struct JSONCRUD {}
+
+impl JSONCRUD {
+  pub fn to_jsonstr(
+    jobj: &Map<String,Value>,
+  ) -> String {
+    serde_json::to_string(&jobj).unwrap().to_string()
+  }
+  
+  pub fn from_jsonstr(
+    jstr: &str
+  ) -> Map<String,Value> {
+    match serde_json::from_str(jstr) {
+      Err(e) => {
+        to_console_error(&format!("JSONCRUD unable to parse json string {:?}\n {:?}",e,jstr));
+        return Map::<String,Value>::new();
+      },
+      Ok(jsonmap) => {
+        return jsonmap;
+      }
+    }
+  }
+  
+  pub fn encode_b64(
+    jstr: String
+  ) -> String {
+    return general_purpose::STANDARD.encode(jstr);
+  }
+
+  pub fn decode_b64_utf8(
+    jstr_b64: &str
+  ) -> Option<String> {
+    match &general_purpose::STANDARD.decode(jstr_b64) {
+      Ok(jstr) => {
+        return Some(
+          std::str::from_utf8(jstr)
+          .expect("JSONCRUD, invalid json UTF8 string decoding")
+          .to_string()
+        )
+      },
+      Err(e) => {
+        to_console_error(&format!("JSONCRUD, base64 decode of b64_string failed {:?}",e));
+        return None;
+      }
+    }
+  }
+
+  pub fn to_jsonstr_b64(
+    jobj: &Map<String,Value>,
+  ) -> String {
+    return Self::encode_b64(Self::to_jsonstr(jobj).to_string());
+  }
+  
+  pub fn from_jsonstr_b64(
+    jstr_b64: &str
+  ) -> Map<String,Value> {
+    if let Some(jstr) = Self::decode_b64_utf8(jstr_b64) {
+      return Self::from_jsonstr(&jstr);
+    }
+    return Map::<String,Value>::new();
+  }
+}
+
+
 
 
 
