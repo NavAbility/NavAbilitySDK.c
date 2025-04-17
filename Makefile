@@ -26,14 +26,6 @@ delete-schema:
 	@echo "Deleting GraphQL schema..."
 	rm -f $(NVA_API_SCHEMA_PATH)
 
-test-tokio: build-tokio
-	cargo test -F tokio
-.PHONY: test-tokio
-
-test-tokio-unsafe: build-tokio
-	cargo test -F tokio -- --nocapture
-.PHONY: test-tokio
-
 build-tokio: 
 	cargo build -F tokio
 .PHONY: build-tokio
