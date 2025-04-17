@@ -20,6 +20,7 @@ clean: delete-schema
 	@echo "Cleaning up..."
 	cargo clean
 	rm -rf test/build
+	cd examples && $(MAKE) clean
 .PHONY: clean
 
 delete-schema:
