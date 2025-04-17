@@ -432,8 +432,12 @@ pub fn to_string_ISO8601(
     .replace("Z","")
     .replace("T"," ");
     let parts = timestamp.split(".").collect::<Vec<&str>>();
-    timestamp = format!("{}.{:0<3}", parts[0], parts[1].get(..3).unwrap_or(parts[1]));
-    return timestamp;
+    // have millis
+    let mut millis = "000".to_owned();
+    if 1 < parts.len() {
+        millis = format!("{:0<3}", parts[1].get(..3).unwrap_or(parts[1]));
+    }
+    return format!("{}.{}", parts[0], millis);
 }
 
 

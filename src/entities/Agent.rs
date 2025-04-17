@@ -21,7 +21,7 @@ pub struct Agent {
     pub _version: String,
     pub createdTimestamp: chrono::DateTime::<Utc>,
     pub lastUpdatedTimestamp: Option<chrono::DateTime::<Utc>>,
-    pub metadata: Option<String>,
+    pub metadata: Option<serde_json::Map<String, serde_json::Value>>,
     pub blobEntries: Option<HashMap<String, BlobEntry>>,
     pub models: Option<Vec<(String,chrono::DateTime<Utc>)>>,
     pub fgs: Option<Vec<(String,chrono::DateTime<Utc>)>>,
@@ -114,7 +114,7 @@ macro_rules! Agent_importers_summary {
 
 
 pub trait AgentFieldImportersFull {
-  fn metadata(&self) -> Option<String>;
+  fn metadata(&self) -> Option<serde_json::Map<String, serde_json::Value>>;
   fn blobEntries(&self) -> Option<HashMap<String, BlobEntry>>;
   fn models(&self) -> Option<Vec<(String,chrono::DateTime<Utc>)>>;
   fn fgs(&self) -> Option<Vec<(String,chrono::DateTime<Utc>)>>;
@@ -125,7 +125,16 @@ pub trait AgentFieldImportersFull {
 macro_rules! Agent_importers_full { 
   ($T:ident) => {
     impl AgentFieldImportersFull for $T {
-      fn metadata(&self) -> Option<String> { self.metadata.clone() }
+      fn metadata(&self) -> Option<serde_json::Map<String, serde_json::Value>> { 
+        if self.metadata.is_none() { 
+          return None; 
+        } else {
+          // TBD if this will stay b64, see NavAbility/NavAbilitySDK.jl#1105
+          return Some(crate::JSONCRUD::from_jsonstr_b64(
+            &self.metadata.clone().unwrap()
+          ));
+        }
+      }
 
       fn blobEntries(&self) -> Option<HashMap<String, BlobEntry>> {
         let mut blob_entries = HashMap::new();
