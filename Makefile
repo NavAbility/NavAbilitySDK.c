@@ -38,6 +38,8 @@ build-tokio:
 	cargo build -F tokio
 .PHONY: build-tokio
 
+build-lib: build-tokio generate-cbindgen-c
+
 $(NVA_API_SCHEMA_PATH):
 	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
 	@graphql-client introspect-schema --authorization $(NVA_API_TOKEN) --output src/gql/schema.json $(NVA_API_URL)
