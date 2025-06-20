@@ -1,0 +1,7 @@
+subscription DefaultSubscription {
+  workerEvent {
+    payload
+    id
+    status
+  }
+}
