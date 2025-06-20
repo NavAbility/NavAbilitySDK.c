@@ -449,6 +449,15 @@ pub struct AddModel;
 )]
 pub struct UpdateBlobentryMetadata;
 
+#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/DefaultSubscription.gql",
+    response_derives = "Debug"
+)]
+pub struct DefaultSubscription;
+
 
 // ===================== traits =========================
 

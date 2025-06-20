@@ -43,42 +43,67 @@ impl NavAbilityClient {
     pub fn new(
         nva_api_url: &String, 
         nva_api_token: &String,
-        org_id: Option<&String>
+        org_id: Option<&String>,
     ) -> Self {
-        // FIXME good header.insert example: https://medium.com/@itsuki.enjoy/post-file-using-multipart-form-data-in-rust-5171ae57aeed
-        //   or https://users.rust-lang.org/t/how-to-upload-a-file-using-rust-or-some-library/45423/4
+        return Self::new_fromargs(
+            nva_api_url,
+            nva_api_token,
+            org_id,
+            false
+        );
+    }
+
+    pub fn similar(
+        nvacl: &NavAbilityClient,
+        do_events: bool,
+    ) -> Self {
+        Self::new_fromargs(
+            &nvacl.apiurl,
+            &nvacl.nva_api_token,
+            Some(&nvacl.user_label),
+            do_events
+        )
+    }
+
+    pub fn new_fromargs(
+        nva_api_url: &String, 
+        nva_api_token: &String,
+        org_id: Option<&String>,
+        do_events: bool,
+    ) -> Self {
+
+        // use HeaderMap: https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.headers
+        let mut headers = reqwest::header::HeaderMap::new();
+        // use bearer auth: https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.bearer_auth
+        headers.insert(
+            reqwest::header::AUTHORIZATION,
+            reqwest::header::HeaderValue::from_str(&format!("Bearer {}", nva_api_token))
+                .unwrap(),
+        );
+        headers.insert(
+            reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
+            reqwest::header::HeaderValue::from_str(&nva_api_url)
+                .unwrap(),
+        );
+        headers.insert(
+            reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
+            reqwest::header::HeaderValue::from_str(&nva_api_url.replace("api.","app."))
+                .unwrap(),
+        );
+        if do_events {
+            // "accept"=>"text/event-stream"
+            headers.insert(
+                reqwest::header::ACCEPT,
+                reqwest::header::HeaderValue::from_str("text/event-stream")
+                    .unwrap(),
+            );
+        }
+        
         let client = Client::builder()
         .user_agent("graphql-rust/0.12.0")
-        .default_headers(
-                // TODO use HeaderMap: https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.headers
-                // TODO use bearer auth: https://docs.rs/reqwest/latest/reqwest/struct.RequestBuilder.html#method.bearer_auth
-                std::iter::once((
-                    reqwest::header::AUTHORIZATION,
-                    reqwest::header::HeaderValue::from_str(&format!("Bearer {}", nva_api_token))
-                        .unwrap(),
-                )).chain(
-                    std::iter::once((
-                        reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-                        reqwest::header::HeaderValue::from_str("https://navability.io")
-                            .unwrap(),
-                    ))
-                ).chain(
-                    std::iter::once((
-                        reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-                        reqwest::header::HeaderValue::from_str(&nva_api_url)
-                            .unwrap(),
-                    ))
-                ).chain(
-                    std::iter::once((
-                        reqwest::header::ACCESS_CONTROL_ALLOW_ORIGIN,
-                        reqwest::header::HeaderValue::from_str(&nva_api_url.replace("api.","app."))
-                            .unwrap(),
-                    ))
-                )
-                .collect(),
-            )
-            .build()
-            .expect("Failure to create client");
+        .default_headers(headers)
+        .build()
+        .expect("Failure to create client");
 
         let mut temp = NavAbilityClient {
             client,
@@ -105,6 +130,8 @@ impl NavAbilityClient {
         temp.user_label = oid;
 
         return temp;
+        // HOLD good header.insert example: https://medium.com/@itsuki.enjoy/post-file-using-multipart-form-data-in-rust-5171ae57aeed
+        //   or https://users.rust-lang.org/t/how-to-upload-a-file-using-rust-or-some-library/45423/4
     }
 }
 
