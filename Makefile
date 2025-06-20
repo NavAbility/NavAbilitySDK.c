@@ -31,7 +31,7 @@ build-tokio:
 	cargo build -F tokio
 .PHONY: build-tokio
 
-build-lib: build-tokio generate-cbindgen-c
+build-lib: generate-cbindgen-c
 
 $(NVA_API_SCHEMA_PATH):
 	@echo "Fetching GraphQL schema from $(NVA_API_URL)..."
@@ -59,7 +59,7 @@ install-rust-deps:
 	cargo install cbindgen
 .PHONY: install-rust-deps
 
-generate-cbindgen-c:
+generate-cbindgen-c: build-tokio
 	cbindgen  --config cbindgen.toml --lang c --crate navabilitysdk --output include/NavAbilitySDK.h.tmp
 	@echo "#ifdef __cplusplus" > include/NavAbilitySDK.h
 	@echo "extern \"C\" {" >> include/NavAbilitySDK.h
