@@ -52,6 +52,8 @@ typedef struct NavAbilityDFG NavAbilityDFG;
 
 typedef struct NvaNode_Factorgraph NvaNode_Factorgraph;
 
+typedef struct Option_bool Option_bool;
+
 typedef struct Point2Point2_FullNormal Point2Point2_FullNormal;
 
 typedef struct Point3Point3_FullNormal Point3Point3_FullNormal;
@@ -93,6 +95,12 @@ typedef struct PriorPose2_FullNormal PriorPose2_FullNormal;
 typedef struct PriorPose3_FullNormal PriorPose3_FullNormal;
 
 typedef struct String String;
+
+/**
+ * Manages subscription events from NavAbilityClient subscriptions
+ * SPECIAL NOTE, can use standaline Self::subscription_listener(_)
+ */
+typedef struct SubscriptionManager SubscriptionManager;
 
 /**
  * The Variable information packed in a way that accomdates multi-lang using json.
@@ -224,6 +232,8 @@ void free_RVec_String(struct RVec_String *rvec);
 
 void free_RVec_f64(struct RVec_f64 *rvec);
 
+void free_SubscriptionManager(struct SubscriptionManager*);
+
 void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
@@ -261,6 +271,8 @@ struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *solveKe
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
+
+struct Option_bool is_status_success(const struct SubscriptionManager *_nvasm, const char *wrk_id);
 
 size_t length_RVec_Agent(const struct RVec_Agent *rv_agent);
 
@@ -311,6 +323,9 @@ struct PriorPoint3_FullNormal *new_PriorPoint3(const struct FullNormal *Z);
 struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
+
+struct SubscriptionManager *new_SubscriptionManager(const struct NavAbilityClient *_nvacl,
+                                                    size_t size);
 
 char *new_uuid4(void);
 
@@ -421,15 +436,16 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
         BlobEntry*:               free_BlobEntry,             \
         NavAbilityClient*:        free_NavAbilityClient,      \
         NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \
+        SubscriptionManager*:     free_SubscriptionManager,   \
         NavAbilityDFG*:           free_NavAbilityDFG,         \
         VariableDFG*:             free_VariableDFG,           \
         FullNormal*:              free_FullNormal,            \
-        PriorPoint2_FullNormal*:  free_PriorPoint2,          \
-        PriorPoint3_FullNormal*:  free_PriorPoint3,          \
+        PriorPoint2_FullNormal*:  free_PriorPoint2,           \
+        PriorPoint3_FullNormal*:  free_PriorPoint3,           \
         PriorPose2_FullNormal*:   free_PriorPose2,            \
         PriorPose3_FullNormal*:   free_PriorPose3,            \
-        Point2Point2_FullNormal*: free_Point2Point2,        \
-        Point3Point3_FullNormal*: free_Point3Point3,        \
+        Point2Point2_FullNormal*: free_Point2Point2,          \
+        Point3Point3_FullNormal*: free_Point3Point3,          \
         Pose2Pose2_FullNormal*:   free_Pose2Pose2,            \
         Pose3Pose3_FullNormal*:   free_Pose3Pose3,            \
         struct FactorDFG_PriorPoint2_FullNormal*:    free_FactorDFG_PriorPoint2_FullNormal,              \
@@ -490,6 +506,7 @@ void freeR(struct RVec_Agent* s) { free_RVec_Agent(s); }
 void freeR(struct RVec_NvaNode_Factorgraph* s) { free_RVec_NvaNode_Factorgraph(s); }
 void freeR(struct BlobEntry* s) { free_BlobEntry(s); }
 void freeR(struct NavAbilityClient* s) { free_NavAbilityClient(s); }
+void freeR(struct SubscriptionManager* s) { free_SubscriptionManager(s); }
 void freeR(struct NavAbilityBlobStore* s) { free_NavAbilityBlobStore(s); }
 void freeR(struct NavAbilityDFG* s) { free_NavAbilityDFG(s); }
 void freeR(struct VariableDFG* s) { free_VariableDFG(s); }

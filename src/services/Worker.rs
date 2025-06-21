@@ -20,7 +20,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn start_worker_query(
   input: serde_json::Map<String,serde_json::Value>,
   worker_label: crate::start_worker::WorkerLabelEnum

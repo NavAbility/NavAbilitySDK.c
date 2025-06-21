@@ -355,6 +355,13 @@ fn free_NavAbilityClient(
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
 #[no_mangle] pub extern "C" 
+fn free_SubscriptionManager(
+    _: Option<Box<crate::SubscriptionManager>>
+) {}
+
+// Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
+#[allow(non_snake_case)]
+#[no_mangle] pub extern "C" 
 fn free_NavAbilityDFG(
     _: Option<Box<crate::NavAbilityDFG>>
 ) {}
