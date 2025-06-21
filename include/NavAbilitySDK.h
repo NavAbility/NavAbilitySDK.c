@@ -52,8 +52,6 @@ typedef struct NavAbilityDFG NavAbilityDFG;
 
 typedef struct NvaNode_Factorgraph NvaNode_Factorgraph;
 
-typedef struct Option_bool Option_bool;
-
 typedef struct Point2Point2_FullNormal Point2Point2_FullNormal;
 
 typedef struct Point3Point3_FullNormal Point3Point3_FullNormal;
@@ -98,7 +96,8 @@ typedef struct String String;
 
 /**
  * Manages subscription events from NavAbilityClient subscriptions
- * SPECIAL NOTE, can use standaline Self::subscription_listener(_)
+ * SPECIAL NOTE1, can use standalone Self::subscription_listener(_)
+ * SPECIAL_NOTE2, both non-blocking and blocking interfaces are provided (for wasm or tokio)
  */
 typedef struct SubscriptionManager SubscriptionManager;
 
@@ -156,6 +155,8 @@ char *addVariable(const struct NavAbilityDFG *nvafg,
 char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
                            const char *variable_label,
                            const struct BlobEntry *entry_);
+
+bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 
 char *computeImageWhitebalance(const struct NavAbilityDFG *nvafg,
                                const char *v_lbl,
@@ -271,8 +272,6 @@ struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *solveKe
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
-
-struct Option_bool is_status_success(const struct SubscriptionManager *_nvasm, const char *wrk_id);
 
 size_t length_RVec_Agent(const struct RVec_Agent *rv_agent);
 

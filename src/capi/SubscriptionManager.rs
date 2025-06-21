@@ -43,18 +43,18 @@ fn new_SubscriptionManager(
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn block_on(
-  _nvasm: Option<&SubscriptionManager>,
+  _nvasm: Option<&mut SubscriptionManager>,
   wrk_id: *const c_char,
   tout_millis: usize,
-) -> Option<bool> {
+) -> bool {
     if _nvasm.is_none() {
-    to_console_error("block_on: the provided *SubscriptionManager is NULL");
-    return None;
+    to_console_error("block_on: provided *SubscriptionManager is NULL");
+    return false;
   }
   let wid = Uuid::parse_str(cstr_to_str(wrk_id)).expect("Cannot parse wrk_id string to uuid");
 
   let tout = std::time::Duration::from_millis(tout_millis as u64);
-  return _nvasm.unwrap().block_on(&wid, tout);
+  return _nvasm.unwrap().block_on(&wid, tout).unwrap_or(false);
 }
 
 

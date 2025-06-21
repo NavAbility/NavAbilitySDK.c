@@ -95,7 +95,7 @@ int main(void) {
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Solving graph with action id: %s\n", wrkid);
   
-  bool success = block_success(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 10000 milliseconds
+  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
   printf("Graph was successful: %d\n", success);
 
   // See the next example for retrieving variable values
