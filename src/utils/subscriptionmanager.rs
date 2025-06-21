@@ -41,7 +41,8 @@ pub enum WorkerStatusEnum {
 
 
 /// Manages subscription events from NavAbilityClient subscriptions
-/// SPECIAL NOTE, can use standaline Self::subscription_listener(_)
+/// SPECIAL NOTE1, can use standalone Self::subscription_listener(_)
+/// SPECIAL_NOTE2, both non-blocking and blocking interfaces are provided (for wasm or tokio)
 #[cfg(any(feature = "tokio", feature = "wasm"))]
 pub struct SubscriptionManager {
   /// Keep track of work requests / events by their UUID
@@ -50,8 +51,10 @@ pub struct SubscriptionManager {
   sse_history: Vec<Uuid>,
   /// Maximum size of sse_history
   size: usize,
-  /// Receive channel for subscription events
-  subs_recv: Receiver<crate::default_subscription::ResponseData>, 
+  /// Receive channel for subscription events (polling interface)
+  nonblocking_recv: Receiver<crate::default_subscription::ResponseData>, 
+  /// Direct notifications channel for individual uuid blocking user requests
+  blocking_into: Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
 }
 
 
@@ -62,16 +65,22 @@ impl SubscriptionManager {
     nvacl: &NavAbilityClient,
     size: usize,
   ) -> Self {
-    let (send_into, recv_from) = channel();
+    // common channel for received subscription events (fullied by polling)
+    let (nonblocking_into, nonblocking_recv) = channel();
+    // specific user request channel for setting up direct (blocking) notifications per user Uuid
+    let (blocking_into, blocking_recv) = channel();
+
     Self::subscription_listener(
-      send_into,
+      nonblocking_into,
       nvacl,
+      blocking_recv,
     );
     return Self {
       events: BTreeMap::new(),
       sse_history: Vec::new(),
       size,
-      subs_recv: recv_from,
+      nonblocking_recv,
+      blocking_into,
     };
   }
 
@@ -116,9 +125,13 @@ impl SubscriptionManager {
   /// Add a given UUID to be tracked, initial status is None/Pending
   pub fn add_tracking(
     &mut self, 
-    id: Uuid
+    id: &Uuid
   ) {
-    self.events.insert(id, None);
+    // tell the async process user wants to be notified via a channel
+
+    // include this UUID in the tracking map (as WorkerStatusEnum::Pending)
+    self.events.insert(id.clone(), None);
+
   }
 
   /// Check if a given event UUID is trackable then return Some(true/false),
@@ -141,7 +154,13 @@ impl SubscriptionManager {
     &self,
     id: &Uuid
   ) -> Option<bool> {
-    return match self.get_status(id) {
+     return Self::is_enum_success(&self.get_status(id));
+  }
+
+  pub fn is_enum_success(
+    wse: &WorkerStatusEnum
+  ) -> Option<bool>{
+    return match wse {
       WorkerStatusEnum::Pending => Some(false),
       WorkerStatusEnum::Status(s) => {
         if s == "DONE" || s == "done" || s == "SUCCESS" || s == "success" {
@@ -178,7 +197,7 @@ impl SubscriptionManager {
 
   /// Try to receive any pending subscription events, store in events map and sse_history
   pub fn poll(&mut self) {
-    while let Ok(subscr) = self.subs_recv.try_recv() {
+    while let Ok(subscr) = self.nonblocking_recv.try_recv() {
       // to_console_debug(&format!("Got subscription response {:?}",&subscr));
       if let Some(subs) = &subscr.worker_event {
         // to_console_debug(&format!("Got subscription for sync_subscription {:?}",&subs));
@@ -197,19 +216,61 @@ impl SubscriptionManager {
     }
   }
 
+  /// Block on a specific UUID subscription event, waiting for a response
+  /// Returns Some(true/false) if the subscription event was successful, otherwise None for other errors
+  pub fn block_on(
+    &mut self,
+    wid: &Uuid,
+    tout_millis: std::time::Duration,
+  ) -> Option<bool> {
+    // if using both polling and blocking, add the id to the polling track map
+    self.add_tracking(wid);
+    // if using blocking, send the request to the channel via standalone function
+    return Self::block_on_standalone(
+      self.blocking_into.clone(),
+      wid,
+      tout_millis,
+    );
+  }
+
+  /// block on a specific UUID subscription event, waiting for a response
+  /// Returns Some(true/false) if the subscription event was successful, otherwise None for other errors
+  pub fn block_on_standalone(
+    blocking_into: Sender<(Uuid,Sender<crate::default_subscription::ResponseData>)>,
+    wid: &Uuid,
+    tout_millis: std::time::Duration,
+  ) -> Option<bool> {
+
+    let (etx, erx) = channel();
+    let _ = blocking_into.send((wid.clone(), etx));
+    match erx.recv_timeout(tout_millis) {
+      Ok(subscr) => {
+        if let Some(we) = subscr.worker_event.as_ref() {
+          return Self::is_enum_success(&WorkerStatusEnum::Status(we.status.to_string()));
+        }
+      },
+      Err(e) => {
+        to_console_error(&format!("Failed to receive subscription response: {}", e));
+      }
+    }
+    return None; // failure
+  }
+
 
   /// Start a subscription listener that sends received events into the provided channel
-  /// DOES NOT REQUIRE a SubscriptionManager instance, can be called standalone
+  /// DOES NOT REQUIRE a SubscriptionManager instance, can be used as standalone function
   #[cfg(any(feature = "tokio", feature = "wasm"))]
   pub fn subscription_listener(
-      send_into: Sender<crate::default_subscription::ResponseData>,
+      nonblocking_into: Sender<crate::default_subscription::ResponseData>,
       nvacl: &NavAbilityClient,
+      blocking_recv: Receiver<(Uuid,Sender<crate::default_subscription::ResponseData>)>,
   ) {
-    // FIXME upgrade to eventsource_reqwest for sse
+    // NOTE couldn't use eventsource_reqwest for sse get requests -- missing header support
     let nvacl_e = NavAbilityClient::similar(
       nvacl,
       true
     );
+    // use the SDK's existing subscription query definition
     let query = crate::DefaultSubscription::build_query(
       crate::default_subscription::Variables {}
     );
@@ -228,7 +289,17 @@ impl SubscriptionManager {
     // start a thread to run the async event loop monitoring the EventSource 
     // and send received eventes into the channel
     crate::execute(async move {
+      let mut please_notify: BTreeMap<Uuid, Sender<crate::default_subscription::ResponseData>> = BTreeMap::new();
       while let Some(event) = nvaes.next().await {
+        // pull any direct user request uuids
+        match blocking_recv.try_recv() {
+          Ok((uuid, sender)) => {
+            please_notify.insert(uuid, sender);
+          },
+          Err(_) => {}
+        }
+
+        // process the event
         match event {
           Ok(Event::Open) => to_console_debug("SSE connection Open!"),
           Ok(Event::Message(message)) => {
@@ -249,9 +320,16 @@ impl SubscriptionManager {
                 serde_json::Error
               > = serde_json::from_str(&jstr);
               if let Ok(subwe) = jobj_ {
-                send_into.send(
-                  subwe
+                use uuid::Uuid;
+
+                nonblocking_into.send(
+                  subwe.clone()
                 ).expect("Failed to send Event");
+                // notify any direct uuids requested by the user
+                let ewid = Uuid::parse_str(&subwe.worker_event.as_ref().unwrap().id).expect("Failed to parse UUID from worker event id");
+                if let Some(sender) = please_notify.remove(&ewid) {
+                  sender.send(subwe).expect(&format!("Failed to send direct notification for UUID {}", &ewid));
+                }
               } else {
                 to_console_error("Failed to parse 'data' from message data");
               }

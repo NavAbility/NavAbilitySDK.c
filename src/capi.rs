@@ -28,3 +28,6 @@ pub use AccessorDispatch::*;
 
 mod Workers;
 pub use Workers::*;
+
+mod SubscriptionManager;
+pub use SubscriptionManager::*;

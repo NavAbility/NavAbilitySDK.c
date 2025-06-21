@@ -87,15 +87,21 @@ int main(void) {
   ); freeR(f2); freeR(normal); // because new_ was used
   printf("Added factor id: %s\n", fid2);
 
+  // before solving, lets start a SubscriptionManager to monitor for worker events
+  SubscriptionManager* nvasm = NULL;
+  nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Solving graph with action id: %s\n", wrkid);
-
-  // Also see deleteFactor and deleteVariable
+  
+  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
+  printf("Graph was successful: %d\n", success);
 
   // See the next example for retrieving variable values
+  // Also see deleteFactor and deleteVariable
 
-  freeR(nvafg); freeR(nvacl);
+  freeR(nvafg); freeR(nvasm); freeR(nvacl);
   printf("All done.\n");
   return 0;
 }
