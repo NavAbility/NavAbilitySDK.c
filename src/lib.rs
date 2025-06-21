@@ -454,7 +454,7 @@ pub struct UpdateBlobentryMetadata;
 #[graphql(
     schema_path = "src/gql/schema.json",
     query_path = "src/gql/DefaultSubscription.gql",
-    response_derives = "Debug"
+    response_derives = "Debug, Clone"
 )]
 pub struct DefaultSubscription;
 
