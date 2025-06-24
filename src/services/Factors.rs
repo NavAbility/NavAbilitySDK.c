@@ -70,7 +70,9 @@ macro_rules! GenDistrFactor {
       }
 
       fn pack(&self) -> String {
-        return self.Z.to_json();
+        return format!("{{\"Z\":{}}}",
+          self.Z.to_json()
+        );
       }
     }
   }
@@ -115,6 +117,11 @@ impl FunctionData {
     fd.nullhypo = nullhypo.unwrap_or(0.0);
     fd.multihypo = multihypo.unwrap_or(Vec::new());
     fd.inflation = inflation.unwrap_or(3.0);
+    fd.eliminated = false;
+    fd.potentialused = false;
+    fd.solveInProgress = 0;
+    fd.edgeIDs = Vec::new();
+    fd.certainhypo = Vec::new();
     return fd;
   }
   
@@ -228,7 +235,13 @@ where
       inflation
     );
     // FIXME, should not be json'd so early: JuliaRobotics/DistributedFactorGraphs.jl#1118
-    f.data = Some(fdata.to_json());
+    f.data = Some(
+      fdata.to_json()
+      .replace("\\\"", "\"")
+      .replace("\"{", "{")
+      .replace("}\"", "}")
+      .replace("type_", "_type")
+    );
     
     return f;
   }
