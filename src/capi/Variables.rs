@@ -8,6 +8,7 @@ use std::{
       c_double
       // c_void, 
   },
+  str::FromStr,
 };
 
 // use ffi_convert::CArray;
@@ -19,6 +20,7 @@ use crate::{
   vec_to_ffi,
   to_console_error, 
   GetLabel,
+  VariableType
 };
 
 
@@ -162,7 +164,7 @@ fn addVariable(
   let vari = crate::services::addVariable(
     nvafg.unwrap(), 
     &cstr_to_str(label).to_string(),
-    &cstr_to_str(variableType).to_string(),
+    &VariableType::from_str(cstr_to_str(variableType)).expect("VariableType::from_str failed"),
     Some(vtags),
     timestamp,
     Some(_nstime),
