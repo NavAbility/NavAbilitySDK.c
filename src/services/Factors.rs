@@ -68,6 +68,10 @@ macro_rules! GenDistrFactor {
       fn type_str(&self) -> String {
         return format!("{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
       }
+
+      fn pack(&self) -> String {
+        return self.Z.to_json();
+      }
     }
   }
 }
@@ -191,6 +195,8 @@ where
     nullhypo: Option<f64>,
     inflation: Option<f64>,
   ) -> Self {
+
+    let binding = fnctype.pack();
     let mut f = Self {
       id: None,
       label: assemble_factor_name(varlbls.clone()),
@@ -215,7 +221,12 @@ where
       }
     }
     // default on create, also deser is different use-case    
-    let fdata = FunctionData::new("FIXME", multihypo, nullhypo, inflation);
+    let fdata = FunctionData::new(
+      binding.as_str(),
+      multihypo, 
+      nullhypo, 
+      inflation
+    );
     // FIXME, should not be json'd so early: JuliaRobotics/DistributedFactorGraphs.jl#1118
     f.data = Some(fdata.to_json());
     

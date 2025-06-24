@@ -48,6 +48,7 @@ pub struct FactorDFG<F> {
 pub trait FactorType<'a, D: crate::Distribution<'a>> {  // Should Distributions -> SampleableBelief?
   fn new(Z: D) -> Self;
   fn type_str(&self) -> String;
+  fn pack(&self) -> String;
 }
 
 
