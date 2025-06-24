@@ -3,7 +3,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(any(feature = "tokio", feature="wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     parse_str_utc, 
     Uuid,
@@ -309,7 +309,7 @@ impl PackedVariableNodeData {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn getPPEMean(
     vari: &VariableDFG,
     solveKey: &str
@@ -324,7 +324,7 @@ pub fn getPPEMean(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn getPPECov(
     vari: &VariableDFG,
     solveKey: &str
