@@ -66,7 +66,7 @@ macro_rules! GenDistrFactor {
       }
 
       fn type_str(&self) -> String {
-        return format!("RoME.{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
+        return format!("{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
       }
     }
   }

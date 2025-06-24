@@ -1,21 +1,30 @@
 
+
+use std::fmt;
+use std::str::FromStr;
+
+#[cfg(any(feature = "tokio", feature="wasm", feature = "blocking"))]
 use crate::{
     parse_str_utc, 
-    BlobEntry,
+    Uuid,
+    BlobEntry, 
+};
+
+
+use crate::{
+    to_console_error, 
     MeanMaxPPE, 
     PackedVariableNodeData, 
     Utc, 
-    Uuid,
     VariableDFG, 
-    SDK_VERSION
+    VariableType,
+    SDK_VERSION,
 };
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
-    // GQLResponseEmptyError,
     Error,     
     Sender, 
-    // Response, 
     NavAbilityDFG,
     send_api_result,
     post_to_nvaapi,
@@ -32,6 +41,39 @@ use crate::{
     // to_console_debug, 
     // to_console_error, 
 };
+
+
+impl fmt::Display for VariableType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "RoME.{:?}", self)
+    }
+}
+
+
+impl FromStr for VariableType {
+
+    type Err = ();
+
+    fn from_str(
+        var_type: &str
+    ) -> Result<VariableType, Self::Err> {
+        let s = var_type.split('.').collect::<Vec<&str>>();
+        if s.len() != 2 {
+            to_console_error(&format!("Missing variable type module definition: {}", var_type));
+        } else {
+            if !s[0].eq("RoME") {
+                to_console_error(&format!("Unknown variable type module (currently only RoME): {}", s[0]));
+            }
+        }
+        return match s.last().unwrap().as_ref() {
+            "Point2" => Ok(VariableType::Point2),
+            "Point3" => Ok(VariableType::Point3),
+            "Pose2" => Ok(VariableType::Pose2),
+            "Pose3" => Ok(VariableType::Pose3),
+            _ => Err(()),
+        };
+    }
+}
 
 
 #[allow(non_snake_case)]
@@ -116,7 +158,7 @@ impl MeanMaxPPE {
 impl VariableDFG {
     pub fn new(
         label: &str,
-        variableType: &str,
+        variableType: &VariableType,
         timestamp: Option<chrono::DateTime<Utc>>,
         nstime: Option<usize>,
     ) -> Self {
@@ -129,7 +171,7 @@ impl VariableDFG {
             nstime: nstime.unwrap_or(0),
             ppes: Vec::new(),
             blobEntries: Vec::new(),
-            variableType: variableType.to_string(),
+            variableType: variableType.clone(),
             _version: SDK_VERSION.to_owned(),
             metadata: "".to_owned(),
             solvable: 1,
@@ -157,7 +199,9 @@ impl VariableDFG {
 
         let mut variable = Self::new(
             &vgql.variable_skeleton_fields.label.clone(),
-            &vgql.variable_summary_fields.variable_type.clone(),
+            &VariableType::from_str(
+                &vgql.variable_summary_fields.variable_type.to_string()
+            ).unwrap(),
             timestamp,
             nstime,
         );
@@ -445,7 +489,7 @@ pub fn to_string_ISO8601(
 pub async fn post_add_variable(
     nvafg: &NavAbilityDFG,
     label: &String,
-    variableType: &String,
+    variableType: &VariableType,
     _tags: Option<Vec<String>>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
@@ -503,7 +547,7 @@ pub async fn add_variable_send(
     send_into: std::sync::mpsc::Sender<Uuid>,
     nvafg: &NavAbilityDFG,
     label: &String,
-    variableType: &String,
+    variableType: &VariableType,
     _tags: Option<Vec<String>>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,
@@ -531,7 +575,7 @@ pub async fn add_variable_send(
 pub fn addVariable(
     nvafg: &NavAbilityDFG,
     label: &String,
-    variableType: &String,
+    variableType: &VariableType,
     _tags: Option<Vec<String>>,
     _timestamp: Option<chrono::DateTime<Utc>>,
     _nstime: Option<usize>,

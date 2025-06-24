@@ -3,7 +3,6 @@ use crate::{
     Uuid,
     Utc,
     BlobEntry,
-    // SDK_VERSION,
 };
 
 
@@ -61,9 +60,21 @@ pub struct VariableDFG {
     pub nstime: usize,
     pub ppes: Vec<MeanMaxPPE>,
     pub blobEntries: Vec<BlobEntry>,
-    pub variableType: String,
+    pub variableType: VariableType,
     pub _version: String,
     pub metadata: String,
     pub solvable: i32,
     pub solverData: Vec<PackedVariableNodeData>,
 }
+
+
+#[derive(Debug, Clone, PartialEq)]
+#[allow(non_snake_case)]
+pub enum VariableType {
+    Point2,
+    Point3,
+    Pose2,
+    Pose3,
+}
+
+
