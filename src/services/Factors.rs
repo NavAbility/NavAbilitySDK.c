@@ -66,7 +66,13 @@ macro_rules! GenDistrFactor {
       }
 
       fn type_str(&self) -> String {
-        return format!("RoME.{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
+        return format!("{}", $fns); //get_fnc_name(&std::any::type_name::<Self>()));
+      }
+
+      fn pack(&self) -> String {
+        return format!("{{\"Z\":{}}}",
+          self.Z.to_json()
+        );
       }
     }
   }
@@ -111,6 +117,11 @@ impl FunctionData {
     fd.nullhypo = nullhypo.unwrap_or(0.0);
     fd.multihypo = multihypo.unwrap_or(Vec::new());
     fd.inflation = inflation.unwrap_or(3.0);
+    fd.eliminated = false;
+    fd.potentialused = false;
+    fd.solveInProgress = 0;
+    fd.edgeIDs = Vec::new();
+    fd.certainhypo = Vec::new();
     return fd;
   }
   
@@ -191,6 +202,8 @@ where
     nullhypo: Option<f64>,
     inflation: Option<f64>,
   ) -> Self {
+
+    let binding = fnctype.pack();
     let mut f = Self {
       id: None,
       label: assemble_factor_name(varlbls.clone()),
@@ -215,9 +228,20 @@ where
       }
     }
     // default on create, also deser is different use-case    
-    let fdata = FunctionData::new("FIXME", multihypo, nullhypo, inflation);
+    let fdata = FunctionData::new(
+      binding.as_str(),
+      multihypo, 
+      nullhypo, 
+      inflation
+    );
     // FIXME, should not be json'd so early: JuliaRobotics/DistributedFactorGraphs.jl#1118
-    f.data = Some(fdata.to_json());
+    f.data = Some(
+      fdata.to_json()
+      .replace("\\\"", "\"")
+      .replace("\"{", "{")
+      .replace("}\"", "}")
+      .replace("type_", "_type")
+    );
     
     return f;
   }

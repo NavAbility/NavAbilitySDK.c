@@ -49,7 +49,7 @@ int main(void) {
   // Assume a zero starting location
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
   const char* time_utc = "2020-01-01 06:30:01.250 UTC";
-  char* v = addVariable(nvafg, "x0", "Pose2", "TESTTAG;", time_utc, 0, 1);
+  char* v = addVariable(nvafg, "x0", "RoME.Pose2", "TESTTAG;", time_utc, 0, 1);
   printf("added variable id: %s\n", v);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
@@ -58,7 +58,7 @@ int main(void) {
   f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
   const char* fid1 = addFactor(
       nvafg,
-      "x1;",
+      "x0;",
       f1,
       "TESTTAG;", 
       "", 0, 
@@ -69,7 +69,7 @@ int main(void) {
 
   // ROBOT MOVES TO (10,0,0)
   const char* time_z = "2020-01-01T06:30:08.500Z";
-  v = addVariable(nvafg, "x1", "Pose2", "TESTTAG;", time_z, 0, 1);
+  v = addVariable(nvafg, "x1", "RoME.Pose2", "TESTTAG;", time_z, 0, 1);
   printf("added variable id: %s\n", v);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
@@ -79,7 +79,7 @@ int main(void) {
   f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
   const char* fid2 = addFactor(
       nvafg,
-      "x1;x2;",
+      "x0;x1;",
       f2,
       "TESTTAG;", 
       "", 0, 
@@ -88,20 +88,22 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
   // before solving, lets start a SubscriptionManager to monitor for worker events
-  SubscriptionManager* nvasm = NULL;
-  nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+  // SubscriptionManager* nvasm = NULL;
+  // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
 
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Solving graph with action id: %s\n", wrkid);
   
-  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
-  printf("Graph was successful: %d\n", success);
+  // bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
+  // printf("Graph was successful: %d\n", success);
 
   // See the next example for retrieving variable values
   // Also see deleteFactor and deleteVariable
 
-  freeR(nvafg); freeR(nvasm); freeR(nvacl);
+  freeR(nvafg); 
+  // freeR(nvasm); 
+  freeR(nvacl);
   printf("All done.\n");
   return 0;
 }

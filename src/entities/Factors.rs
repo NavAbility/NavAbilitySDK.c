@@ -14,14 +14,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[allow(non_snake_case)]
 pub struct FunctionData { // FIXME FunctionNodeData
-  pub eliminated:  Option<bool>,
-  pub potialused: Option<bool>,
-  pub edgeIDs: Option<Vec<i64>>,
+  pub eliminated:  bool,
+  pub potentialused: bool,
+  pub edgeIDs: Vec<i64>,
   pub fnc: String,
   pub multihypo: Vec<f64>,
-  pub certainhypo: Option<Vec<i64>>,
+  pub certainhypo: Vec<i64>,
   pub nullhypo: f64,
-  pub solveInProgress: Option<i64>,
+  pub solveInProgress: i64,
   pub inflation: f64
 }
 
@@ -48,6 +48,7 @@ pub struct FactorDFG<F> {
 pub trait FactorType<'a, D: crate::Distribution<'a>> {  // Should Distributions -> SampleableBelief?
   fn new(Z: D) -> Self;
   fn type_str(&self) -> String;
+  fn pack(&self) -> String;
 }
 
 
