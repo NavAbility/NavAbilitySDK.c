@@ -88,21 +88,22 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
   // before solving, lets start a SubscriptionManager to monitor for worker events
-  // SubscriptionManager* nvasm = NULL;
-  // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+  SubscriptionManager* nvasm = NULL;
+  nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+  printf("FFI future works\n");
 
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Solving graph with action id: %s\n", wrkid);
   
-  // bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
-  // printf("Graph was successful: %d\n", success);
+  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
+  printf("Graph was successful: %d\n", success);
+  freeR(nvasm); 
 
   // See the next example for retrieving variable values
   // Also see deleteFactor and deleteVariable
 
   freeR(nvafg); 
-  // freeR(nvasm); 
   freeR(nvacl);
   printf("All done.\n");
   return 0;
