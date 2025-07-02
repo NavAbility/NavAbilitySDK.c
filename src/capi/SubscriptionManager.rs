@@ -37,8 +37,9 @@ pub struct SubscriptionManagerII {
 
 
 pub struct Tuple {
-  pub smi:  Box<SubscriptionManagerI>,
-  pub smii: Box<SubscriptionManagerII>,
+  pub smi:  Option<Box<SubscriptionManagerI>>,
+  pub smii: Option<Box<SubscriptionManagerII>>,
+  pub nvasm: Option<Box<SubscriptionManager>>,
 }
 
 // use std::convert::From;
@@ -81,8 +82,9 @@ fn new_SubsChannels() -> *mut Tuple {
   };
 
   let tup = Tuple {
-    smi: Box::new(smi),
-    smii: Box::new(smii),
+    smi:  Some(Box::new(smi)),
+    smii: Some(Box::new(smii)),
+    nvasm: None, // will be set later
   };
 
   return Box::into_raw(Box::new(tup));
@@ -111,9 +113,9 @@ fn assign_SubscriptionManager(
   //   blocking_into,
   // };
 
-  let tup = Box::from_raw(tup_.unwrap()); // take ownership of the Tuple
+  let tup = Box::from_raw(tup_.unwrap());
 
-  let smii = tup.smii; // take ownership of the SubscriptionManagerII
+  let smii = (tup.smii.unwrap()); // take ownership of the SubscriptionManagerII
 
   let nvasm = SubscriptionManager::from_parts(_nvacl.unwrap(), size, smii.nonblocking_recv, smii.blocking_into);
 
