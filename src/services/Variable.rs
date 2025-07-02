@@ -3,7 +3,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature="wasm", feature = "blocking"))]
 use crate::{
     parse_str_utc, 
     Uuid,
@@ -21,7 +21,9 @@ use crate::{
     SDK_VERSION,
 };
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     Error,     
     Sender, 
@@ -101,7 +103,7 @@ impl MeanMaxPPE {
         }
     }
 
-    #[cfg(any(feature = "tokio", feature = "blocking"))]
+    #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
     pub fn from_gql(
         ppe: &ppe_fields // FIXME refac to trait similar to BlobEntry_fields
     ) -> Self {
@@ -179,7 +181,7 @@ impl VariableDFG {
         }
     }
 
-    #[cfg(any(feature = "tokio", feature = "blocking"))]
+    #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
     pub fn from_gql(
         vgql: &get_variable::GetVariableVariables
     ) -> Self {
@@ -278,7 +280,7 @@ impl PackedVariableNodeData {
         }
     }
 
-    #[cfg(any(feature = "tokio", feature = "blocking"))]
+    #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
     pub fn from_gql(
         vndgql: &get_variable::solverdata_fields
     ) -> Self {
@@ -326,8 +328,8 @@ pub fn getPPEMean(
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn getPPECov(
-    vari: &VariableDFG,
-    solveKey: &str
+    _vari: &VariableDFG,
+    _solveKey: &str
 ) -> Vec<f64> {
 
     todo!("getPPECov, TODO extract from solverData.val -- see JuliaRobotics/DistributedFactorGraphs.jl#535");
@@ -336,13 +338,13 @@ pub fn getPPECov(
     //         return ppe.cov.clone();
     //     }
     // }
-    return Vec::new();
+    // return Vec::new();
 }
 
 
 // ===================== Queries =========================
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_variable(
     nvafg: &NavAbilityDFG,
     label: &str,
@@ -400,7 +402,7 @@ pub fn getVariable(
 
 // TODO get better function signature
 // #[allow(non_snake_case)]
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_list_variables(
     nvafg: &NavAbilityDFG,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -432,7 +434,7 @@ pub async fn post_list_variables(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn send_list_variables(
     send_into: Sender<Vec<String>>,
     nvafg: &NavAbilityDFG,
@@ -470,7 +472,7 @@ pub fn listVariables(
 pub fn to_string_ISO8601(
     dt: chrono::DateTime<Utc>
 ) -> String{
-    let mut timestamp = dt.to_string()
+    let timestamp = dt.to_string()
     .replace(" UTC","")
     .replace("UTC","")
     .replace("Z","")
@@ -485,7 +487,7 @@ pub fn to_string_ISO8601(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_variable(
     nvafg: &NavAbilityDFG,
     label: &String,
@@ -542,7 +544,7 @@ pub async fn post_add_variable(
 }
 
 
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn add_variable_send(
     send_into: std::sync::mpsc::Sender<Uuid>,
     nvafg: &NavAbilityDFG,

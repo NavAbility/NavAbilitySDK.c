@@ -1,22 +1,22 @@
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Uuid,
   Utc,
   Sender,
-  Agent,
+  // Agent,
   Error,
   GraphQLQuery,
   NavAbilityClient,
-  GetLabel,
+  // GetLabel,
   NvaNode,
   Factorgraph,
   post_to_nvaapi,
   send_api_result,
   parse_str_utc,
-  to_console_debug,
+  // to_console_debug,
   to_console_error,
   ListGraphs,
   list_graphs,
@@ -30,15 +30,15 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_factorgraphs::graph_fields_skeleton as GGs_GraphFieldsSkeleton;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Graph_importers_skeleton!(GGs_GraphFieldsSkeleton);
 
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl NvaNode<Factorgraph> {
   pub fn from_gql_skeleton(
     gql: &impl GraphFieldImportersSkeleton,
@@ -54,7 +54,7 @@ impl NvaNode<Factorgraph> {
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_list_graphs(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -85,7 +85,7 @@ pub async fn post_list_graphs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio"))] // feature = "thread", 
 pub fn q_listGraphs(
   send_into: Sender<Vec<String>>, 
   nvacl: &NavAbilityClient,
@@ -114,7 +114,7 @@ pub fn q_listGraphs(
   });
 }
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn listGraphs(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -122,7 +122,7 @@ pub fn listGraphs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_factorgraphs(
   nvacl: &NavAbilityClient,
   label_contains: String
@@ -156,7 +156,7 @@ pub async fn post_get_factorgraphs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] 
+#[cfg(any(feature = "tokio"))] // , feature = "thread" 
 pub fn q_getFactorgraphs(
   send_into: Sender<Vec<NvaNode<Factorgraph>>>, 
   nvacl: &NavAbilityClient,
@@ -190,7 +190,7 @@ pub fn q_getFactorgraphs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn getFactorgraphs(
   nvacl: &NavAbilityClient,
   label_contains: String,
@@ -200,7 +200,7 @@ pub fn getFactorgraphs(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_factorgraph(
   nvacl: &NavAbilityClient,
   label: &str,
@@ -231,7 +231,7 @@ pub async fn post_add_factorgraph(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn add_factorgraph_send(
   send_into: std::sync::mpsc::Sender<crate::add_factorgraph::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -268,7 +268,7 @@ pub fn addFactorgraph(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_graph_entry(
   nvacl: &NavAbilityClient,
   fg_label: &String,
@@ -322,7 +322,7 @@ pub async fn post_add_graph_entry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_connect_graph_agent(
   nvacl: &NavAbilityClient,
   graph: &str,
@@ -351,7 +351,7 @@ pub async fn post_connect_graph_agent(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn connectAgentGraph(
   nvacl: &NavAbilityClient,
   graph: &str,
@@ -368,7 +368,7 @@ pub fn connectAgentGraph(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_find_org_model_fgs(
   nvacl: &NavAbilityClient,
   model_label_contains: Option<String>,
@@ -397,7 +397,7 @@ pub async fn post_find_org_model_fgs(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn find_org_model_fgs_send(
   send_into: std::sync::mpsc::Sender<crate::find_org_model_graphs::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,

@@ -1,13 +1,17 @@
 
-
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 use reqwest_eventsource::{
   EventSource,
   Event,
 };
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 use url::form_urlencoded;
 
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 use futures::stream::StreamExt;
 
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 use std::{
   sync::mpsc::{
     Sender, 
@@ -21,11 +25,10 @@ use std::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
   Uuid,
   GraphQLQuery,
-  QueryBody,
   NavAbilityClient,
   to_console_debug, 
   to_console_error,
@@ -43,7 +46,7 @@ pub enum WorkerStatusEnum {
 /// Manages subscription events from NavAbilityClient subscriptions
 /// SPECIAL NOTE1, can use standalone Self::subscription_listener(_)
 /// SPECIAL_NOTE2, both non-blocking and blocking interfaces are provided (for wasm or tokio)
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 pub struct SubscriptionManager {
   /// Keep track of work requests / events by their UUID
   events: BTreeMap<Uuid, Option<crate::default_subscription::ResponseData>>,
@@ -58,30 +61,61 @@ pub struct SubscriptionManager {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
 impl SubscriptionManager {
   /// Create a new SubscriptionManager, starts a subscription listener that sends events into an internal channel
-  pub fn new(
+  pub fn from_parts(
     nvacl: &NavAbilityClient,
     size: usize,
+    nonblocking_recv: Receiver<crate::default_subscription::ResponseData>,
+    blocking_into: Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
   ) -> Self {
-    // common channel for received subscription events (fullied by polling)
-    let (nonblocking_into, nonblocking_recv) = channel();
-    // specific user request channel for setting up direct (blocking) notifications per user Uuid
-    let (blocking_into, blocking_recv) = channel();
 
-    Self::subscription_listener(
-      nonblocking_into,
-      nvacl,
-      blocking_recv,
-    );
-    return Self {
+    let nvasm = Self {
       events: BTreeMap::new(),
       sse_history: Vec::new(),
       size,
       nonblocking_recv,
       blocking_into,
     };
+
+    return nvasm;
+  }
+
+  pub fn new_channels(
+  ) -> (
+    (
+      Sender<crate::default_subscription::ResponseData>,
+      Receiver<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+    ),(
+      Receiver<crate::default_subscription::ResponseData>,
+      Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+    )
+  ) {
+    // common channel for received subscription events (fullied by polling)
+    let (nonblocking_into, nonblocking_recv) = channel();
+    // specific user request channel for setting up direct (blocking) notifications per user Uuid
+    let (blocking_into, blocking_recv) = channel();
+
+    ((nonblocking_into, blocking_recv), (nonblocking_recv, blocking_into))
+  }
+
+  pub fn new(
+    nvacl: &NavAbilityClient,
+    size: usize,
+  ) -> Self {
+    // create the channels for non-blocking and blocking interfaces
+    let ((nonblocking_into, blocking_recv), (nonblocking_recv, blocking_into)) = Self::new_channels();
+
+    let nvasm = Self::from_parts(nvacl, size, nonblocking_recv, blocking_into);
+
+    Self::subscription_listener(
+      nonblocking_into,
+      nvacl,
+      blocking_recv,
+    );
+
+    return nvasm;
   }
 
 
@@ -179,8 +213,8 @@ impl SubscriptionManager {
     id: &Uuid
   ) -> WorkerStatusEnum {
     // if Some(true/false)=>trackable ELSE None=>something else is wrong
-    if let Some(Status) = self.has_status(id) {
-      if !Status {
+    if let Some(status) = self.has_status(id) {
+      if !status {
         return WorkerStatusEnum::Pending;
       }
       if let Some(req_data_) = self.events.get(id).as_ref() {
@@ -259,7 +293,7 @@ impl SubscriptionManager {
 
   /// Start a subscription listener that sends received events into the provided channel
   /// DOES NOT REQUIRE a SubscriptionManager instance, can be used as standalone function
-  #[cfg(any(feature = "tokio", feature = "wasm"))]
+  #[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
   pub fn subscription_listener(
       nonblocking_into: Sender<crate::default_subscription::ResponseData>,
       nvacl: &NavAbilityClient,

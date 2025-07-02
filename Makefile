@@ -31,6 +31,10 @@ build-tokio:
 	cargo build -F tokio
 .PHONY: build-tokio
 
+build-thread: 
+	cargo build -F thread
+.PHONY: build-thread
+
 build-lib: generate-cbindgen-c
 
 $(NVA_API_SCHEMA_PATH):

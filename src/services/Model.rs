@@ -1,34 +1,41 @@
 
-use std::collections::HashMap;
+// use std::collections::HashMap;
 
 use chrono::DateTime;
-use log::Metadata;
+// use log::Metadata;
 
 use crate::{
-    Agent, BlobEntry, Utc, Uuid, Error
+    Agent, 
+    BlobEntry, 
+    Utc, 
+    Uuid,
 };
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+use crate::Error;
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use base64::{Engine as _, engine::general_purpose};
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     GraphQLQuery,
     QueryBody,
     NavAbilityClient,
-    NvaNode,
-    Factorgraph,
+    // NvaNode,
+    // Factorgraph,
     ListModels,
     GetModel,
     AddModel,
     ListModelsGraphs,
-    GetId,
+    // GetId,
     parse_str_utc,
-    to_console_debug,
+    // to_console_debug,
     to_console_error,
     post_to_nvaapi,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub fn list_models_query(
     model_label_contains: Option<&str>,
 ) -> QueryBody<crate::list_models::Variables> {
@@ -44,7 +51,7 @@ pub fn list_models_query(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_list_models(
     nvacl: &NavAbilityClient,
     model_label_contains: Option<&str>,
@@ -66,15 +73,16 @@ pub async fn post_list_models(
 
 
 
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     Graph_importers_skeleton,
     GraphFieldImportersSkeleton
 };
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_model::graph_fields_skeleton as GM_GraphFieldsSkeleton;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Graph_importers_skeleton!(GM_GraphFieldsSkeleton);
 
 
@@ -100,7 +108,7 @@ pub struct GetModelResponse {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl GetModelResponse {
     pub fn from_gql_summary(
         gmr: &crate::get_model::ResponseData
@@ -157,7 +165,7 @@ impl GetModelResponse {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_model(
     nvacl: &NavAbilityClient,
     model_label: &str,
@@ -181,7 +189,7 @@ pub async fn post_get_model(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn add_model_async(
     nvacl: &NavAbilityClient,
     model_label: &String,
@@ -213,7 +221,7 @@ pub async fn add_model_async(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub fn list_model_graphs_query(
     model_label: &str,
 ) -> QueryBody<crate::list_models_graphs::Variables> {
@@ -225,7 +233,7 @@ pub fn list_model_graphs_query(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_list_model_graphs(
     nvacl: NavAbilityClient,
     model_label: &str,

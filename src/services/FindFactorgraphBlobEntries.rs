@@ -1,39 +1,28 @@
 
 
-use std::{
-  error::Error,
-  sync::mpsc::Sender,
-};
-
-use graphql_client::GraphQLQuery;
-
-
-
-use chrono::{
-  Utc,
-  ParseError
-};
-use uuid::Uuid;
-
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
+  Error,
   BlobEntryFieldsImporters,
   BlobEntry_importers,
   FindFactorgraphBlobEntries,
+  GraphQLQuery,
+  Uuid,
   NavAbilityClient,
   BlobEntry,
-  parse_str_utc,
+  // parse_str_utc,
   to_console_error,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::find_factorgraph_blob_entries::blobEntry_fields as FG_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 BlobEntry_importers!(FG_BlobEntryFields);
 
 
-
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_find_factorgraph_blob_entries(
   nvacl: &NavAbilityClient,
   label: &str,
@@ -69,7 +58,7 @@ pub async fn post_find_factorgraph_blob_entries(
 
 #[cfg(target_arch = "wasm32")]
 pub async fn q_findFactorgraphBlobEntries(
-  send_into: Sender<Vec<BlobEntry>>, 
+  send_into: crate::Sender<Vec<BlobEntry>>, 
   nvacl: &NavAbilityClient,
   label: &str,
   bentry_lbl_contains: &str,

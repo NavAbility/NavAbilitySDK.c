@@ -1,22 +1,20 @@
 
-use crate::Uuid;
-use crate::to_console_error;
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+use crate::{
+    Uuid,
+    to_console_error,
+};
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::NavAbilityClient;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::Client;
-// #[cfg(any(feature = "tokio"))]
-// use reqwest::Client;
-// #[cfg(feature="blocking")]
-// use ::reqwest::blocking::Client;
-// #[cfg(feature="blocking")]
-// use graphql_client::reqwest::post_graphql_blocking;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(Debug,Clone)]
 #[allow(non_snake_case)]
+#[allow(dead_code)]
 pub struct FileUploader<T> {
     nvacl: NavAbilityClient,
     pub file: T, // assume read and seek are available
@@ -26,13 +24,13 @@ pub struct FileUploader<T> {
 }
 
 // TODO , feature = "blocking"
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[allow(non_snake_case)]
 impl<T> FileUploader<T> {
     pub fn new(
         nvacl: NavAbilityClient,
         file: T,
-        label: String,
+        _label: String,
         blobId: Uuid,
         chunk_size: Option<u64>,
     ) -> Self {

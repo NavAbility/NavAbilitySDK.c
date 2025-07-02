@@ -1,25 +1,23 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     // Utc,
     // Uuid,
-    Sender,
+    // Sender,
     GraphQLQuery,
     Response,
     Error,
     // SDK_VERSION,
     GetURS,
     get_urs,
-    to_console_debug,
     to_console_error,
 };
 
+#[cfg(feature = "wasm")]
+use crate::to_console_debug;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-use crate::{
-    NavAbilityClient,
-    check_deser,
-};
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+use crate::NavAbilityClient;
 
 
 #[cfg(feature = "blocking")]
@@ -45,7 +43,7 @@ pub fn get_robots_blocking(client: &NavAbilityClient) -> get_robots::ResponseDat
 
 #[cfg(feature = "blocking")]
 pub fn fetch_ur_list_blocking(
-    send_into: &mut Sender<Vec<get_robots::GetRobotsUsers>>, 
+    send_into: &mut crate::Sender<Vec<get_robots::GetRobotsUsers>>, 
     nvacl: &NavAbilityClient
 ) -> Result<(),Box<dyn Error>> {
 
@@ -61,7 +59,7 @@ pub fn fetch_ur_list_blocking(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn fetch_urs_async(
     nvacl: &NavAbilityClient,
     // robot_label: String,
@@ -93,10 +91,10 @@ pub async fn fetch_urs_async(
 
 #[cfg(feature = "wasm")]
 pub async fn fetch_context_web(
-    send_into: Sender<Vec<get_urs::GetUrsOrgs>>, 
+    send_into: crate::Sender<Vec<get_urs::GetUrsOrgs>>, 
     client: &NavAbilityClient,
-    robot_label: String,
-    session_label: String,
+    _robot_label: String,
+    _session_label: String,
 ) { // -> Vec<get_robots::GetRobotsUsers> {
     let result = fetch_urs_async(&client).await;
     // FIXME use new common query functions refactor .orgs part

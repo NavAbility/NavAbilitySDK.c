@@ -6,11 +6,12 @@ use crate::{
   SDK_VERSION
 };
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
-  chrono::ParseError, 
   get_variable, 
-  parse_str_utc, 
+  // parse_str_utc, 
   post_to_nvaapi,
   send_api_result,
   // to_console_debug, 
@@ -33,8 +34,8 @@ use crate::{
   AddModelBlobEntry,
 };
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   BlobEntrySummaryImporters,
   BlobEntry_importers_summary,
@@ -44,33 +45,33 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use get_blob_entry::blobEntry_fields as GB_BlobEntryFields;
 // duplication in blobEntry_fields GQL fragments in different queries
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers!(GB_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use get_variable::blobEntry_fields as GV_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers!(GV_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use get_agents::blobEntry_fields_summary as GAs_BlobEntrySummary;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers_summary!(GAs_BlobEntrySummary);
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_agent::blobEntry_fields_summary as GA_BlobEntrySummary;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers_summary!(GA_BlobEntrySummary);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_model::blobEntry_fields_summary as GM_BlobEntrySummary;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers_summary!(GM_BlobEntrySummary);
 
 
@@ -88,7 +89,7 @@ impl BlobEntry {
     return be
   }
   
-  #[cfg(any(feature = "tokio", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
   pub fn from_gql_summary(
     begql: &impl BlobEntrySummaryImporters,
   ) -> Self {
@@ -102,7 +103,7 @@ impl BlobEntry {
     return be;
   }
   
-  #[cfg(any(feature = "tokio", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
   pub fn from_gql(
     begql: &impl BlobEntryFieldsImporters,
   ) -> Self {
@@ -127,7 +128,7 @@ impl BlobEntry {
     return be;
   }
   
-  #[cfg(any(feature = "tokio", feature = "blocking"))]
+  #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
   pub fn try_from_receiver(
     rx: &std::sync::mpsc::Receiver<Vec<BlobEntry>>, //get_blob_entry::ResponseData>
   ) -> Option<Vec<Self>> {
@@ -147,7 +148,7 @@ impl BlobEntry {
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_blob_entry(
   nvacl: &NavAbilityClient,
   id: Uuid
@@ -193,7 +194,7 @@ pub async fn post_get_blob_entry(
 
 
 
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn get_blob_entry_send(
   send_into: std::sync::mpsc::Sender<Vec<BlobEntry>>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -208,7 +209,7 @@ pub async fn get_blob_entry_send(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_delete_blobentry(
   nvacl: &NavAbilityClient,
   id: Uuid,
@@ -232,7 +233,7 @@ pub async fn post_delete_blobentry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn delete_blobentry_send(
   send_into: std::sync::mpsc::Sender<delete_blob_entry::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -245,7 +246,7 @@ pub async fn delete_blobentry_send(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 #[allow(non_snake_case)]
 pub fn deleteBlobEntry(
   nvacl: &NavAbilityClient,
@@ -258,7 +259,7 @@ pub fn deleteBlobEntry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_update_blobentry_metadata(
   nvacl: &NavAbilityClient,
   id: &Uuid,
@@ -286,7 +287,7 @@ pub async fn post_update_blobentry_metadata(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_agent_entry(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -349,7 +350,7 @@ pub async fn post_add_agent_entry(
 // };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub async fn q_addAgentBlobEntry(
   send_into: std::sync::mpsc::Sender<String>,
   nvacl: &NavAbilityClient,
@@ -369,7 +370,7 @@ pub async fn q_addAgentBlobEntry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn addAgentBlobEntry(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -385,7 +386,7 @@ pub fn addAgentBlobEntry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_model_blobentry(
     nvacl: &NavAbilityClient,
     model_label: &String,
@@ -436,7 +437,7 @@ pub async fn post_add_model_blobentry(
 
 
 // FIXME return Uuid (not string)
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_variable_blobentry(
   nvafg: &NavAbilityDFG,
   variable_lbl: &String,
@@ -490,7 +491,7 @@ pub async fn post_add_variable_blobentry(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub async fn q_addVariableBlobEntry(
   send_into: std::sync::mpsc::Sender<Uuid>,
   nvafg: &NavAbilityDFG,
@@ -509,7 +510,7 @@ pub async fn q_addVariableBlobEntry(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn addVariableBlobEntry(
   nvafg: &NavAbilityDFG,
   variable_label: &String,

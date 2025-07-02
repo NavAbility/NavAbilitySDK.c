@@ -1,10 +1,10 @@
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use std::collections::HashMap;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Uuid,
   Utc,
@@ -37,33 +37,33 @@ use crate::{
 
 // ===================== HELPERS ========================
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_agents::agent_fields_summary as GAs_AgentFieldsSummary;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Agent_importers_summary!(GAs_AgentFieldsSummary);
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_agents::agent_fields_full as GAs_AgentFieldsFull;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Agent_importers_full!(GAs_AgentFieldsFull);
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_agent::agent_fields_summary as GA_AgentFieldsSummary;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Agent_importers_summary!(GA_AgentFieldsSummary);
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_agent::agent_fields_full as GA_AgentFieldsFull;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Agent_importers_full!(GA_AgentFieldsFull);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::get_model::agent_fields_summary as GM_AgentFieldsSummary;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 Agent_importers_summary!(GM_AgentFieldsSummary);
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl Agent {
   pub fn from_gql_summary(
     aggql: &impl AgentFieldImportersSummary,
@@ -96,7 +96,7 @@ impl Agent {
 // ===================== QUERIES ========================
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_list_agents(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -129,7 +129,7 @@ pub async fn post_list_agents(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn listAgents(
   nvacl: &NavAbilityClient,
 ) -> Result<Vec<String>, Box<dyn Error>> {
@@ -137,7 +137,7 @@ pub fn listAgents(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn q_listAgents(
   send_into: Sender<Vec<String>>, 
   nvacl: &NavAbilityClient,
@@ -168,8 +168,7 @@ pub fn q_listAgents(
 
 
 
-
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_agents(
   nvacl: &NavAbilityClient,
   label_contains: String
@@ -205,7 +204,7 @@ pub async fn post_get_agents(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] 
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn q_getAgents(
   send_into: Sender<Vec<Agent>>, 
   nvacl: &NavAbilityClient,
@@ -238,7 +237,7 @@ pub fn q_getAgents(
 // }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn getAgents(
   nvacl: &NavAbilityClient,
   label_contains: String,
@@ -248,7 +247,7 @@ pub fn getAgents(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_agent(
   nvacl: &NavAbilityClient,
   agent_label: Option<&str>
@@ -292,7 +291,7 @@ pub async fn post_get_agent(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_agent(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -323,7 +322,7 @@ pub async fn post_add_agent(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio"))] // feature = "thread", 
 pub fn q_addAgent(
   send_into: Sender<add_agent::ResponseData>, 
   nvacl: &NavAbilityClient,
@@ -356,7 +355,7 @@ pub fn q_addAgent(
   });
 }
 
-#[cfg(feature = "tokio")]
+#[cfg(feature = "tokio")] // , feature = "thread"
 #[allow(non_snake_case)]
 pub fn addAgent(
   nvacl: &NavAbilityClient,  
@@ -374,7 +373,7 @@ pub fn addAgent(
 
 
 // FIXME parse result to Vec<Agent> with metadata and Vec<BlobEntry_summary> populated
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_agent_entries_metadata(
   nvacl: &NavAbilityClient,
   agent_label: String,
@@ -407,7 +406,7 @@ pub async fn post_get_agent_entries_metadata(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn get_agent_entries_metadata_send(
   send_into: Sender<get_agent_entries_metadata::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -429,7 +428,7 @@ pub async fn get_agent_entries_metadata_send(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_update_agent_metadata(
   nvacl: &NavAbilityClient,
   agent_label: &String,
@@ -457,7 +456,7 @@ pub async fn post_update_agent_metadata(
 }
 
 
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn update_agent_metadata_send(
   send_into: std::sync::mpsc::Sender<String>,
   nvacl: &NavAbilityClient,

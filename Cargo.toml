@@ -32,7 +32,7 @@ futures = "^0.3"
 
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tokio = { version = "^1.40", default-features = false, optional=true}
+tokio = { version = "^1.40", optional=true, default-features = false, features = ["rt-multi-thread",] }
 tracing = "^0.1"
 ffi-convert = { version="^0.6", optional=true }
 libc = { version = "^0.2", default-features = false, optional=true}
@@ -46,8 +46,8 @@ graphql_client_cli = "^0.14"
 
 [features]
 tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
+thread = ["dep:reqwest"]
 blocking = ["graphql_client/reqwest","graphql_client/reqwest-blocking"]
-thread = []
 
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]

@@ -1,10 +1,4 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-use std::{
-  sync::mpsc::Sender,
-  error::Error,
-  // any::type_name
-};
 
 use serde::Serialize;
 use uuid::Uuid;
@@ -15,24 +9,25 @@ use chrono::{
 };
 
 use base64::{
-  // alphabet,
   engine::general_purpose,
   Engine as _,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
+  Error,
   to_console_error,
-  // type_of,
   GraphQLQuery,
   GetId,
   AddFactors,
   add_factors,
-  send_api_result,
   SDK_VERSION,
   common_traits::GetLabel,
 };
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+use crate::send_api_result;
 
 use crate::{
   entities::Distributions::Distribution, 
@@ -49,7 +44,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::entities::ClientDFG::NavAbilityDFG;
 
 
@@ -268,17 +263,18 @@ struct ManualFacVarFieldInput {
 }
 
 impl ManualFacVarFieldInput {
+  #[allow(dead_code)]
   pub fn to_json(&self) -> String {
     serde_json::to_string(&self).unwrap().to_string()
   }
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
-) -> Result<Uuid, Box<dyn crate::Error>> {
+) -> Result<Uuid, Box<dyn Error>> {
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
 
@@ -352,18 +348,26 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(feature = "tokio")]
 pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
-) -> Result<Uuid, Box<dyn Error>> {
+) -> Result<
+    Uuid, Box<dyn Error>> {
   return crate::execute(post_add_factor(nvafg, factor));
 }
+// #[cfg(feature = "thread")]
+// pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
+//   nvafg: &NavAbilityDFG,
+//   factor: FactorDFG<F>,
+// ) -> Result<
+//     Uuid, Box<dyn Error + Send + Sync>> {
+//   return crate::execute(post_add_factor(nvafg, factor));
+// }
 
-
-#[cfg(any(feature = "tokio", feature = "thread"))] // feature = "thread", 
+#[cfg(any(feature = "tokio"))] // feature = "thread", 
 pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
-  send_into: Sender<Uuid>, 
+  send_into: crate::Sender<Uuid>, 
   nvafg: NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<(), Box<dyn Error>> {
