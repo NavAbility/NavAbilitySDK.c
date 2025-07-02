@@ -29,12 +29,17 @@ pub struct SubscriptionManagerI {
   pub nonblocking_into: Sender<crate::default_subscription::ResponseData>,
 }
 
-#[repr(C)]
+// #[repr(C)]
 pub struct SubscriptionManagerII {
   pub nonblocking_recv: Receiver<crate::default_subscription::ResponseData>,
   pub blocking_into: Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
 }
 
+
+pub struct Tuple {
+  pub smi:  Box<SubscriptionManagerI>,
+  pub smii: Box<SubscriptionManagerII>,
+}
 
 // use std::convert::From;
 
@@ -61,16 +66,26 @@ pub struct SubscriptionManagerII {
 // ref. https://doc.rust-lang.org/std/boxed/
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn new_SubsChannels() -> *mut SubscriptionManagerII {
+fn new_SubsChannels() -> *mut Tuple {
     // create the channels for non-blocking and blocking interfaces
   let ((nonblocking_into, blocking_recv), (nonblocking_recv, blocking_into)) = SubscriptionManager::new_channels();
+
+  let smi = SubscriptionManagerI {
+    blocking_recv,
+    nonblocking_into,
+  };
 
   let smii = SubscriptionManagerII {
     nonblocking_recv,
     blocking_into,
   };
 
-  return Box::into_raw(Box::new(smii));
+  let tup = Tuple {
+    smi: Box::new(smi),
+    smii: Box::new(smii),
+  };
+
+  return Box::into_raw(Box::new(tup));
 }
 
 
@@ -81,7 +96,7 @@ fn new_SubsChannels() -> *mut SubscriptionManagerII {
 fn assign_SubscriptionManager(
   _nvacl: Option<&NavAbilityClient>,
   size: usize,
-  smii_: Option<&mut SubscriptionManagerII>,
+  tup_: Option<&mut Tuple>,
 ) -> Option<Box<SubscriptionManager>> {
   if _nvacl.is_none() {
     to_console_error("new_SubscriptionManager: provided for *NavAbilityClient is NULL/None");
@@ -95,7 +110,10 @@ fn assign_SubscriptionManager(
   //   nonblocking_recv,
   //   blocking_into,
   // };
-  let smii = Box::from_raw(smii_.unwrap()); // take ownership of the SubscriptionManagerII
+
+  let tup = Box::from_raw(tup_.unwrap()); // take ownership of the Tuple
+
+  let smii = tup.smii; // take ownership of the SubscriptionManagerII
 
   let nvasm = SubscriptionManager::from_parts(_nvacl.unwrap(), size, smii.nonblocking_recv, smii.blocking_into);
 

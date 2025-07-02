@@ -146,14 +146,14 @@ int main(void) {
   //     return 1;
   // }
 
-  SubscriptionManagerII* smii = NULL;
-  smii = new_SubsChannels();
+  Tuple* tup = NULL;
+  tup = new_SubsChannels();
 
   // Initialize the SubscriptionManager with the NavAbilityClient
   SubscriptionManager* nvasm = NULL;
   // SubscriptionManagerStart* nvsms = NULL;
   // pthread_mutex_lock(&input->mutex);
-  nvasm = assign_SubscriptionManager(nvacl, 64, smii); // keep up to 64 events in the manager
+  nvasm = assign_SubscriptionManager(nvacl, 64, tup); // keep up to 64 events in the manager
   // nvasm = get_nvasm(nvsms); // get the SubscriptionManager from the start struct
   
   // Wait for the thread to initialize the SubscriptionManager
