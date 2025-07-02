@@ -99,10 +99,12 @@ fn assign_SubscriptionManager(
   _nvacl: Option<&NavAbilityClient>,
   size: usize,
   tup_: Option<&mut Tuple>,
-) -> Option<Box<SubscriptionManager>> {
+) -> *mut Tuple {
   if _nvacl.is_none() {
-    to_console_error("new_SubscriptionManager: provided for *NavAbilityClient is NULL/None");
-    return None;
+    let msg = "assign_SubscriptionManager: the provided for *NavAbilityClient is NULL/None".to_owned();
+    to_console_error(&msg);
+    panic!("{}", msg);
+    // return None;
   }
 
   // // create the channels for non-blocking and blocking interfaces
@@ -120,6 +122,12 @@ fn assign_SubscriptionManager(
   let nvasm = SubscriptionManager::from_parts(_nvacl.unwrap(), size, smii.nonblocking_recv, smii.blocking_into);
 
 
+  let tup2 = Tuple {
+    smi:  Some(tup.smi.unwrap()), // keep the SubscriptionManagerI
+    smii: None, // we no longer need this
+    nvasm: Some(Box::new(nvasm)), // set the SubscriptionManager we just created
+  };
+
   // *nvasm = nvasm_;
 
   // SubscriptionManager::subscription_listener(
@@ -128,7 +136,8 @@ fn assign_SubscriptionManager(
   //   blocking_recv,
   // );
 
-  return Some(Box::new(nvasm));
+  return Box::into_raw(Box::new(tup2));
+  // return Some(Box::new(nvasm));
 }
 
 

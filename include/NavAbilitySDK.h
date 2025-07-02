@@ -158,9 +158,9 @@ char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
                            const char *variable_label,
                            const struct BlobEntry *entry_);
 
-struct SubscriptionManager *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
-                                                       size_t size,
-                                                       struct Tuple *tup_);
+struct Tuple *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
+                                         size_t size,
+                                         struct Tuple *tup_);
 
 bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 

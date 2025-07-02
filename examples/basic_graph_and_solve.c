@@ -153,7 +153,7 @@ int main(void) {
   SubscriptionManager* nvasm = NULL;
   // SubscriptionManagerStart* nvsms = NULL;
   // pthread_mutex_lock(&input->mutex);
-  nvasm = assign_SubscriptionManager(nvacl, 64, tup); // keep up to 64 events in the manager
+  tup = assign_SubscriptionManager(nvacl, 64, tup); // keep up to 64 events in the manager
   // nvasm = get_nvasm(nvsms); // get the SubscriptionManager from the start struct
   
   // Wait for the thread to initialize the SubscriptionManager
