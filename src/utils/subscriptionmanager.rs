@@ -1,17 +1,17 @@
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 use reqwest_eventsource::{
   EventSource,
   Event,
 };
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 use url::form_urlencoded;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 use futures::stream::StreamExt;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 use std::{
   sync::mpsc::{
     Sender, 
@@ -25,7 +25,7 @@ use std::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Uuid,
   GraphQLQuery,
@@ -46,7 +46,7 @@ pub enum WorkerStatusEnum {
 /// Manages subscription events from NavAbilityClient subscriptions
 /// SPECIAL NOTE1, can use standalone Self::subscription_listener(_)
 /// SPECIAL_NOTE2, both non-blocking and blocking interfaces are provided (for wasm or tokio)
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub struct SubscriptionManager {
   /// Keep track of work requests / events by their UUID
   events: BTreeMap<Uuid, Option<crate::default_subscription::ResponseData>>,
@@ -61,7 +61,7 @@ pub struct SubscriptionManager {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 impl SubscriptionManager {
   /// Create a new SubscriptionManager, starts a subscription listener that sends events into an internal channel
   pub fn from_parts(
@@ -117,7 +117,6 @@ impl SubscriptionManager {
 
     return nvasm;
   }
-
 
   /// List all tracked UUIDs, returning a tuple of:
   /// (set of pending UUIDs, map of Status UUIDs to their status, map of unknown UUIDs to their status)
@@ -293,13 +292,15 @@ impl SubscriptionManager {
 
   /// Start a subscription listener that sends received events into the provided channel
   /// DOES NOT REQUIRE a SubscriptionManager instance, can be used as standalone function
-  #[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+  #[cfg(any(feature = "tokio", feature = "thread"))]
   pub fn subscription_listener(
       nonblocking_into: Sender<crate::default_subscription::ResponseData>,
       nvacl: &NavAbilityClient,
       blocking_recv: Receiver<(Uuid,Sender<crate::default_subscription::ResponseData>)>,
   ) {
     // NOTE couldn't use eventsource_reqwest for sse get requests -- missing header support
+
+    use crate::to_console_debug;
     let nvacl_e = NavAbilityClient::similar(
       nvacl,
       true
@@ -320,11 +321,15 @@ impl SubscriptionManager {
 
     // wasmbindgen limitation?  overcome +'static requirement
 
+    to_console_debug("Starting subscription handler...");
     // start a thread to run the async event loop monitoring the EventSource 
     // and send received eventes into the channel
     crate::execute(async move {
       let mut please_notify: BTreeMap<Uuid, Sender<crate::default_subscription::ResponseData>> = BTreeMap::new();
       while let Some(event) = nvaes.next().await {
+        use crate::to_console_debug;
+
+        to_console_debug("nvaes.next()");
         // pull any direct user request uuids
         match blocking_recv.try_recv() {
           Ok((uuid, sender)) => {
@@ -373,8 +378,10 @@ impl SubscriptionManager {
             to_console_error(&format!("Error: {}", err));
             nvaes.close();
           }
-        }
+        } // match event
+        to_console_debug("Processed an event from the EventSource");
       }
     });
+    to_console_debug("Subscription handler running...");
   }
 }

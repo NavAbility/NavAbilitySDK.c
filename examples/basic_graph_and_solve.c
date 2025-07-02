@@ -4,6 +4,52 @@
 #include <string.h>
 #include "NavAbilitySDK.h"
 
+#include <pthread.h>
+
+
+typedef struct _SSEThreadArgs {
+  NavAbilityClient* nvacl;
+  SubscriptionManager* nvasm;
+  pthread_mutex_t mutex;
+  pthread_cond_t condition;
+} SSEThreadArgs;
+
+void* thread_function(void* args) {
+    printf("Thread is running\n");
+    SSEThreadArgs* input = (SSEThreadArgs*)args;
+    NavAbilityClient* nvacl = (NavAbilityClient*)input->nvacl;
+    if (nvacl == NULL) {
+      printf("Error: NavAbilityClient is NULL\n");
+      return NULL;
+    }
+      // // Initialize the SubscriptionManager with the NavAbilityClient
+      // SubscriptionManager* nvasm = NULL;
+      // SubscriptionManagerStart* nvsms = NULL;
+      // // pthread_mutex_lock(&input->mutex);
+      // nvsms = assign_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+      // if (nvasm == NULL) {
+      //     printf("Error: Failed to create SubscriptionManager\n");
+      //     return NULL;
+      // }
+      // input->nvasm = nvasm;
+    // pthread_cond_signal(&input->condition); // Signal the waiting thread that the SubscriptionManager is ready
+    // pthread_mutex_unlock(&input->mutex);
+    printf("SubscriptionManager created successfully\n");
+    return NULL;
+}
+
+void* waiting_thread(void* arg) {
+    SSEThreadArgs* args = (SSEThreadArgs*)arg;
+    pthread_mutex_t mutex = args->mutex;
+    pthread_cond_t condition = args->condition;
+    pthread_mutex_lock(&mutex);
+    printf("Waiting for condition variable...\n");
+    pthread_cond_wait(&condition, &mutex);
+    pthread_mutex_unlock(&mutex);
+    printf("Condition variable signaled, thread proceeding\n");
+    return NULL;
+}
+
 
 // Sample library usage.
 int main(void) {
@@ -88,17 +134,47 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
   // before solving, lets start a SubscriptionManager to monitor for worker events
+  SSEThreadArgs args;
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
+  args.nvacl = nvacl;
+  args.nvasm = NULL; // will be set in the thread/
+  pthread_t thread;
+  // int result = pthread_create(&thread, NULL, thread_function, (void*)&args);
+  // if (result != 0) {
+  //     printf("SSE thread creation failed\n");
+  //     return 1;
+  // }
+
+  SubscriptionManagerII* smii = NULL;
+  smii = new_SubsChannels();
+
+  // Initialize the SubscriptionManager with the NavAbilityClient
   SubscriptionManager* nvasm = NULL;
-  nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
-  printf("FFI future works\n");
+  // SubscriptionManagerStart* nvsms = NULL;
+  // pthread_mutex_lock(&input->mutex);
+  nvasm = assign_SubscriptionManager(nvacl, 64, smii); // keep up to 64 events in the manager
+  // nvasm = get_nvasm(nvsms); // get the SubscriptionManager from the start struct
+  
+  // Wait for the thread to initialize the SubscriptionManager
+  // waiting_thread((void*)&args); // wait for the thread to signal
+  sleep(1); // sleep for a second to allow the thread to initialize the SubscriptionManager
+  if (nvasm == NULL) {
+      printf("Error: Main thread not seeing SubscriptionManager\n");
+  }
+
+  // SubscriptionManager* nvasm = NULL;
+  // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+  printf("After waiting -- FFI works\n");
 
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x1");
-  printf("Solving graph with action id: %s\n", wrkid);
+  printf("Blocking on solve graph, action id: %s\n", wrkid);
   
-  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
-  printf("Graph was successful: %d\n", success);
-  freeR(nvasm); 
+  // bool success = block_on(args.nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
+  // printf("Graph was successful: %d\n", success);
+  pthread_join(thread, NULL);
+  // freeR(nvasm); 
 
   // See the next example for retrieving variable values
   // Also see deleteFactor and deleteVariable
