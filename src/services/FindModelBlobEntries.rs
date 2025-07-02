@@ -1,45 +1,39 @@
 
 
-use std::{
-  error::Error,
-  sync::mpsc::Sender,
-};
 
-use chrono::{
-  Utc,
-  ParseError
-};
-use uuid::Uuid;
-
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
+  Uuid,
   GraphQLQuery,
-  to_console_debug, 
+  // to_console_debug, 
   to_console_error, 
-  GetLabel, 
+  // GetLabel, 
   NavAbilityClient,
-  services::Blob,
+  // services::Blob,
   BlobEntry,
-  parse_str_utc,
+  // parse_str_utc,
   FindModelBlobEntries,
+  // Sender,
+  Error,
   // find_model_blob_entries,
 };
 
 
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
   BlobEntryFieldsImporters,
   BlobEntry_importers,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::find_model_blob_entries::blobEntry_fields as FM_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 BlobEntry_importers!(FM_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_find_model_blob_entries(
   nvacl: &NavAbilityClient,
   model_label: &str,
@@ -51,7 +45,7 @@ pub async fn post_find_model_blob_entries(
     be_label_contains: Some(bentry_lbl_contains.to_string()),
   };
   
-  let request_body = crate::FindModelBlobEntries::build_query(variables);
+  let request_body = FindModelBlobEntries::build_query(variables);
   
   return crate::post_to_nvaapi::<
     crate::find_model_blob_entries::Variables,
@@ -77,7 +71,7 @@ pub async fn post_find_model_blob_entries(
 // initially used for wasm only, maybe relax for native, see SDK.rs for non-wasm examples
 #[cfg(target_arch = "wasm32")]
 pub fn q_findModelBlobEntries(
-  send_into: Sender<Vec<BlobEntry>>, 
+  send_into: crate::Sender<Vec<BlobEntry>>, 
   nvacl: &NavAbilityClient,
   model_label: &str,
   bentry_lbl_contains: &str,

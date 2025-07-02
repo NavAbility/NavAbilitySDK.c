@@ -1,19 +1,19 @@
 
 use uuid::Uuid;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
   Error,
   GraphQLQuery,
   NavAbilityClient,
   post_to_nvaapi,
-  to_console_debug,
-  to_console_error,
-  parse_str_utc,
+  // to_console_debug,
+  // to_console_error,
+  // parse_str_utc,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_connect_graph_model(
   nvacl: &NavAbilityClient,
   graph: &str,

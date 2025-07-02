@@ -1,22 +1,22 @@
 
 use serde::Serialize;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use base64::{
   Engine as _, 
   engine::general_purpose, 
-  read
-  // alphabet
+  // read,
+  // alphabet,
 };
 
 // use std::os::linux::raw;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Utc,
   Uuid,
   GraphQLQuery,
-  Response,
+  // Response,
   Error,
   Sender,
   // SDK_VERSION,
@@ -38,7 +38,7 @@ use crate::{
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_create_download(
   nvacl: &NavAbilityClient,
   blob_id: Uuid,
@@ -66,7 +66,7 @@ pub async fn post_create_download(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn q_createDownload(
   send_into: Sender<create_download::ResponseData>, 
   nvacl: &NavAbilityClient,
@@ -91,7 +91,7 @@ pub fn q_createDownload(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_create_upload(
   nvacl: NavAbilityClient,
   // filename: String,
@@ -121,12 +121,12 @@ pub async fn post_create_upload(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn q_createUpload(
   send_into: Sender<create_upload::ResponseData>, 
   nvacl: &NavAbilityClient,
-  filename: &String,
-  blob_size: i64,
+  _filename: &String,
+  _blob_size: i64,
   nparts: Option<i64>,
   blob_id: Option<Uuid>, // doenst work yet, leave None
 ) -> Result<(), Box<dyn Error>> {
@@ -145,8 +145,8 @@ pub fn q_createUpload(
 pub fn q_createUpload(
   send_into: Sender<create_upload::ResponseData>, 
   nvacl: &NavAbilityClient,
-  filename: &String,
-  blob_size: i64,
+  _filename: &String,
+  _blob_size: i64,
   nparts: Option<i64>,
   blob_id: Option<Uuid>, // doenst work yet, leave None
 ) {
@@ -171,7 +171,7 @@ pub fn q_createUpload(
 
 
 // TODO update to new query/mutation pattern
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_complete_upload(
   nvacl: NavAbilityClient,
   blob_id: Uuid,
@@ -219,14 +219,14 @@ pub async fn post_complete_upload(
 
 
 // TODO , feature = "blocking"
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[allow(non_snake_case)]
 pub async fn post_blob_singlepart(
   nvabs: &NavAbilityBlobStore,
   blobId: Uuid,
   filename: &str,
   file_mime: &str,
-  file_timestamp: Option<&chrono::DateTime<Utc>>,
+  _file_timestamp: Option<&chrono::DateTime<Utc>>,
   file_bytes: std::sync::Arc<[u8]>,
 ) -> Result<(), Box<dyn Error>> {
   let _nvacl = &nvabs.client;
@@ -290,14 +290,14 @@ struct PostOnPrem {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[allow(non_snake_case)]
 pub async fn post_blob_onprem(
   nvabs: &NavAbilityBlobStore,
   blobId: Uuid,
-  filename: &str,
-  file_mime: &str,
-  file_timestamp: Option<&chrono::DateTime<Utc>>,
+  _filename: &str,
+  _file_mime: &str,
+  _file_timestamp: Option<&chrono::DateTime<Utc>>,
   file_bytes: std::sync::Arc<[u8]>,
 ) -> Result<(), Box<dyn Error>> {
 
@@ -338,7 +338,7 @@ pub async fn post_blob_onprem(
 
 
 // TODO , feature = "blocking"
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[allow(non_snake_case)]
 pub async fn post_blob_store(
   nvabs: &NavAbilityBlobStore,
@@ -373,7 +373,7 @@ pub async fn post_blob_store(
 }
 
 // TODO , feature = "blocking"
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 #[allow(non_snake_case)]
 pub fn addBlob(
   nvabs: NavAbilityBlobStore,
@@ -407,7 +407,7 @@ pub fn addBlob(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_delete_blob(
   nvacl: &NavAbilityClient,
   blob_id: Uuid,
@@ -440,7 +440,7 @@ pub async fn post_delete_blob(
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn delete_blob_send(
   send_into: std::sync::mpsc::Sender<delete_blob::ResponseData>,
   nvacl: &NavAbilityClient,
@@ -483,7 +483,7 @@ pub fn deleteBlob(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn download_blob(
   // nvacl: &NavAbilityClient,
   url: String
@@ -506,11 +506,12 @@ pub async fn download_blob(
     .send()
     .await;
     if let Err(ref re) = req_res {
-      to_console_error(&format!("Error in download request from NavAbilityBlobStore: {:?}", re));
+      let msg = format!("Error in download request from NavAbilityBlobStore: {:?}", re);
+      to_console_error(&msg);
+      return Err(msg.into());
     }
     let bytes = req_res?.bytes().await?;
     return Ok(bytes.to_vec());
   //   }
   // }
-  return Err("Error in download request from NavAbilityBlobStore".into());
 }

@@ -6,12 +6,8 @@
 
 use std::fmt;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-use std::{
-  any::type_name,
-  convert::TryInto,
-  future::Future
-};
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+use std::future::Future;
 
 use serde::{Serialize,Deserialize};
 
@@ -20,7 +16,10 @@ use serde_json::{
   Value
 };
 
-use base64::{Engine as _, engine::{self, general_purpose}, alphabet};
+use base64::{
+  Engine as _, 
+  engine::general_purpose,
+};
 
 // use graphql_client::GraphQLQuery;
 use crate::{
@@ -46,24 +45,33 @@ macro_rules! genGetLabel {
 
 
 #[cfg(feature = "thread")]
-pub fn execute<R, F: Future<Output = R>>(  //  + Send + 'static
-f: F
-) -> R {
+pub fn execute<R, F>(
+  f: F
+) where 
+  R: 'static + std::marker::Send + 'static, // R: Send + 'static,
+  // https://docs.rs/futures/latest/futures/trait.Future.html
+  // https://docs.rs/futures/latest/futures/trait.Future.html#associatedtype.Output
+  // https://doc.rust-lang.org/std/thread/fn.spawn.html
+  // F: Future<Output = R> + 'static + std::marker::Send
+  F: Future<Output = R> + std::marker::Send + 'static
+{ // -> std::thread::JoinHandle<R> {
   // use any executor of your choice instead
   std::thread::spawn(move || futures::executor::block_on(f));
 }
 
 #[cfg(feature = "tokio")]
-pub fn execute<R,F: Future<Output = R>>(  // Result<R,Box<dyn Error>> // < + Send + 'static>
-f: F
+pub fn execute<R,F: Future<Output = R>>(
+  f: F
 ) -> R {
-  // TODO, use any executor of your choice instead
-  return tokio::runtime::Builder::new_current_thread()
+  // use any executor of your choice instead
+  // return tokio::runtime::Builder::new_current_thread()
+  return tokio::runtime::Builder::new_multi_thread()
+  .worker_threads(2)
   .enable_all()
   .build()
   .unwrap()
   .block_on(f);
-  // std::thread::spawn(move || futures::executor::block_on(f));
+  // .spawn(f);
 }
 
 
@@ -305,7 +313,7 @@ pub fn send_api_result<T>(
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_to_nvaapi_cb<
   R: for<'de> Deserialize<'de>,
   T
@@ -360,7 +368,7 @@ pub async fn post_to_nvaapi_cb<
 
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub async fn post_to_nvaapi<
   V: Serialize,
   R: for<'de> Deserialize<'de>,

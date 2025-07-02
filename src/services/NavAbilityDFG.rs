@@ -1,25 +1,27 @@
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 use std::collections::HashMap;
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     Uuid,
     GetId,
-    NvaNode,
-    Agent,
-    Factorgraph,
 };
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 use crate::{
     NavAbilityClient,
-    NavAbilityDFG,
+    Agent,
+    NvaNode,
+    Factorgraph,
     NavAbilityBlobStore,
 };
 
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+use crate::NavAbilityDFG;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl GetId for NavAbilityDFG {
     fn getId(
         &self, 
@@ -60,12 +62,11 @@ impl NavAbilityDFG {
             label: crate::NvaStoreLabel::Cloud(storelb.to_owned()),
         };
         let mut blobStores = HashMap::new();
-
-        let mut mkey = "".to_owned();
-        match &store.label {
-            crate::NvaStoreLabel::Cloud(lb) => { mkey = lb.clone();},
-            crate::NvaStoreLabel::Onprem(lb) => { mkey = lb.clone();},
-        }
+        // let mut mkey = "".to_owned();
+        let mkey = match &store.label {
+            crate::NvaStoreLabel::Cloud(lb) => { lb.clone() },
+            crate::NvaStoreLabel::Onprem(lb) => { lb.clone() },
+        };
         blobStores.insert(mkey, store);
 
         // check if fgraph exists

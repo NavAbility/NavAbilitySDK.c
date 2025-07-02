@@ -1,12 +1,11 @@
 
-use std::collections;
+// use std::collections;
+// use regex::Regex;
+// use serde_json;
+// use serde::Serialize;
 
-use regex::Regex;
 
-use serde_json;
-use serde::Serialize;
-
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Uuid,
   GraphQLQuery,
@@ -15,12 +14,12 @@ use crate::{
   NavAbilityClient,
   post_to_nvaapi,
   StartWorker,
-  to_console_debug, 
-  to_console_error,
+  // to_console_debug, 
+  // to_console_error,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub fn start_worker_query(
   input: serde_json::Map<String,serde_json::Value>,
   worker_label: crate::start_worker::WorkerLabelEnum
@@ -36,7 +35,7 @@ pub fn start_worker_query(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_start_worker(
   nvacl: &NavAbilityClient,
   input: serde_json::Map<String,serde_json::Value>,
@@ -71,7 +70,7 @@ pub async fn post_start_worker(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread"))]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn startWorker(
   nvacl: &NavAbilityClient,
   input: serde_json::Map<String,serde_json::Value>,

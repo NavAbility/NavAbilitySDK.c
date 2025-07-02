@@ -81,7 +81,7 @@ fn getVariable(
 #[no_mangle] pub unsafe extern "C" 
 fn getPPEMean(
   vari_: Option<&crate::VariableDFG>,
-  solveKey: *const c_char
+  _solveKey: *const c_char
 ) -> Option<Box<RVec<c_double>>> {
   if vari_.is_none() {
     to_console_error("getPPEMean: provided *VariableDFG is NULL/None");
@@ -90,7 +90,7 @@ fn getPPEMean(
   let vari = vari_.unwrap();
   let ppem = crate::services::getPPEMean(
     vari,
-    &cstr_to_str(solveKey),
+    &cstr_to_str(_solveKey),
   );
 
   if ppem.is_empty() {
@@ -110,7 +110,7 @@ fn getPPEMean(
 #[no_mangle] pub unsafe extern "C" 
 fn getPPECov(
   vari_: Option<&crate::VariableDFG>,
-  solveKey: *const c_char
+  _solveKey: *const c_char
 ) -> Option<Box<RVec<c_double>>> {
   if vari_.is_none() {
     to_console_error("getPPECov: provided *VariableDFG is NULL/None");
@@ -123,7 +123,7 @@ fn getPPECov(
 
   let ppec = crate::services::getPPECov(
     vari,
-    &cstr_to_str(solveKey),
+    &cstr_to_str(_solveKey),
   );
 
   if ppec.is_empty() {

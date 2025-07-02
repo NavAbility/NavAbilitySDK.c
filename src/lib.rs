@@ -3,7 +3,6 @@
 use std::{
     error::Error, 
     sync::mpsc::Sender,
-    collections::HashMap,
 };
 use serde::Serialize;
 use uuid::Uuid;
@@ -19,7 +18,7 @@ use graphql_client::{
 };
 
 
-#[cfg(any(feature = "tokio"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 use reqwest::Client;
 #[cfg(feature="blocking")]
 use ::reqwest::blocking::Client;
@@ -43,7 +42,7 @@ pub use crate::utils::*;
 
 
 pub mod services;
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub use crate::services::{
     post_get_agents,
     // post_get_blob_entry,
@@ -81,19 +80,27 @@ use crate::capi::*;
 
 const SDK_VERSION: &str = "0.25";
 
-
+#[allow(dead_code)]
 type UUID = String;
+#[allow(dead_code)]
 type BigInt = String;
+#[allow(dead_code)]
 type DateTime = String;
+#[allow(dead_code)]
 type EmailAddress = String;
+#[allow(dead_code)]
 type Metadata = String;
+#[allow(dead_code)]
 type JSON = serde_json::Map<String, serde_json::Value>;
+#[allow(dead_code)]
 type B64JSON = String;
+#[allow(dead_code)]
 type Latitude = f64;
+#[allow(dead_code)]
 type Longitude = f64;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -103,7 +110,7 @@ type Longitude = f64;
 pub struct GetBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -113,7 +120,7 @@ pub struct GetBlobEntry;
 pub struct ListAgents;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -123,7 +130,7 @@ pub struct ListAgents;
 pub struct UpdateAgentMetadata;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -133,7 +140,7 @@ pub struct UpdateAgentMetadata;
 pub struct GetAgents;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -143,7 +150,7 @@ pub struct GetAgents;
 pub struct GetAgent;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -153,7 +160,7 @@ pub struct GetAgent;
 pub struct GetFactorgraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -163,7 +170,7 @@ pub struct GetFactorgraphs;
 pub struct GetURS;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -173,7 +180,7 @@ pub struct GetURS;
 pub struct ListModels;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -183,7 +190,7 @@ pub struct ListModels;
 pub struct GetModel;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -203,7 +210,7 @@ pub struct ListModelsGraphs;
 pub struct FindModelBlobEntries;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -213,7 +220,7 @@ pub struct FindModelBlobEntries;
 pub struct AddFactorgraph;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -223,7 +230,7 @@ pub struct AddFactorgraph;
 pub struct GetAgentEntriesMetadata;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -233,7 +240,7 @@ pub struct GetAgentEntriesMetadata;
 pub struct CreateDownload;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -243,7 +250,7 @@ pub struct CreateDownload;
 pub struct CreateUpload;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -253,7 +260,7 @@ pub struct CreateUpload;
 pub struct CompleteUpload;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -263,7 +270,7 @@ pub struct CompleteUpload;
 pub struct StartWorker;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -273,7 +280,7 @@ pub struct StartWorker;
 pub struct GetVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -284,7 +291,7 @@ pub struct ListVariables;
 // Implicit ListWhere due to graphql-client limitation: https://github.com/graphql-rust/graphql-client/issues/508
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -294,7 +301,7 @@ pub struct ListVariables;
 pub struct AddVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -304,7 +311,7 @@ pub struct AddVariable;
 pub struct AddFactors;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -314,7 +321,7 @@ pub struct AddFactors;
 pub struct AddAgentBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -324,7 +331,7 @@ pub struct AddAgentBlobEntry;
 pub struct AddVariableBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -334,7 +341,7 @@ pub struct AddVariableBlobEntry;
 pub struct AddFactorgraphBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -344,7 +351,7 @@ pub struct AddFactorgraphBlobEntry;
 pub struct ConnectGraphAgent;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -354,7 +361,7 @@ pub struct ConnectGraphAgent;
 pub struct ConnectGraphModel;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -364,7 +371,7 @@ pub struct ConnectGraphModel;
 pub struct AddModelBlobEntry;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -373,7 +380,7 @@ pub struct AddModelBlobEntry;
 )]
 pub struct DeleteBlobEntry;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -382,7 +389,7 @@ pub struct DeleteBlobEntry;
 )]
 pub struct DeleteBlob;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -392,7 +399,7 @@ pub struct DeleteBlob;
 pub struct GetOrg;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -402,7 +409,7 @@ pub struct GetOrg;
 pub struct ListGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -412,7 +419,7 @@ pub struct ListGraphs;
 pub struct FindOrgModelGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -422,7 +429,7 @@ pub struct FindOrgModelGraphs;
 pub struct FindFactorgraphBlobEntries;
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -431,7 +438,7 @@ pub struct FindFactorgraphBlobEntries;
 )]
 pub struct AddAgent;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -440,7 +447,7 @@ pub struct AddAgent;
 )]
 pub struct AddModel;
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -449,7 +456,7 @@ pub struct AddModel;
 )]
 pub struct UpdateBlobentryMetadata;
 
-#[cfg(any(feature = "tokio", feature = "wasm"))]
+#[cfg(any(feature = "tokio", feature = "thread"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -468,7 +475,7 @@ pub trait QueryDetails<Q: Serialize> {
     fn to_jstr(&self) -> String;
 }
 
-impl<Q: Serialize> QueryDetails<Q> for graphql_client::QueryBody<Q> {
+impl<Q: Serialize> QueryDetails<Q> for QueryBody<Q> {
     fn operation_name(&self) -> &str { 
         self.operation_name 
     }
@@ -517,7 +524,7 @@ impl<T> GetLabel for NvaNode<T> {
     fn getLabel(&self) -> &String { &self.label }
 }
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl GetLabel for crate::entities::ClientDFG::NavAbilityDFG {
     fn getLabel(&self) -> &String { &self.fg.getLabel() }
 }
@@ -538,7 +545,7 @@ pub trait GetId {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 impl<T> GetId for NvaNode<T> {
     fn getId(
         &self, 
@@ -560,7 +567,7 @@ impl<T> GetId for NvaNode<T> {
 
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[cfg(test)]
 mod tests {
     use super::*;

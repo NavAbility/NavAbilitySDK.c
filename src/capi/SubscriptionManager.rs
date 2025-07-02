@@ -8,6 +8,11 @@ use std::{
 
 use uuid::Uuid;
 
+use std::sync::mpsc::{
+  Sender,
+  Receiver,
+};
+
 use crate::{
   to_console_debug,
   to_console_error,
@@ -18,26 +23,117 @@ use crate::{
   NavAbilityDFG,
 };
 
+// #[repr(C)]
+pub struct SubscriptionManagerI {
+  pub blocking_recv: Receiver<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+  pub nonblocking_into: Sender<crate::default_subscription::ResponseData>,
+}
 
-//
+#[repr(C)]
+pub struct SubscriptionManagerII {
+  pub nonblocking_recv: Receiver<crate::default_subscription::ResponseData>,
+  pub blocking_into: Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+}
+
+
+// use std::convert::From;
+
+// impl From<
+//   SubscriptionManagerII
+// > for (
+//   Receiver<crate::default_subscription::ResponseData>,
+//   Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+// ) {
+//   fn from(
+//     tup: SubscriptionManagerII
+//   ) -> (
+//     Receiver<crate::default_subscription::ResponseData>,
+//     Sender<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+//   ) {
+//     return (
+//       tup.nonblocking_recv, 
+//       tup.blocking_into
+//     )
+//   }
+// }
+
 
 // ref. https://doc.rust-lang.org/std/boxed/
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn new_SubscriptionManager(
+fn new_SubsChannels() -> *mut SubscriptionManagerII {
+    // create the channels for non-blocking and blocking interfaces
+  let ((nonblocking_into, blocking_recv), (nonblocking_recv, blocking_into)) = SubscriptionManager::new_channels();
+
+  let smii = SubscriptionManagerII {
+    nonblocking_recv,
+    blocking_into,
+  };
+
+  return Box::into_raw(Box::new(smii));
+}
+
+
+
+// ref. https://doc.rust-lang.org/std/boxed/
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn assign_SubscriptionManager(
   _nvacl: Option<&NavAbilityClient>,
   size: usize,
+  smii_: Option<&mut SubscriptionManagerII>,
 ) -> Option<Box<SubscriptionManager>> {
   if _nvacl.is_none() {
     to_console_error("new_SubscriptionManager: provided for *NavAbilityClient is NULL/None");
     return None;
   }
 
-  return Some(Box::new(SubscriptionManager::new(
-      _nvacl.unwrap(),
-      size,
-  )));
+  // // create the channels for non-blocking and blocking interfaces
+  // let ((nonblocking_into, blocking_recv), (nonblocking_recv, blocking_into)) = SubscriptionManager::new_channels();
+
+  // let smii = SubscriptionManagerII {
+  //   nonblocking_recv,
+  //   blocking_into,
+  // };
+  let smii = Box::from_raw(smii_.unwrap()); // take ownership of the SubscriptionManagerII
+
+  let nvasm = SubscriptionManager::from_parts(_nvacl.unwrap(), size, smii.nonblocking_recv, smii.blocking_into);
+
+
+  // *nvasm = nvasm_;
+
+  // SubscriptionManager::subscription_listener(
+  //   nonblocking_into,
+  //   _nvacl.unwrap(),
+  //   blocking_recv,
+  // );
+
+  return Some(Box::new(nvasm));
 }
+
+
+
+// // ref. https://doc.rust-lang.org/std/boxed/
+// #[allow(non_snake_case)]
+// #[no_mangle] pub unsafe extern "C" 
+// fn listenSubscriptions(
+//   _nvacl: Option<&NavAbilityClient>,
+//   _sms: *mut SubscriptionManagerStart,
+// ) {
+//   if _nvacl.is_none() {
+//     to_console_error("listenSubscriptions: provided *NavAbilityClient is NULL/None");
+//     return;
+//   }
+//   // let sms = _sms.unwrap();
+//   let sms = Box::from_raw(_sms);
+//   // take ownership of the nonblocking channel and the blocking receiver
+//   to_console_debug("listenSubscriptions: starting subscription listener");
+//   SubscriptionManager::subscription_listener(
+//     sms.nonblocking_into,
+//     _nvacl.unwrap(),
+//     sms.blocking_recv,
+//   );
+// }
 
 
 #[allow(non_snake_case)]

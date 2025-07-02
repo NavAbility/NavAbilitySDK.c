@@ -5,6 +5,7 @@ use crate::Utc;
 
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Org {
   id: Uuid,
   label: String,

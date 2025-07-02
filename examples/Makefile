@@ -4,7 +4,7 @@ INC_DIR = ../include/
 LIB_DIR = ../target/debug/
 
 CXX := gcc
-CXXFLAGS = -Wall -g -I$(INC_DIR)
+CXXFLAGS = -Wall -g -lpthread -I$(INC_DIR)
 
 .DEFAULT_GOAL := run-all
 

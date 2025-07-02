@@ -5,17 +5,16 @@ use crate::{
     BlobEntry,
 };
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
-#[macro_use]
+// #[macro_use]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 use crate::{
     genGetLabel,
     GetLabel,
     Sender,
     Response,
-    GraphQLQuery,
     Error,
     send_api_result,
-    to_console_debug,
+    // to_console_debug,
     to_console_error,
     parse_str_utc,
     get_blob_entry,
@@ -68,7 +67,7 @@ use crate::{
 /// # Returns
 ///
 /// * `Result<Response<T>, Box<dyn Error>>` - A `Result` containing the deserialized response or an error.
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 pub fn check_deser<T>(
   serde_res: Result<Response<T>,reqwest::Error>
 ) -> Result<Response<T>,Box<dyn Error>> {
@@ -107,11 +106,11 @@ pub fn send_query_result<F,T>(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 genGetLabel!(Session);
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 #[deprecated(since="0.1.0", note="please use send_api_result(send_into, `response_body=Ok(data)`) instead")]
 pub fn send_api_response<T>(
     send_into: Sender<T>,
@@ -121,11 +120,11 @@ pub fn send_api_response<T>(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]pub trait SameBlobEntryFields {
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]pub trait SameBlobEntryFields {
     fn to_gql_blobentry(self) -> get_blob_entry::blobEntry_fields;
 }
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 impl BlobEntry {
     pub fn same_gql(
         sgql: impl SameBlobEntryFields,
@@ -202,14 +201,14 @@ impl BlobEntry {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 impl SameBlobEntryFields for get_blob_entry::blobEntry_fields {
     fn to_gql_blobentry(self) -> get_blob_entry::blobEntry_fields {
         return self;
     }
 }
 
-#[cfg(any(feature = "tokio", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
 impl SameBlobEntryFields for get_variable::blobEntry_fields {
     fn to_gql_blobentry(
         self

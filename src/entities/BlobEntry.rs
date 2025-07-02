@@ -1,11 +1,6 @@
 
+use crate::Uuid;
 
-use crate::{
-    get_blob_entry, Utc, Uuid, parse_str_utc,
-};
-use chrono::{
-    ParseError,
-};
 
 
 /// A `BlobEntry` is a small amount of structured data that holds contextual/reference information to find an actual blob. 
@@ -42,11 +37,11 @@ pub struct BlobEntry {
     /// Additional storage for functional metadata used in some scenarios, e.g. to support advanced features such as `parsejson(base64decode(entry.metadata))['time_sync']`.
     pub metadata: String,
     /// When the Blob itself was first created.
-    pub timestamp: chrono::DateTime<Utc>,
+    pub timestamp: chrono::DateTime<chrono::Utc>,
     /// When the BlobEntry was created.
-    pub createdTimestamp: Option<chrono::DateTime<Utc>>,
+    pub createdTimestamp: Option<chrono::DateTime<chrono::Utc>>,
     /// Use carefully, but necessary to support advanced usage such as time synchronization over Blob data.
-    pub lastUpdatedTimestamp: Option<chrono::DateTime<Utc>>,
+    pub lastUpdatedTimestamp: Option<chrono::DateTime<chrono::Utc>>,
     /// Self type declaration for when duck-typing happens.
     pub _type: String,
     /// Type version of this BlobEntry. Consider upgrading to `::VersionNumber`.
@@ -59,7 +54,7 @@ pub trait BlobEntrySummaryImporters {
     fn label(&self) -> String;
     fn size(&self) -> Option<i64>;
     fn mimeType(&self) -> String;
-    fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<Utc>>;
+    fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<chrono::Utc>>;
 }
 
 
@@ -87,7 +82,7 @@ macro_rules! BlobEntry_importers_summary {
             fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<Utc>> {
                 let timestamp = &self.last_updated_timestamp;
                 // 2024-09-16T16:51:20.555Z
-                if let Ok(tms) = parse_str_utc(timestamp.clone()) {
+                if let Ok(tms) = crate::parse_str_utc(timestamp.clone()) {
                     return Some(tms);
                 } else {
                     let errm = format!("BlobEntry, failed chrono parse_from_str timestamp {:?}",timestamp);
@@ -115,9 +110,9 @@ pub trait BlobEntryFieldsImporters {
     fn description(&self) -> String;
     fn mimeType(&self) -> String;
     fn metadata(&self) -> String;
-    fn timestamp(&self) -> Result<chrono::DateTime<Utc>, ParseError>;
-    fn createdTimestamp(&self) -> Option<chrono::DateTime<Utc>>;
-    fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<Utc>>;
+    fn timestamp(&self) -> Result<chrono::DateTime<chrono::Utc>, chrono::ParseError>;
+    fn createdTimestamp(&self) -> Option<chrono::DateTime<chrono::Utc>>;
+    fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<chrono::Utc>>;
     fn _type(&self) -> String;
     fn _version(&self) -> String;
 }
@@ -177,14 +172,14 @@ macro_rules! BlobEntry_importers {
                 return self.metadata.clone().unwrap_or("".to_owned()).to_string();
             }
 
-            fn timestamp(&self) -> Result<chrono::DateTime<Utc>, ParseError> {
-                return parse_str_utc(self.timestamp.clone().unwrap_or("".to_owned()));
+            fn timestamp(&self) -> Result<chrono::DateTime<chrono::Utc>, chrono::ParseError> {
+                return crate::parse_str_utc(self.timestamp.clone().unwrap_or("".to_owned()));
             }
 
-            fn createdTimestamp(&self) -> Option<chrono::DateTime<Utc>> {
+            fn createdTimestamp(&self) -> Option<chrono::DateTime<chrono::Utc>> {
                 let timestamp = &self.created_timestamp;
                 // 2024-09-16T16:51:20.555Z
-                if let Ok(tms) = parse_str_utc(timestamp.clone()) {
+                if let Ok(tms) = crate::parse_str_utc(timestamp.clone()) {
                     return Some(tms);
                 } else {
                     let errm = format!("BlobEntry, failed chrono parse_from_str timestamp {:?}",timestamp);
@@ -193,10 +188,10 @@ macro_rules! BlobEntry_importers {
                 return None;
             }
 
-            fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<Utc>> {
+            fn lastUpdatedTimestamp(&self) -> Option<chrono::DateTime<chrono::Utc>> {
                 let timestamp = &self.last_updated_timestamp;
                 // 2024-09-16T16:51:20.555Z
-                if let Ok(tms) = parse_str_utc(timestamp.clone()) {
+                if let Ok(tms) = crate::parse_str_utc(timestamp.clone()) {
                     return Some(tms);
                 } else {
                     let errm = format!("BlobEntry, failed chrono parse_from_str timestamp {:?}",timestamp);
