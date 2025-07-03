@@ -186,7 +186,7 @@ fn assign_SubscriptionManager(
   let nvacl_sm = nvacl__.clone();
   // let handles = (0..1).map(|worker_id| {
     // let handle: thread::JoinHandle<()> = 
-    thread::spawn(|| async move {
+    thread::spawn( move || {
         // listenSubscriptions(smi)
       // to_console_debug(&format!("assign_SubMan future: starting subscription listener, nvacl.api_url={:?}", &nvacl.apiurl));
       println!("assign_SubMan future: starting subscription listener, nvacl.api_url={:?}", &nvacl.apiurl);
