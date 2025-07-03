@@ -101,6 +101,8 @@ typedef struct String String;
  */
 typedef struct SubscriptionManager SubscriptionManager;
 
+typedef struct SubscriptionManagerI SubscriptionManagerI;
+
 typedef struct Tuple Tuple;
 
 /**
@@ -160,7 +162,8 @@ char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
 
 struct Tuple *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
                                          size_t size,
-                                         struct Tuple *tup_);
+                                         struct Tuple *tup_,
+                                         void (*callback)(void*));
 
 bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 
@@ -186,6 +189,8 @@ void deleteFactorById(const struct NavAbilityDFG *nvafg, const char *fid);
 void deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *deriveRobotConfig(const struct NavAbilityDFG *nvafg);
+
+struct SubscriptionManagerI *dummy(void);
 
 void free_Agent(struct Agent*);
 

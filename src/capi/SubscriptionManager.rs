@@ -2,6 +2,7 @@
 
 use std::{
   os::raw::{
+    c_void,
     c_char,
   }
 };
@@ -41,6 +42,9 @@ pub struct Tuple {
   pub smii: Option<Box<SubscriptionManagerII>>,
   pub nvasm: Option<Box<SubscriptionManager>>,
 }
+
+#[no_mangle] pub unsafe extern "C" 
+fn dummy() -> Option<Box<SubscriptionManagerI>> {None}
 
 // use std::convert::From;
 
@@ -91,6 +95,30 @@ fn new_SubsChannels() -> *mut Tuple {
 }
 
 
+// // ref. https://doc.rust-lang.org/std/boxed/
+// #[allow(non_snake_case)]
+// #[no_mangle] pub unsafe extern "C" 
+// fn get_NvaSubsMan(
+//   tup_: Option<&Tuple>,
+// ) -> Option<Box<SubscriptionManager>> {
+//   if tup_.is_none() {
+//     let msg = "get_NvaSubsMan: the provided for *SubscriptionManager is NULL/None".to_owned();
+//     to_console_error(&msg);
+//     panic!("{}", msg);
+//     // return None;
+//   }
+
+//   let tup = tup_.unwrap();
+//   // TODO if None
+//   return Some(tup.nvasm.unwrap());
+// }
+
+// #[no_mangle] pub unsafe extern "C" 
+// fn set_on_data_callback(
+//   callback: extern "C" fn(*mut c_void),
+// ) {
+//   callback(buffer.len() as *mut c_void);
+// }
 
 // ref. https://doc.rust-lang.org/std/boxed/
 #[allow(non_snake_case)]
@@ -99,6 +127,7 @@ fn assign_SubscriptionManager(
   _nvacl: Option<&NavAbilityClient>,
   size: usize,
   tup_: Option<&mut Tuple>,
+  callback: extern "C" fn(*mut c_void),
 ) -> *mut Tuple {
   if _nvacl.is_none() {
     let msg = "assign_SubscriptionManager: the provided for *NavAbilityClient is NULL/None".to_owned();
@@ -118,12 +147,13 @@ fn assign_SubscriptionManager(
   let tup = Box::from_raw(tup_.unwrap());
 
   let smii = (tup.smii.unwrap()); // take ownership of the SubscriptionManagerII
+  let mut smi = (tup.smi.unwrap()); // take ownership of the SubscriptionManagerII
 
   let nvasm = SubscriptionManager::from_parts(_nvacl.unwrap(), size, smii.nonblocking_recv, smii.blocking_into);
 
-
+  // rebuild the Tuple with the new SubscriptionManager but without the box to SubscriptionManagerII channels
   let tup2 = Tuple {
-    smi:  Some(tup.smi.unwrap()), // keep the SubscriptionManagerI
+    smi:  None, // Some(tup.smi.unwrap()), // keep the SubscriptionManagerI
     smii: None, // we no longer need this
     nvasm: Some(Box::new(nvasm)), // set the SubscriptionManager we just created
   };
@@ -135,6 +165,8 @@ fn assign_SubscriptionManager(
   //   _nvacl.unwrap(),
   //   blocking_recv,
   // );
+  let state_ptr: *mut c_void = &mut smi as *mut _ as *mut c_void;
+  callback(state_ptr);
 
   return Box::into_raw(Box::new(tup2));
   // return Some(Box::new(nvasm));

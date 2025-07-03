@@ -7,47 +7,28 @@
 #include <pthread.h>
 
 
-typedef struct _SSEThreadArgs {
-  NavAbilityClient* nvacl;
-  SubscriptionManager* nvasm;
-  pthread_mutex_t mutex;
-  pthread_cond_t condition;
-} SSEThreadArgs;
 
-void* thread_function(void* args) {
-    printf("Thread is running\n");
-    SSEThreadArgs* input = (SSEThreadArgs*)args;
-    NavAbilityClient* nvacl = (NavAbilityClient*)input->nvacl;
-    if (nvacl == NULL) {
-      printf("Error: NavAbilityClient is NULL\n");
-      return NULL;
-    }
-      // // Initialize the SubscriptionManager with the NavAbilityClient
-      // SubscriptionManager* nvasm = NULL;
-      // SubscriptionManagerStart* nvsms = NULL;
-      // // pthread_mutex_lock(&input->mutex);
-      // nvsms = assign_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
-      // if (nvasm == NULL) {
-      //     printf("Error: Failed to create SubscriptionManager\n");
-      //     return NULL;
-      // }
-      // input->nvasm = nvasm;
-    // pthread_cond_signal(&input->condition); // Signal the waiting thread that the SubscriptionManager is ready
-    // pthread_mutex_unlock(&input->mutex);
-    printf("SubscriptionManager created successfully\n");
-    return NULL;
+void* sse_listener(void* arg) {
+  SubscriptionManagerI* smi = (SubscriptionManagerI*)arg;
+  printf("sse_listener is running\n");
 }
 
-void* waiting_thread(void* arg) {
-    SSEThreadArgs* args = (SSEThreadArgs*)arg;
-    pthread_mutex_t mutex = args->mutex;
-    pthread_cond_t condition = args->condition;
-    pthread_mutex_lock(&mutex);
-    printf("Waiting for condition variable...\n");
-    pthread_cond_wait(&condition, &mutex);
-    pthread_mutex_unlock(&mutex);
-    printf("Condition variable signaled, thread proceeding\n");
-    return NULL;
+void* test_thread(void* arg) {
+  // SubscriptionManagerI* smi = (SubscriptionManagerI*)arg;
+
+  pthread_t thread;
+  int result = pthread_create(&thread, NULL, sse_listener, arg);
+  if (result != 0) {
+      printf("SSE thread creation failed\n");
+      return 1;
+  }
+
+  printf("Test thread is running\n");
+  // FIXME -- restore join when Rust side multi-threading is fixed
+  pthread_join(thread, NULL);
+  printf("after pthread join\n");
+
+  return NULL;
 }
 
 
@@ -133,37 +114,14 @@ int main(void) {
   ); freeR(f2); freeR(normal); // because new_ was used
   printf("Added factor id: %s\n", fid2);
 
-  // before solving, lets start a SubscriptionManager to monitor for worker events
-  SSEThreadArgs args;
-  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-  pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
-  args.nvacl = nvacl;
-  args.nvasm = NULL; // will be set in the thread/
-  pthread_t thread;
-  // int result = pthread_create(&thread, NULL, thread_function, (void*)&args);
-  // if (result != 0) {
-  //     printf("SSE thread creation failed\n");
-  //     return 1;
-  // }
 
-  Tuple* tup = NULL;
-  tup = new_SubsChannels();
+  Tuple* subsctx = NULL;
+  subsctx = new_SubsChannels();
 
   // Initialize the SubscriptionManager with the NavAbilityClient
-  SubscriptionManager* nvasm = NULL;
-  // SubscriptionManagerStart* nvsms = NULL;
-  // pthread_mutex_lock(&input->mutex);
-  tup = assign_SubscriptionManager(nvacl, 64, tup); // keep up to 64 events in the manager
-  // nvasm = get_nvasm(nvsms); // get the SubscriptionManager from the start struct
-  
-  // Wait for the thread to initialize the SubscriptionManager
-  // waiting_thread((void*)&args); // wait for the thread to signal
-  sleep(1); // sleep for a second to allow the thread to initialize the SubscriptionManager
-  if (nvasm == NULL) {
-      printf("Error: Main thread not seeing SubscriptionManager\n");
-  }
-
   // SubscriptionManager* nvasm = NULL;
+  subsctx = assign_SubscriptionManager(nvacl, 64, subsctx, &test_thread); // keep up to 64 events in the manager
+
   // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
   printf("After waiting -- FFI works\n");
 
@@ -173,7 +131,7 @@ int main(void) {
   
   // bool success = block_on(args.nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
   // printf("Graph was successful: %d\n", success);
-  pthread_join(thread, NULL);
+  // pthread_join(thread, NULL);
   // freeR(nvasm); 
 
   // See the next example for retrieving variable values
