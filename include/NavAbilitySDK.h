@@ -103,8 +103,6 @@ typedef struct SubscriptionManager SubscriptionManager;
 
 typedef struct SubscriptionManagerI SubscriptionManagerI;
 
-typedef struct Tuple Tuple;
-
 /**
  * The Variable information packed in a way that accomdates multi-lang using json.
  */
@@ -160,10 +158,9 @@ char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
                            const char *variable_label,
                            const struct BlobEntry *entry_);
 
-struct Tuple *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
-                                         size_t size,
-                                         struct Tuple *tup_,
-                                         void (*callback)(void*));
+struct SubscriptionManager *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
+                                                       size_t size,
+                                                       void (*callback)(void*));
 
 bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 
@@ -294,6 +291,8 @@ size_t length_RVec_f64(const struct RVec_f64 *rv_s);
 
 struct RVec_String *listVariables(const struct NavAbilityDFG *_nvafg);
 
+void listenSubscriptions(struct SubscriptionManagerI *smi_);
+
 struct BlobEntry *new_BlobEntry(const char *blobId,
                                 const char *label,
                                 const char *blobstore,
@@ -333,8 +332,6 @@ struct PriorPoint3_FullNormal *new_PriorPoint3(const struct FullNormal *Z);
 struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
-
-struct Tuple *new_SubsChannels(void);
 
 char *new_uuid4(void);
 

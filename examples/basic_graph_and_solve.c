@@ -9,8 +9,12 @@
 
 
 void* sse_listener(void* arg) {
-  SubscriptionManagerI* smi = (SubscriptionManagerI*)arg;
+  SubscriptionManagerI* smi;
+  smi = (SubscriptionManagerI*)arg;
   printf("sse_listener is running\n");
+  listenSubscriptions(smi);
+  printf("sse_listener finished\n");
+  return NULL;
 }
 
 void* test_thread(void* arg) {
@@ -20,13 +24,13 @@ void* test_thread(void* arg) {
   int result = pthread_create(&thread, NULL, sse_listener, arg);
   if (result != 0) {
       printf("SSE thread creation failed\n");
-      return 1;
+      return NULL;
   }
 
   printf("Test thread is running\n");
-  // FIXME -- restore join when Rust side multi-threading is fixed
-  pthread_join(thread, NULL);
-  printf("after pthread join\n");
+  // // FIXME -- restore join when Rust side multi-threading is fixed
+  // pthread_join(thread, NULL);
+  // printf("after pthread join\n");
 
   return NULL;
 }
@@ -115,12 +119,9 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
 
-  Tuple* subsctx = NULL;
-  subsctx = new_SubsChannels();
-
   // Initialize the SubscriptionManager with the NavAbilityClient
-  // SubscriptionManager* nvasm = NULL;
-  subsctx = assign_SubscriptionManager(nvacl, 64, subsctx, &test_thread); // keep up to 64 events in the manager
+  SubscriptionManager* nvasm = NULL;
+  nvasm = assign_SubscriptionManager(nvacl, 64, &test_thread); // keep up to 64 events in the manager
 
   // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
   printf("After waiting -- FFI works\n");
@@ -129,7 +130,8 @@ int main(void) {
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Blocking on solve graph, action id: %s\n", wrkid);
   
-  // bool success = block_on(args.nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
+  // sleep(10); // give some time for the solve to start
+  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
   // printf("Graph was successful: %d\n", success);
   // pthread_join(thread, NULL);
   // freeR(nvasm); 
@@ -137,6 +139,7 @@ int main(void) {
   // See the next example for retrieving variable values
   // Also see deleteFactor and deleteVariable
 
+  freeR(nvasm);
   freeR(nvafg); 
   freeR(nvacl);
   printf("All done.\n");

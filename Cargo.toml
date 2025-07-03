@@ -27,6 +27,8 @@ reqwest = {version = "^0.12", optional=true, features = [
 ] }
 reqwest-eventsource = "0.6"
 futures = "^0.3"
+# async-ffi = "^0.5"
+# once_ cell = "^1.21"
 # for blocking calls, but features deps not 100% sorted out yet TODO
 # graphql_client = { version="0.14", features = ["reqwest","reqwest-blocking"] }
 
