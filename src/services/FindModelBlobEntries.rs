@@ -1,7 +1,7 @@
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Uuid,
   GraphQLQuery,
@@ -20,20 +20,20 @@ use crate::{
 
 
 // #[macro_use]
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   BlobEntryFieldsImporters,
   BlobEntry_importers,
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::find_model_blob_entries::blobEntry_fields as FM_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers!(FM_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_find_model_blob_entries(
   nvacl: &NavAbilityClient,
   model_label: &str,

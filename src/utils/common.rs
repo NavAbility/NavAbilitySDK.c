@@ -6,7 +6,7 @@
 
 use std::fmt;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use std::future::Future;
 
 use serde::{Serialize,Deserialize};
@@ -313,7 +313,7 @@ pub fn send_api_result<T>(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_to_nvaapi_cb<
   R: for<'de> Deserialize<'de>,
   T
@@ -368,7 +368,7 @@ pub async fn post_to_nvaapi_cb<
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_to_nvaapi<
   V: Serialize,
   R: for<'de> Deserialize<'de>,
