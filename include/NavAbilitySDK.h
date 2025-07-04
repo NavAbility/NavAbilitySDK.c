@@ -101,8 +101,6 @@ typedef struct String String;
  */
 typedef struct SubscriptionManager SubscriptionManager;
 
-typedef struct SubscriptionManagerII SubscriptionManagerII;
-
 /**
  * The Variable information packed in a way that accomdates multi-lang using json.
  */
@@ -157,10 +155,6 @@ char *addVariable(const struct NavAbilityDFG *nvafg,
 char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
                            const char *variable_label,
                            const struct BlobEntry *entry_);
-
-struct SubscriptionManager *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
-                                                       size_t size,
-                                                       struct SubscriptionManagerII *smii_);
 
 bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 
@@ -329,11 +323,12 @@ struct PriorPose2_FullNormal *new_PriorPose2(const struct FullNormal *Z);
 
 struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
 
-struct SubscriptionManagerII *new_SubsChannels(void);
-
 char *new_uuid4(void);
 
 char *solveGraphParametric(const struct NavAbilityDFG *nvafg, const char *variableLabel);
+
+struct SubscriptionManager *start_SubscriptionManager(const struct NavAbilityClient *_nvacl,
+                                                      size_t size);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,

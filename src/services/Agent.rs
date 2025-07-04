@@ -150,21 +150,6 @@ pub fn q_listAgents(
   })
 }
 
-#[cfg(feature = "wasm")]
-pub fn q_listAgents(
-  send_into: Sender<Vec<String>>, 
-  nvacl: &NavAbilityClient,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = nvacl.clone();
-  let send_into_ = send_into.clone();
-  crate::execute(async move {
-    let _ = send_api_result(
-      send_into_, 
-      post_list_agents(&nvacl_).await,
-    );
-  });
-}
 
 
 
@@ -336,24 +321,6 @@ pub fn q_addAgent(
   })
 }
 
-#[cfg(feature = "wasm")]
-pub fn q_addAgent(
-  send_into: Sender<add_agent::ResponseData>, 
-  nvacl: &NavAbilityClient,
-  agent_label: &String,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = nvacl.clone();
-  let send_into_ = send_into.clone();
-  let ag_lbl_ = agent_label.clone();
-  crate::execute(async move {
-    let _ = crate::send_api_result(
-      send_into_, 
-      post_add_agent(&nvacl_, &ag_lbl_).await,
-    );
-    ()
-  });
-}
 
 #[cfg(feature = "tokio")] // , feature = "thread"
 #[allow(non_snake_case)]

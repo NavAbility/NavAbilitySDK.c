@@ -254,23 +254,3 @@ pub async fn post_list_model_graphs(
 }
 
 
-#[cfg(feature = "wasm")]
-pub fn q_listModelGraphs(
-  send_into: crate::Sender<crate::list_models_graphs::ResponseData>, 
-  nvacl: &NavAbilityClient,
-  model: String,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = (*nvacl).clone();
-  // let send_into_ = send_into.clone();
-  let model_ = model.to_string();
-  crate::execute(async move {
-    let _ = crate::send_api_result(
-      send_into, 
-      post_list_model_graphs(
-        nvacl_, 
-        &model_
-      ).await,
-    );
-  });
-}

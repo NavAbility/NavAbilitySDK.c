@@ -3,7 +3,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature="wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
     parse_str_utc, 
     Uuid,

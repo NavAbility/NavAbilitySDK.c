@@ -57,19 +57,3 @@ pub fn q_getOrgId(
 }
 
 
-#[cfg(feature = "wasm")]
-pub fn q_getOrgId(
-  send_into: Sender<crate::get_org::ResponseData>, 
-  nvacl: &NavAbilityClient,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = nvacl.clone();
-  let send_into_ = send_into.clone();
-  crate::execute(async move {
-    let _ = send_api_result(
-      send_into_, 
-      post_org_id(&nvacl_).await,
-    );
-  });
-}
-

@@ -30,10 +30,13 @@ use crate::{
   Uuid,
   GraphQLQuery,
   NavAbilityClient,
-  to_console_debug, 
-  to_console_error,
 };
 
+
+use crate::{
+  to_console_debug,
+  to_console_error,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WorkerStatusEnum {
@@ -300,7 +303,8 @@ impl SubscriptionManager {
   ) {
     // NOTE couldn't use eventsource_reqwest for sse get requests -- missing header support
 
-    use crate::to_console_debug;
+    // to_console_debug(&format!("listener wants similar, nvacl.api_url={:?}",&nvacl.apiurl));
+
     let nvacl_e = NavAbilityClient::similar(
       nvacl,
       true
@@ -329,7 +333,7 @@ impl SubscriptionManager {
       while let Some(event) = nvaes.next().await {
         use crate::to_console_debug;
 
-        to_console_debug("nvaes.next()");
+        // to_console_debug("nvaes.next()");
         // pull any direct user request uuids
         match blocking_recv.try_recv() {
           Ok((uuid, sender)) => {
@@ -379,7 +383,7 @@ impl SubscriptionManager {
             nvaes.close();
           }
         } // match event
-        to_console_debug("Processed an event from the EventSource");
+        // to_console_debug("Processed an event from the EventSource");
       }
     });
     to_console_debug("Subscription handler running...");

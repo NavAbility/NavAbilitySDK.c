@@ -117,7 +117,7 @@ impl NavAbilityClient {
         // #[cfg(not(feature = "wasm"))] // FIXME
         #[cfg(any(feature = "tokio", feature = "blocking"))]
         let mut oid = org_id.unwrap_or(&"".to_string()).to_string();
-        #[cfg(any(feature = "wasm", feature = "thread"))]
+        #[cfg(any(feature = "thread"))]
         let oid = org_id.unwrap_or(&"".to_string()).to_string();
 
         #[cfg(any(feature = "tokio", feature = "blocking"))] // , feature = "thread"

@@ -1,7 +1,7 @@
 
 
 // #[macro_use]
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Error,
   BlobEntryFieldsImporters,
@@ -16,13 +16,13 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::find_factorgraph_blob_entries::blobEntry_fields as FG_BlobEntryFields;
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 BlobEntry_importers!(FG_BlobEntryFields);
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_find_factorgraph_blob_entries(
   nvacl: &NavAbilityClient,
   label: &str,
