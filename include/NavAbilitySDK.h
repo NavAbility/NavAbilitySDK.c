@@ -101,8 +101,6 @@ typedef struct String String;
  */
 typedef struct SubscriptionManager SubscriptionManager;
 
-typedef struct SubscriptionManagerI SubscriptionManagerI;
-
 /**
  * The Variable information packed in a way that accomdates multi-lang using json.
  */
@@ -158,10 +156,6 @@ char *addVariableBlobEntry(const struct NavAbilityDFG *nvafg_,
                            const char *variable_label,
                            const struct BlobEntry *entry_);
 
-struct SubscriptionManager *assign_SubscriptionManager(const struct NavAbilityClient *_nvacl,
-                                                       size_t size,
-                                                       void (*callback)(void*));
-
 bool block_on(struct SubscriptionManager *_nvasm, const char *wrk_id, size_t tout_millis);
 
 char *computeImageWhitebalance(const struct NavAbilityDFG *nvafg,
@@ -186,8 +180,6 @@ void deleteFactorById(const struct NavAbilityDFG *nvafg, const char *fid);
 void deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *deriveRobotConfig(const struct NavAbilityDFG *nvafg);
-
-struct SubscriptionManagerI *dummy(void);
 
 void free_Agent(struct Agent*);
 
@@ -291,8 +283,6 @@ size_t length_RVec_f64(const struct RVec_f64 *rv_s);
 
 struct RVec_String *listVariables(const struct NavAbilityDFG *_nvafg);
 
-void listenSubscriptions(struct SubscriptionManagerI *smi_);
-
 struct BlobEntry *new_BlobEntry(const char *blobId,
                                 const char *label,
                                 const char *blobstore,
@@ -336,6 +326,9 @@ struct PriorPose3_FullNormal *new_PriorPose3(const struct FullNormal *Z);
 char *new_uuid4(void);
 
 char *solveGraphParametric(const struct NavAbilityDFG *nvafg, const char *variableLabel);
+
+struct SubscriptionManager *start_SubscriptionManager(const struct NavAbilityClient *_nvacl,
+                                                      size_t size);
 
 const char *updateAgentMetadata(const struct NavAbilityClient *_nvacl,
                                 const char *agent_label,

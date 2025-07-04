@@ -4,37 +4,6 @@
 #include <string.h>
 #include "NavAbilitySDK.h"
 
-#include <pthread.h>
-
-
-
-void* sse_listener(void* arg) {
-  SubscriptionManagerI* smi;
-  smi = (SubscriptionManagerI*)arg;
-  printf("sse_listener is running\n");
-  listenSubscriptions(smi);
-  printf("sse_listener finished\n");
-  return NULL;
-}
-
-void* test_thread(void* arg) {
-  // SubscriptionManagerI* smi = (SubscriptionManagerI*)arg;
-
-  pthread_t thread;
-  int result = pthread_create(&thread, NULL, sse_listener, arg);
-  if (result != 0) {
-      printf("SSE thread creation failed\n");
-      return NULL;
-  }
-
-  printf("Test thread is running\n");
-  // // FIXME -- restore join when Rust side multi-threading is fixed
-  // pthread_join(thread, NULL);
-  // printf("after pthread join\n");
-
-  return NULL;
-}
-
 
 // Sample library usage.
 int main(void) {
@@ -49,6 +18,10 @@ int main(void) {
 
   NavAbilityClient* nvacl = NULL;
   nvacl = new_NavAbilityClient(url,atk);
+
+  // Initialize the SubscriptionManager with the NavAbilityClient -- used later for synchronizing events
+  SubscriptionManager* nvasm = NULL;
+  nvasm = start_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
 
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
@@ -119,28 +92,16 @@ int main(void) {
   printf("Added factor id: %s\n", fid2);
 
 
-  // Initialize the SubscriptionManager with the NavAbilityClient
-  SubscriptionManager* nvasm = NULL;
-  nvasm = assign_SubscriptionManager(nvacl, 64, &test_thread); // keep up to 64 events in the manager
-
-  // nvasm = new_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
-  printf("After waiting -- FFI works\n");
-
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Blocking on solve graph, action id: %s\n", wrkid);
   
-  // sleep(10); // give some time for the solve to start
-  bool success = block_on(nvasm, wrkid, 20000); // wait for the worker to finish or timeout after 20000 milliseconds
-  // printf("Graph was successful: %d\n", success);
-  // pthread_join(thread, NULL);
-  // freeR(nvasm); 
+  // wait for the worker to finish or timeout after 20000 milliseconds
+  bool success = block_on(nvasm, wrkid, 20000); 
+  printf("Graph was successful: %d\n", success);
 
-  // See the next example for retrieving variable values
-  // Also see deleteFactor and deleteVariable
-
-  freeR(nvasm);
   freeR(nvafg); 
+  freeR(nvasm);
   freeR(nvacl);
   printf("All done.\n");
   return 0;

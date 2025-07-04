@@ -4,7 +4,7 @@ INC_DIR = ../include/
 LIB_DIR = ../target/debug/
 
 CXX := gcc
-CXXFLAGS = -Wall -g -fwrapv -lpthread -I$(INC_DIR)
+CXXFLAGS = -Wall -g -fwrapv -I$(INC_DIR)
 
 .DEFAULT_GOAL := run-all
 
@@ -27,7 +27,7 @@ build-basic-graph: basic_graph_and_solve.c
 .PHONY: build-basic-graph
 
 run-basic-graph: build-basic-graph
-	@LD_LIBRARY_PATH=../target/debug/ ./build/basic_graph
+	@LD_LIBRARY_PATH=../target/debug/ RUST_BACKTRACE=full ./build/basic_graph
 .PHONY: run-basic-graph
 
 build-camera-lidar: adding_camera_or_lidar.c
