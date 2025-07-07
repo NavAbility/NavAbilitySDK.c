@@ -21,11 +21,16 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = new_NavAbilityClient(url,atk);
+  char* orlb = NULL;
+  nvacl = new_NavAbilityClient(url,atk, orlb);
+
+  // Initialize the SubscriptionManager with the NavAbilityClient -- used later for synchronizing events
+  SubscriptionManager* nvasm = NULL;
+  nvasm = start_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
 
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
-  sprintf(fglbl, "FG_%03d", rand());
+  snprintf(fglbl, sizeof(fglbl), "FG_%05d", rand() % 100000);
   printf("fglbl: %s\n", fglbl);
   nvafg = new_NavAbilityDFG(
       nvacl,
@@ -56,8 +61,8 @@ int main(void) {
   Pose3Pose3_FullNormal *rf = NULL;
 
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
-  addVariable(nvafg, "x1", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x0", "RoME.Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x1", "RoME.Pose2", "", "", 0, 1);
   rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
   const char* fid1 = addFactor(
       nvafg,
@@ -69,7 +74,7 @@ int main(void) {
   );
   printf("Added factor id: %s\n", fid1);
   
-  addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x2", "RoME.Pose2", "", "", 0, 1);
   const char* fid2 = addFactor(
     nvafg,
     "x1;x2;",
@@ -80,7 +85,7 @@ int main(void) {
   );
   printf("Added factor id: %s\n", fid2);
 
-  addVariable(nvafg, "x3", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x3", "RoME.Pose2", "", "", 0, 1);
   const char* fid3 = addFactor(
     nvafg,
     "x2;x3;",
@@ -91,7 +96,7 @@ int main(void) {
   );
   printf("Added factor id: %s\n", fid3);
 
-  addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x4", "RoME.Pose2", "", "", 0, 1);
   const char* fid4 = addFactor(
     nvafg,
     "x3;x4;",
@@ -115,7 +120,12 @@ int main(void) {
   printf("Added factor id: %s\n", fid5);
 
   // Solve the basic graph
-  solveGraphParametric(nvafg, "x0");
+  char* wrkid = solveGraphParametric(nvafg, "x0");
+
+  // wait for the worker to finish or timeout after 2000 milliseconds
+  bool success = block_on(nvasm, wrkid, 5000);
+  printf("Graph solve success: %d\n", success);
+  freeR(wrkid); // free the worker id returned by solveGraphParametric
 
   // wait for solve to finish (THIS IS THE OVERSIMPLEFIED PART)
 
@@ -144,7 +154,7 @@ int main(void) {
   );
   printf("Added factor id: %s\n", fid6);
 
-  addVariable(nvafg, "x5", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x5", "RoME.Pose2", "", "", 0, 1);
   const char* fid7 = addFactor(
     nvafg,
     "x4;x5;",
@@ -153,7 +163,7 @@ int main(void) {
     "", 0, 
     1
   );
-  addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x6", "RoME.Pose2", "", "", 0, 1);
   const char* fid8 = addFactor(
     nvafg,
     "x5;x6;",
@@ -164,11 +174,17 @@ int main(void) {
   );
 
   // Solve the basic graph
-  solveGraphParametric(nvafg, "x6");
+  wrkid = solveGraphParametric(nvafg, "x6");
+    // wait for the worker to finish or timeout after 2000 milliseconds
+  success = block_on(nvasm, wrkid, 5000);
+  printf("Graph solve success: %d\n", success);
+  freeR(wrkid); // free the worker id returned by solveGraphParametric
 
   // See other examples for combining other data including IMU, Camera, Lidar
 
-  freeR(pf); freeR(rf); freeR(normal); freeR(X2); freeR(nvafg); freeR(nvacl);
+  // freeR(X2); 
+  freeR(pf); freeR(rf); freeR(normal); 
+  freeR(nvafg); freeR(nvasm); freeR(nvacl);
   printf("All done.\n");
   return 0;
 }

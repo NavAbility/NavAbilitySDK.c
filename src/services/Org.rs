@@ -19,9 +19,14 @@ use crate::{
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_org_id(
     nvacl: &NavAbilityClient,
+    label: Option<&String>, // label_CONTAINS filter
 ) -> Result<crate::get_org::ResponseData, Box<dyn Error>> {
     
-    let request_body = GetOrg::build_query(crate::get_org::Variables {});
+    let request_body = GetOrg::build_query(
+      crate::get_org::Variables {
+        label: label.cloned(),
+      }
+    );
 
     return post_to_nvaapi::<
         crate::get_org::Variables,
@@ -46,12 +51,13 @@ pub async fn post_org_id(
 pub fn q_getOrgId(
   send_into: Sender<crate::get_org::ResponseData>, 
   nvacl: &NavAbilityClient,
+  label: Option<&String>, // label_CONTAINS filter
 ) {
   // wasmbindgen limitation?  overcome +'static requirement
   crate::execute(async move {
     let _ = send_api_result(
       send_into, 
-      post_org_id(&nvacl).await,
+      post_org_id(&nvacl, label).await,
     );
   });
 }

@@ -96,8 +96,10 @@ typedef struct String String;
 
 /**
  * Manages subscription events from NavAbilityClient subscriptions
- * SPECIAL NOTE1, can use standalone Self::subscription_listener(_)
- * SPECIAL_NOTE2, both non-blocking and blocking interfaces are provided (for wasm or tokio)
+ * SPECIAL NOTE1, can use standalone Self::subscription_listener(_) or as managed object.
+ * SPECIAL_NOTE2, both polling/non-blocking and blocking interfaces are provided.
+ * SPECIAL_NOTE3, supports both native and wasm32 targets.
+ * SPECIAL_NOTE4, also supports FFI bindings for C/C++, see NavAbilitySDK.c/src/capi/SubscriptionManager.rs
  */
 typedef struct SubscriptionManager SubscriptionManager;
 
@@ -298,7 +300,9 @@ struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const do
 struct NavAbilityBlobStore *new_NavAbilityBlobStore(const struct NavAbilityClient *nvacl,
                                                     const char *label);
 
-struct NavAbilityClient *new_NavAbilityClient(const char *api_url, const char *api_token);
+struct NavAbilityClient *new_NavAbilityClient(const char *api_url,
+                                              const char *api_token,
+                                              const char *orgLabel);
 
 struct NavAbilityDFG *new_NavAbilityDFG(const struct NavAbilityClient *_nvacl,
                                         const char *fgLabel,

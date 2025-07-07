@@ -23,14 +23,13 @@ impl GetId for NavAbilityClient {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "blocking"))]
 impl NavAbilityClient {
-    #[cfg(any(feature = "tokio", feature = "blocking"))]
     pub fn getOrgId(
         &self
     ) -> Uuid {
         if self.user_label.is_empty() {
-            crate::execute(crate::services::post_org_id(&self))
+            crate::execute(crate::services::post_org_id(&self, None))
             .expect(&format!(
                 "Error, unable to get OrgId with NavAbilityClient\napi_url:{}\ntoken:{}\n",
                 self.apiurl,
@@ -69,7 +68,7 @@ impl NavAbilityClient {
     pub fn new_fromargs(
         nva_api_url: &String, 
         nva_api_token: &String,
-        org_id: Option<&String>,
+        org_lbl: Option<&String>,
         do_events: bool,
     ) -> Self {
 
@@ -113,21 +112,24 @@ impl NavAbilityClient {
             nva_api_token: nva_api_token.to_string(),
         };
 
-        // also cover wasm case
-        // #[cfg(not(feature = "wasm"))] // FIXME
-        #[cfg(any(feature = "tokio", feature = "blocking"))]
-        let mut oid = org_id.unwrap_or(&"".to_string()).to_string();
-        #[cfg(any(feature = "thread"))]
-        let oid = org_id.unwrap_or(&"".to_string()).to_string();
+        let mut oglb = org_lbl.unwrap_or(&"".to_string()).to_string();
+        let oid = if let Ok(uid) = uuid::Uuid::parse_str(&oglb) {
+            uid.to_string()
+        } else {
+            let mut ret = "".to_owned();
+            // crate::to_console_debug(&format!("NavAbilityClient constructor trying orlb={:?}",&oglb));
+            #[cfg(any(feature = "tokio", feature="thread", feature = "blocking"))]
+            {
+                ret = crate::execute(crate::services::post_org_id(
+                    &temp,
+                    Some(&oglb),
+                )).expect("Error, unable to get OrgId from NavAbilityClient")
+                .orgs[0].id
+                .to_string();
+            }
 
-        #[cfg(any(feature = "tokio", feature = "blocking"))] // , feature = "thread"
-        if org_id.is_none() {
-            oid = crate::execute(crate::services::post_org_id(
-                &temp
-            )).expect("Error, unable to get OrgId from NavAbilityClient")
-            .orgs[0].id
-            .to_string();
-        }
+            ret
+        };
     
         temp.user_label = oid;
 

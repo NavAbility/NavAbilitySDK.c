@@ -1,5 +1,5 @@
-query GetOrg {
-  orgs {
+query GetOrg($label: String = "") {
+  orgs(where: {label_CONTAINS: $label}) {
     id
     label
     description
