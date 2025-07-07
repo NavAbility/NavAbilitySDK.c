@@ -75,6 +75,7 @@ fn new_uuid4() -> *mut c_char {
 fn new_NavAbilityClient(
     api_url: *const c_char,
     api_token: *const c_char, 
+    orgLabel: *const c_char, // unused in this version
 ) -> Box<crate::NavAbilityClient> {
     let capi_url = CStr::from_ptr(api_url);
     let url = capi_url.to_str().expect("Bad encoding url");
@@ -83,10 +84,20 @@ fn new_NavAbilityClient(
     let atk_cstr = CStr::from_ptr(api_token);
     let atk = atk_cstr.to_str().expect("Bad encoding atk");
 
+    let orglbl = if orgLabel.is_null() {
+        // If orgLabel is NULL, we use the default organization label
+        // This is a workaround for the fact that we don't have a way to pass
+        // an empty string from C to Rust.
+        None
+    } else {
+        let orglbl_cstr = CStr::from_ptr(orgLabel);
+        Some(orglbl_cstr.to_str().expect("Bad encoding orgLabel").to_string())
+    };
+
     return Box::new(crate::NavAbilityClient::new(
         &url.to_owned(),
         &atk.to_owned(),
-        None
+        orglbl.as_ref(),
     ))
 }
 
@@ -114,6 +125,9 @@ fn new_NavAbilityDFG<'a>(
     if !(storeLabel.is_none()) {
         _storeLabel = Some(cstr_to_str(storeLabel.unwrap()));
     }
+
+    // let orlb = &nvacl.user_label[..8];
+    // crate::to_console_debug(&format!("New NavAbilityDFG on org={:?}", orlb));
 
     return Some(Box::new(
         crate::NavAbilityDFG::new(

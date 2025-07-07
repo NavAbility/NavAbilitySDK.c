@@ -17,16 +17,23 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = new_NavAbilityClient(url,atk);
+  const char* orlb = NULL;
+  nvacl = new_NavAbilityClient(url, atk, orlb);
 
   // Initialize the SubscriptionManager with the NavAbilityClient -- used later for synchronizing events
   SubscriptionManager* nvasm = NULL;
   nvasm = start_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
 
-  NavAbilityDFG *nvafg = NULL;
+
+  // The array char[] is allocated on the stack (not the heap), so its memory is automatically managed.  No free is needed.
+  // - Stack allocation (`char fglbl[30];`): No need to free.
+  // - Heap allocation (`char* fglbl = malloc(30);`): Must free with `free(fglbl);`.
   char fglbl[30];
-  sprintf(fglbl, "FG_%03d", rand());
+  snprintf(fglbl, sizeof(fglbl), "FG_%05d", rand() % 100000);
   printf("fglbl: %s\n", fglbl);
+
+  // Create a new NavAbilityDFG (Distributed Factor Graph) instance
+  NavAbilityDFG *nvafg = NULL;
   nvafg = new_NavAbilityDFG(
       nvacl,
       fglbl,
@@ -96,10 +103,12 @@ int main(void) {
   char* wrkid = solveGraphParametric(nvafg, "x1");
   printf("Blocking on solve graph, action id: %s\n", wrkid);
   
-  // wait for the worker to finish or timeout after 20000 milliseconds
-  bool success = block_on(nvasm, wrkid, 20000); 
-  printf("Graph was successful: %d\n", success);
+  // wait for the worker to finish or timeout after _ milliseconds
+  bool success = block_on(nvasm, wrkid, 5000); 
+  printf("Graph solve success: %d\n", success);
+  freeR(wrkid); // free the worker id returned by solveGraphParametric
 
+  // freeR(fglbl); // free the string created by sprintf
   freeR(nvafg); 
   freeR(nvasm);
   freeR(nvacl);
