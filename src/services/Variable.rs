@@ -3,13 +3,6 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
-use crate::{
-    parse_str_utc, 
-    Uuid,
-    BlobEntry, 
-};
-
 
 use crate::{
     to_console_error, 
@@ -22,9 +15,11 @@ use crate::{
 };
 
 
-
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
+    parse_str_utc, 
+    Uuid,
+    BlobEntry, 
     Error,     
     Sender, 
     NavAbilityDFG,
@@ -34,6 +29,8 @@ use crate::{
     GraphQLQuery,
     ListVariables,
     AddVariable,
+    DeleteVariable,
+    delete_variable,
     GetId,
     get_variable::{
         self, 
@@ -596,4 +593,57 @@ pub fn addVariable(
         _solvable,
         _metadata,
     ));
+}
+
+
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+pub async fn post_delete_variable(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  
+  let variables = delete_variable::Variables {
+    variable_id: nvafg.getId(label).to_string(),
+  };
+  let request_body = DeleteVariable::build_query(variables);
+  
+  return crate::post_to_nvaapi::<
+    delete_variable::Variables,
+    delete_variable::ResponseData,
+    i64
+  >(
+    &nvafg.client,
+    request_body, 
+    |s| {
+      s.delete_variables.nodes_deleted
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[allow(non_snake_case)]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn q_deleteVariable(
+  send_into: crate::Sender<i64>, 
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_delete_variable(nvafg, label).await,
+    );
+  })
+}
+
+
+#[cfg(feature = "tokio")]
+pub fn deleteVariable(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  return crate::execute(post_delete_variable(nvafg, label));
 }
