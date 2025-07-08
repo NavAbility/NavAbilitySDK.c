@@ -1,0 +1,15 @@
+mutation DeleteFactor($factorId: ID!) {
+  deleteFactors(
+    where: { id: $factorId }
+    delete: {
+      blobEntries: {
+        where: {
+          node: { parentConnection: {Factor: { node: { id: $factorId } } } }
+        }
+      }
+    }
+  ) {
+    nodesDeleted
+    relationshipsDeleted
+  }
+}

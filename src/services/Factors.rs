@@ -22,6 +22,8 @@ use crate::{
   GetId,
   AddFactors,
   add_factors,
+  DeleteFactor,
+  delete_factor,
   SDK_VERSION,
   common_traits::GetLabel,
 };
@@ -379,3 +381,42 @@ pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   })
 }
 
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+pub async fn post_delete_factor(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<delete_factor::ResponseData, Box<dyn Error>> {
+  
+  let variables = delete_factor::Variables {
+    factor_id: nvafg.getId(label).to_string(),
+  };
+  let request_body = DeleteFactor::build_query(variables);
+  
+  return crate::post_to_nvaapi::<
+    delete_factor::Variables,
+    delete_factor::ResponseData,
+    delete_factor::ResponseData
+  >(
+    &nvafg.client,
+    request_body, 
+    |s| s,
+    Some(3)
+  ).await;
+}
+
+
+#[allow(non_snake_case)]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn q_deleteFactor(
+  send_into: crate::Sender<delete_factor::ResponseData>, 
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_delete_factor(nvafg, label).await,
+    );
+  })
+}
