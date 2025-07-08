@@ -355,7 +355,9 @@ pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<
-    Uuid, Box<dyn Error>> {
+    Uuid, 
+    Box<dyn Error>
+> {
   return crate::execute(post_add_factor(nvafg, factor));
 }
 // #[cfg(feature = "thread")]
@@ -386,7 +388,7 @@ pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 pub async fn post_delete_factor(
   nvafg: &NavAbilityDFG,
   label: &str,
-) -> Result<delete_factor::ResponseData, Box<dyn Error>> {
+) -> Result<i64, Box<dyn Error>> {
   
   let variables = delete_factor::Variables {
     factor_id: nvafg.getId(label).to_string(),
@@ -396,11 +398,13 @@ pub async fn post_delete_factor(
   return crate::post_to_nvaapi::<
     delete_factor::Variables,
     delete_factor::ResponseData,
-    delete_factor::ResponseData
+    i64
   >(
     &nvafg.client,
     request_body, 
-    |s| s,
+    |s| {
+      s.delete_factors.nodes_deleted
+    },
     Some(3)
   ).await;
 }
@@ -409,7 +413,7 @@ pub async fn post_delete_factor(
 #[allow(non_snake_case)]
 #[cfg(any(feature = "tokio"))] // , feature = "thread"
 pub fn q_deleteFactor(
-  send_into: crate::Sender<delete_factor::ResponseData>, 
+  send_into: crate::Sender<i64>, 
   nvafg: &NavAbilityDFG,
   label: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -419,4 +423,12 @@ pub fn q_deleteFactor(
       post_delete_factor(nvafg, label).await,
     );
   })
+}
+
+#[cfg(feature = "tokio")]
+pub fn deleteFactor(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  return crate::execute(post_delete_factor(nvafg, label));
 }
