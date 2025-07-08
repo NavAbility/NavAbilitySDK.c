@@ -72,7 +72,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", flb1);
+  printf("Added factor label: %s\n", flb1);
   
   addVariable(nvafg, "x2", "RoME.Pose2", "", "", 0, 1);
   const char* flb2 = addFactor(
@@ -83,7 +83,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", flb2);
+  printf("Added factor label: %s\n", flb2);
 
   addVariable(nvafg, "x3", "RoME.Pose2", "", "", 0, 1);
   const char* flb3 = addFactor(
@@ -94,7 +94,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", flb3);
+  printf("Added factor label: %s\n", flb3);
 
   addVariable(nvafg, "x4", "RoME.Pose2", "", "", 0, 1);
   const char* flb4 = addFactor(
@@ -105,7 +105,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", flb4);
+  printf("Added factor label: %s\n", flb4);
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
@@ -117,7 +117,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", flb5);
+  printf("Added factor label: %s\n", flb5);
 
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x0");
@@ -152,7 +152,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", flb6);
+  printf("Added factor label: %s\n", flb6);
 
   addVariable(nvafg, "x5", "RoME.Pose2", "", "", 0, 1);
   const char* flb7 = addFactor(
