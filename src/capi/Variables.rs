@@ -63,7 +63,6 @@ fn getVariable(
     nvafg.unwrap(), 
     &cstr_to_str(label),
     true,
-    // false,
   );
   
   match vari {
@@ -88,13 +87,14 @@ fn getPPEMean(
     return None;
   }
   let vari = vari_.unwrap();
+  let solveKey = cstr_to_str(_solveKey);
   let ppem = crate::services::getPPEMean(
     vari,
-    &cstr_to_str(_solveKey),
+    &solveKey,
   );
 
   if ppem.is_empty() {
-    to_console_error(&format!("getPPEMean: for VariableDFG {} is empty", &vari.getLabel()));
+    // to_console_error(&format!("getPPEMean: for VariableDFG {}:{} is empty", &vari.getLabel(), &solveKey));
     return None;
   }
   
@@ -117,9 +117,6 @@ fn getPPECov(
     return None;
   }
   let vari = vari_.unwrap();
-
-  println!("getPPECov: work in progress");
-  return None;
 
   let ppec = crate::services::getPPECov(
     vari,
