@@ -497,7 +497,7 @@ pub async fn post_add_variable(
     _nstime: Option<usize>,
     _solvable: Option<i64>,
     _metadata: Option<String>,
-) -> Result<Uuid,Box<dyn Error>> {
+) -> Result<String,Box<dyn Error>> {
 
     let metadata = Some(if _metadata.is_some() {
         _metadata.unwrap().clone()
@@ -532,12 +532,13 @@ pub async fn post_add_variable(
     return post_to_nvaapi::<
         crate::add_variable::Variables,
         crate::add_variable::ResponseData,
-        Uuid
+        String
     >(
         &nvafg.client,
         request_body, 
         |s| {
-            return Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response");
+            // return Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response");
+            return s.add_variables.variables[0].label.to_string();
         },
         Some(1)
     ).await;
@@ -546,7 +547,7 @@ pub async fn post_add_variable(
 
 #[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn add_variable_send(
-    send_into: std::sync::mpsc::Sender<Uuid>,
+    send_into: std::sync::mpsc::Sender<String>,
     nvafg: &NavAbilityDFG,
     label: &String,
     variableType: &VariableType,
@@ -583,7 +584,7 @@ pub fn addVariable(
     _nstime: Option<usize>,
     _solvable: Option<i64>,
     _metadata: Option<String>,
-) -> Result<Uuid, Box<dyn Error>> {
+) -> Result<String, Box<dyn Error>> {
 
     return crate::execute(post_add_variable(
         nvafg,
