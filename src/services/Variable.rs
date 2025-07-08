@@ -598,7 +598,7 @@ pub fn addVariable(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_delete_variable(
   nvafg: &NavAbilityDFG,
   label: &str,
