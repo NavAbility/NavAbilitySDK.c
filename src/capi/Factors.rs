@@ -173,15 +173,15 @@ macro_rules! GenFactorDFG_Type {
             );
 
             // Do the add factor call here
-            let idr = crate::services::addFactor(
+            let lbr = crate::services::addFactor(
                 nvafg.unwrap(), 
                 f
             );
 
 
             // return Some(Box::new( f ));
-            if let Ok(id) = idr {
-                return convert_str(&id.to_string());
+            if let Ok(lb) = lbr {
+                return convert_str(&lb.to_string());
             } else {
                 return convert_str("ERROR");
             }
