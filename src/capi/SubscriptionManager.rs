@@ -49,9 +49,7 @@ fn start_SubscriptionManager(
 
   let nvasm = SubscriptionManager::from_parts(&nvacl.clone(), size, nonblocking_recv, blocking_into);
 
-  to_console_debug(&format!("assign_SubsMan: before spawning listener thread, smi.nvacl.api_url={:?}",&nvacl.apiurl));
   thread::spawn( move || {
-    println!("assign_SubMan future: starting subscription listener, nvacl.api_url={:?}", &nvacl.apiurl);
     SubscriptionManager::subscription_listener(
       nonblocking_into,
       &nvacl.clone(),
@@ -59,7 +57,6 @@ fn start_SubscriptionManager(
     );
     ()
   });
-  to_console_debug("assign_SubscriptionManager: subscription listener thread spawned");
   
   return Some(Box::new(nvasm));
 }
