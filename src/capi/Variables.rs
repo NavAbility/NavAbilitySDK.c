@@ -173,8 +173,8 @@ fn addVariable(
   );
   
   match vari {
-    Ok(id) => {
-      return convert_str(&id.to_string());
+    Ok(lb) => {
+      return convert_str(&lb.to_string());
     },
     Err(e) => {
       to_console_error(&format!("Problem with addVariable {:?}",e));

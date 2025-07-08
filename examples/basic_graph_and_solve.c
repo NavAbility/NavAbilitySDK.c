@@ -61,7 +61,7 @@ int main(void) {
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
   const char* time_utc = "2020-01-01 06:30:01.250 UTC";
   char* v = addVariable(nvafg, "x0", "RoME.Pose2", "TESTTAG;", time_utc, 0, 1);
-  printf("added variable id: %s\n", v);
+  printf("added variable label: %s\n", v);
 
   // and prior factor indicating the starting location at 0 ( a prior belief is used)
   normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
@@ -75,13 +75,13 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f1); freeR(normal); // because new_ was used
-  printf("Added factor id: %s\n", fid1);
+  printf("Added factor label: %s\n", fid1);
   
 
   // ROBOT MOVES TO (10,0,0)
   const char* time_z = "2020-01-01T06:30:08.500Z";
   v = addVariable(nvafg, "x1", "RoME.Pose2", "TESTTAG;", time_z, 0, 1);
-  printf("added variable id: %s\n", v);
+  printf("added variable label: %s\n", v);
   
   // a relative motion factor indicating the robot moved 10 units in the x direction
   mn[0] = 10.0;
@@ -96,7 +96,7 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor id: %s\n", fid2);
+  printf("Added factor label: %s\n", fid2);
 
 
   // Solve the basic graph
