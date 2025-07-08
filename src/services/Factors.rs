@@ -276,7 +276,7 @@ impl ManualFacVarFieldInput {
 pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
-) -> Result<Uuid, Box<dyn Error>> {
+) -> Result<String, Box<dyn Error>> {
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
 
@@ -335,14 +335,16 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 
   return crate::post_to_nvaapi_cb::<
     add_factors::ResponseData,
-    Uuid
+    String
   >(
     |s| {
       if &s.add_factors.factors.len() != &1 {
         to_console_error(&format!("post_add_factor: expected 1 factor in response, got {}", s.add_factors.factors.len()));
-        return Uuid::nil();
+        // return Uuid::nil();
+        return "".to_owned();
       }
-      return Uuid::parse_str(&s.add_factors.factors[0].factor_skeleton_fields.id).expect("post_add_variable not able to parse uuid from API response");
+      // return Uuid::parse_str(&s.add_factors.factors[0].factor_skeleton_fields.id).expect("post_add_variable not able to parse uuid from API response");
+      return s.add_factors.factors[0].factor_skeleton_fields.label.to_string();
     },
     Some(1),
     post_req
@@ -355,7 +357,7 @@ pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<
-    Uuid, 
+    String, 
     Box<dyn Error>
 > {
   return crate::execute(post_add_factor(nvafg, factor));
@@ -371,7 +373,7 @@ pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 
 #[cfg(any(feature = "tokio"))] // feature = "thread", 
 pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
-  send_into: crate::Sender<Uuid>, 
+  send_into: crate::Sender<String>, 
   nvafg: NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<(), Box<dyn Error>> {
