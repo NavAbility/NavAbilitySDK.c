@@ -67,7 +67,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv); // new_ means must freeR(normal) later
   PriorPose2_FullNormal *f1 = NULL;
   f1 = new_PriorPose2(normal);  // new_ means must freeR(f1) later
-  const char* fid1 = addFactor(
+  const char* flb1 = addFactor(
       nvafg,
       "x0;",
       f1,
@@ -75,7 +75,7 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f1); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", fid1);
+  printf("Added factor label: %s\n", flb1);
   
 
   // ROBOT MOVES TO (10,0,0)
@@ -88,7 +88,7 @@ int main(void) {
   normal = new_FullNormal(3,mn,cv);
   Pose2Pose2_FullNormal *f2 = NULL;
   f2 = new_Pose2Pose2(normal);  // new_ means must freeR(pf) later
-  const char* fid2 = addFactor(
+  const char* flb2 = addFactor(
       nvafg,
       "x0;x1;",
       f2,
@@ -96,7 +96,7 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", fid2);
+  printf("Added factor label: %s\n", flb2);
 
 
   // Solve the basic graph
