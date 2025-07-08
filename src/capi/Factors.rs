@@ -28,11 +28,28 @@ use crate::{
 
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
-fn deleteFactorById(
+fn deleteFactor(
   nvafg: Option<&crate::NavAbilityDFG>,
-  fid: *const c_char,
-) {
-  println!("deleteFactorById, Work in progress");
+  label: *const c_char,
+) -> i64 {
+    if nvafg.is_none() {
+        eprintln!("deleteFactor: provided *NavAbilityDFG is NULL/None");
+        return -1 as i64;
+    }
+
+    let label_str = cstr_to_str(label);
+    let idr = crate::services::deleteFactor(
+        nvafg.unwrap(), 
+        label_str
+    );
+
+    if let Err(ref e) = idr {
+        eprintln!("deleteFactor error: {}", e);
+    }
+    match idr {
+        Ok(id) => id as i64, // Return the id of the deleted factor
+        Err(_) => -1 as i64, // Return 0 on error
+    }
 }
 
 
