@@ -314,9 +314,18 @@ pub fn getPPEMean(
     solveKey: &str
 ) -> Vec<f64> {
 
-    for ppe in vari.ppes.iter() {
-        if ppe.solveKey.eq(solveKey) {
-            return ppe.mean.clone();
+    if solveKey.eq("parametric") {
+        // Special case for parametric solveKey (PPE being deprecated in DFG v1)
+        for vnd in vari.solverData.iter() {
+            if vnd.solveKey.eq(solveKey) {
+                return vnd.vecval.clone();
+            }
+        }
+    } else {
+        for ppe in vari.ppes.iter() {
+            if ppe.solveKey.eq(solveKey) {
+                return ppe.mean.clone();
+            }
         }
     }
     return Vec::new();
@@ -325,17 +334,20 @@ pub fn getPPEMean(
 
 #[cfg(any(feature = "tokio", feature = "blocking"))]
 pub fn getPPECov(
-    _vari: &VariableDFG,
-    _solveKey: &str
+    vari: &VariableDFG,
+    solveKey: &str
 ) -> Vec<f64> {
-
-    todo!("getPPECov, TODO extract from solverData.val -- see JuliaRobotics/DistributedFactorGraphs.jl#535");
-    // for ppe in vari.ppes.iter() {
-    //     if ppe.solveKey.eq(solveKey) {
-    //         return ppe.cov.clone();
-    //     }
-    // }
-    // return Vec::new();
+    if solveKey.eq("parametric") {
+        // Special case for parametric solveKey (PPE being deprecated in DFG v1)
+        for vnd in vari.solverData.iter() {
+            if vnd.solveKey.eq(solveKey) {
+                return vnd.vecbw.clone();
+            }
+        }
+    } else {
+        todo!("getPPECov, TODO extract from solverData.val -- see JuliaRobotics/DistributedFactorGraphs.jl#535");
+    }
+    return Vec::new();
 }
 
 

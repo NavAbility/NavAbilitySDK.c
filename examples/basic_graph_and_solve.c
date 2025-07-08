@@ -24,7 +24,6 @@ int main(void) {
   SubscriptionManager* nvasm = NULL;
   nvasm = start_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
 
-
   // The array char[] is allocated on the stack (not the heap), so its memory is automatically managed.  No free is needed.
   // - Stack allocation (`char fglbl[30];`): No need to free.
   // - Heap allocation (`char* fglbl = malloc(30);`): Must free with `free(fglbl);`.
@@ -107,6 +106,21 @@ int main(void) {
   bool success = block_on(nvasm, wrkid, 5000); 
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric
+
+  // GET MEAN AND COV OF X2 AND USE AS PRIOR
+  VariableDFG* X1 = NULL;
+  X1 = getVariable(nvafg, "x1");
+  RVec_f64* mn_ = getPPEMean(X1, "parametric");
+  printf("Mean of x1: [%.3g %.3g %.3g]\n", 
+    *getIndex(mn_, 0), *getIndex(mn_, 1), *getIndex(mn_, 2)
+  ); 
+  RVec_f64* cv_ = getPPECov(X1, "parametric");
+  // TBD confirm column major order, covariance is symmetric
+  printf("Cov of x1:\n[%.2g %.2g %.2g]\n[%.2g %.2g %.2g]\n[%.2g %.2g %.2g]\n", 
+    *getIndex(cv_, 0), *getIndex(cv_, 1), *getIndex(cv_, 2),
+    *getIndex(cv_, 3), *getIndex(cv_, 4), *getIndex(cv_, 5),
+    *getIndex(cv_, 6), *getIndex(cv_, 7), *getIndex(cv_, 8)
+  ); 
 
   // freeR(fglbl); // free the string created by sprintf
   freeR(nvafg); 
