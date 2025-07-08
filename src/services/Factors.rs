@@ -14,7 +14,7 @@ use base64::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Error,
   to_console_error,
@@ -46,7 +46,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::entities::ClientDFG::NavAbilityDFG;
 
 
@@ -272,7 +272,7 @@ impl ManualFacVarFieldInput {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
@@ -386,7 +386,7 @@ pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_delete_factor(
   nvafg: &NavAbilityDFG,
   label: &str,
