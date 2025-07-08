@@ -179,7 +179,7 @@ void deleteBlob(const struct NavAbilityClient *nvacl_, const char *blob_id, cons
 
 int64_t deleteFactor(const struct NavAbilityDFG *nvafg, const char *label);
 
-void deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
+int64_t deleteVariable(const struct NavAbilityDFG *nvafg, const char *label);
 
 char *deriveRobotConfig(const struct NavAbilityDFG *nvafg);
 
