@@ -3,13 +3,6 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
-use crate::{
-    parse_str_utc, 
-    Uuid,
-    BlobEntry, 
-};
-
 
 use crate::{
     to_console_error, 
@@ -22,9 +15,11 @@ use crate::{
 };
 
 
-
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
+    parse_str_utc, 
+    Uuid,
+    BlobEntry, 
     Error,     
     Sender, 
     NavAbilityDFG,
@@ -34,6 +29,8 @@ use crate::{
     GraphQLQuery,
     ListVariables,
     AddVariable,
+    DeleteVariable,
+    delete_variable,
     GetId,
     get_variable::{
         self, 
@@ -497,7 +494,7 @@ pub async fn post_add_variable(
     _nstime: Option<usize>,
     _solvable: Option<i64>,
     _metadata: Option<String>,
-) -> Result<Uuid,Box<dyn Error>> {
+) -> Result<String,Box<dyn Error>> {
 
     let metadata = Some(if _metadata.is_some() {
         _metadata.unwrap().clone()
@@ -532,12 +529,13 @@ pub async fn post_add_variable(
     return post_to_nvaapi::<
         crate::add_variable::Variables,
         crate::add_variable::ResponseData,
-        Uuid
+        String
     >(
         &nvafg.client,
         request_body, 
         |s| {
-            return Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response");
+            // return Uuid::parse_str(&s.add_variables.variables[0].id).expect("post_add_variable not able to parse uuid from API response");
+            return s.add_variables.variables[0].label.to_string();
         },
         Some(1)
     ).await;
@@ -546,7 +544,7 @@ pub async fn post_add_variable(
 
 #[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn add_variable_send(
-    send_into: std::sync::mpsc::Sender<Uuid>,
+    send_into: std::sync::mpsc::Sender<String>,
     nvafg: &NavAbilityDFG,
     label: &String,
     variableType: &VariableType,
@@ -583,7 +581,7 @@ pub fn addVariable(
     _nstime: Option<usize>,
     _solvable: Option<i64>,
     _metadata: Option<String>,
-) -> Result<Uuid, Box<dyn Error>> {
+) -> Result<String, Box<dyn Error>> {
 
     return crate::execute(post_add_variable(
         nvafg,
@@ -595,4 +593,57 @@ pub fn addVariable(
         _solvable,
         _metadata,
     ));
+}
+
+
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+pub async fn post_delete_variable(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  
+  let variables = delete_variable::Variables {
+    variable_id: nvafg.getId(label).to_string(),
+  };
+  let request_body = DeleteVariable::build_query(variables);
+  
+  return crate::post_to_nvaapi::<
+    delete_variable::Variables,
+    delete_variable::ResponseData,
+    i64
+  >(
+    &nvafg.client,
+    request_body, 
+    |s| {
+      s.delete_variables.nodes_deleted
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[allow(non_snake_case)]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn q_deleteVariable(
+  send_into: crate::Sender<i64>, 
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_delete_variable(nvafg, label).await,
+    );
+  })
+}
+
+
+#[cfg(feature = "tokio")]
+pub fn deleteVariable(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  return crate::execute(post_delete_variable(nvafg, label));
 }

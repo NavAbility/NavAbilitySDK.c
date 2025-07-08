@@ -1,0 +1,22 @@
+mutation DeleteVariable($variableId: ID!) {
+  deleteVariables(
+    where: { id: $variableId }
+    delete: {
+      ppes: {
+        where: { node: { variableConnection: { node: { id: $variableId } } } }
+      }
+      solverData: {
+        where: { node: { variableConnection: { node: { id: $variableId } } } }
+      }
+      blobEntries: {
+        where: { node: { parentConnection: {Variable: {node: {id: $variableId } } } } }
+      }
+      factors: {
+        where: { node: { variablesConnection_SOME: {node: {id: $variableId } } } } 
+      }
+    }
+  ) {
+    nodesDeleted
+    relationshipsDeleted
+  }
+}

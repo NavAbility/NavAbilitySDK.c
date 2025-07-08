@@ -14,7 +14,7 @@ use base64::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
   Error,
   to_console_error,
@@ -22,6 +22,8 @@ use crate::{
   GetId,
   AddFactors,
   add_factors,
+  DeleteFactor,
+  delete_factor,
   SDK_VERSION,
   common_traits::GetLabel,
 };
@@ -44,7 +46,7 @@ use crate::{
 };
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::entities::ClientDFG::NavAbilityDFG;
 
 
@@ -270,11 +272,11 @@ impl ManualFacVarFieldInput {
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
-) -> Result<Uuid, Box<dyn Error>> {
+) -> Result<String, Box<dyn Error>> {
   let label = factor.getLabel().to_string();
   let id = nvafg.getId(&label).to_string();
 
@@ -333,14 +335,16 @@ pub async fn post_add_factor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 
   return crate::post_to_nvaapi_cb::<
     add_factors::ResponseData,
-    Uuid
+    String
   >(
     |s| {
       if &s.add_factors.factors.len() != &1 {
         to_console_error(&format!("post_add_factor: expected 1 factor in response, got {}", s.add_factors.factors.len()));
-        return Uuid::nil();
+        // return Uuid::nil();
+        return "".to_owned();
       }
-      return Uuid::parse_str(&s.add_factors.factors[0].factor_skeleton_fields.id).expect("post_add_variable not able to parse uuid from API response");
+      // return Uuid::parse_str(&s.add_factors.factors[0].factor_skeleton_fields.id).expect("post_add_variable not able to parse uuid from API response");
+      return s.add_factors.factors[0].factor_skeleton_fields.label.to_string();
     },
     Some(1),
     post_req
@@ -353,7 +357,9 @@ pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   nvafg: &NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<
-    Uuid, Box<dyn Error>> {
+    String, 
+    Box<dyn Error>
+> {
   return crate::execute(post_add_factor(nvafg, factor));
 }
 // #[cfg(feature = "thread")]
@@ -367,7 +373,7 @@ pub fn addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
 
 #[cfg(any(feature = "tokio"))] // feature = "thread", 
 pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
-  send_into: crate::Sender<Uuid>, 
+  send_into: crate::Sender<String>, 
   nvafg: NavAbilityDFG,
   factor: FactorDFG<F>,
 ) -> Result<(), Box<dyn Error>> {
@@ -379,3 +385,52 @@ pub fn q_addFactor<'a, F: crate::FactorType<'a, FullNormal<'a>>>(
   })
 }
 
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+pub async fn post_delete_factor(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  
+  let variables = delete_factor::Variables {
+    factor_id: nvafg.getId(label).to_string(),
+  };
+  let request_body = DeleteFactor::build_query(variables);
+  
+  return crate::post_to_nvaapi::<
+    delete_factor::Variables,
+    delete_factor::ResponseData,
+    i64
+  >(
+    &nvafg.client,
+    request_body, 
+    |s| {
+      s.delete_factors.nodes_deleted
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[allow(non_snake_case)]
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn q_deleteFactor(
+  send_into: crate::Sender<i64>, 
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return send_api_result(
+      send_into, 
+      post_delete_factor(nvafg, label).await,
+    );
+  })
+}
+
+#[cfg(feature = "tokio")]
+pub fn deleteFactor(
+  nvafg: &NavAbilityDFG,
+  label: &str,
+) -> Result<i64, Box<dyn Error>> {
+  return crate::execute(post_delete_factor(nvafg, label));
+}

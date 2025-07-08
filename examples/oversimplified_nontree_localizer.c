@@ -64,7 +64,7 @@ int main(void) {
   addVariable(nvafg, "x0", "RoME.Pose2", "", "", 0, 1);
   addVariable(nvafg, "x1", "RoME.Pose2", "", "", 0, 1);
   rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
-  const char* fid1 = addFactor(
+  const char* flb1 = addFactor(
       nvafg,
       "x0;x1;",
       rf,
@@ -72,10 +72,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", fid1);
+  printf("Added factor label: %s\n", flb1);
   
   addVariable(nvafg, "x2", "RoME.Pose2", "", "", 0, 1);
-  const char* fid2 = addFactor(
+  const char* flb2 = addFactor(
     nvafg,
     "x1;x2;",
     rf,
@@ -83,10 +83,10 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", fid2);
+  printf("Added factor label: %s\n", flb2);
 
   addVariable(nvafg, "x3", "RoME.Pose2", "", "", 0, 1);
-  const char* fid3 = addFactor(
+  const char* flb3 = addFactor(
     nvafg,
     "x2;x3;",
     rf,
@@ -94,10 +94,10 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", fid3);
+  printf("Added factor label: %s\n", flb3);
 
   addVariable(nvafg, "x4", "RoME.Pose2", "", "", 0, 1);
-  const char* fid4 = addFactor(
+  const char* flb4 = addFactor(
     nvafg,
     "x3;x4;",
     rf,
@@ -105,11 +105,11 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor id: %s\n", fid4);
+  printf("Added factor label: %s\n", flb4);
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
-  const char* fid5 = addFactor(
+  const char* flb5 = addFactor(
       nvafg,
       "x0;",
       pf,
@@ -117,7 +117,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", fid5);
+  printf("Added factor label: %s\n", flb5);
 
   // Solve the basic graph
   char* wrkid = solveGraphParametric(nvafg, "x0");
@@ -130,8 +130,8 @@ int main(void) {
   // wait for solve to finish (THIS IS THE OVERSIMPLEFIED PART)
 
   // delete variables now marginalized out
-  deleteFactorById(nvafg, fid1);
-  deleteFactorById(nvafg, fid2);
+  deleteFactor(nvafg, flb1);
+  deleteFactor(nvafg, flb2);
   deleteVariable(nvafg, "x0");
   deleteVariable(nvafg, "x1");
 
@@ -144,7 +144,7 @@ int main(void) {
   freeR(normal); freeR(pf);
   normal = new_FullNormal(6,mn,cv); // FIXME fix, use mn_, cv_ instead
   pf = new_PriorPose3(normal);
-  const char* fid6 = addFactor(
+  const char* flb6 = addFactor(
       nvafg,
       "x2;",
       pf,
@@ -152,10 +152,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor id: %s\n", fid6);
+  printf("Added factor label: %s\n", flb6);
 
   addVariable(nvafg, "x5", "RoME.Pose2", "", "", 0, 1);
-  const char* fid7 = addFactor(
+  const char* flb7 = addFactor(
     nvafg,
     "x4;x5;",
     rf,
@@ -164,7 +164,7 @@ int main(void) {
     1
   );
   addVariable(nvafg, "x6", "RoME.Pose2", "", "", 0, 1);
-  const char* fid8 = addFactor(
+  const char* flb8 = addFactor(
     nvafg,
     "x5;x6;",
     rf,

@@ -305,10 +305,30 @@ pub struct AddVariable;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
+    query_path = "src/gql/DeleteVariable.gql",
+    response_derives = "Debug"
+)]
+pub struct DeleteVariable;
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/AddFactors.gql",
     response_derives = "Debug"
 )]
 pub struct AddFactors;
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/DeleteFactor.gql",
+    response_derives = "Debug"
+)]
+pub struct DeleteFactor;
 
 
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]

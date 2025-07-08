@@ -173,8 +173,8 @@ fn addVariable(
   );
   
   match vari {
-    Ok(id) => {
-      return convert_str(&id.to_string());
+    Ok(lb) => {
+      return convert_str(&lb.to_string());
     },
     Err(e) => {
       to_console_error(&format!("Problem with addVariable {:?}",e));
@@ -189,6 +189,24 @@ fn addVariable(
 fn deleteVariable(
   nvafg: Option<&crate::NavAbilityDFG>,
   label: *const c_char,
-) {
-  println!("deleteVariable, Work in progress");
+) -> i64 {
+    if nvafg.is_none() {
+        eprintln!("deleteVariable: provided *NavAbilityDFG is NULL/None");
+        return -1 as i64;
+    }
+
+    let label_str = cstr_to_str(label);
+    let idr = crate::services::deleteVariable(
+        nvafg.unwrap(), 
+        label_str
+    );
+
+    if let Err(ref e) = idr {
+        eprintln!("deleteVariable error: {}", e);
+    }
+    match idr {
+        Ok(id) => id as i64, // Return the id of the deleted factor
+        Err(_) => -1 as i64, // Return 0 on error
+    }
 }
+
