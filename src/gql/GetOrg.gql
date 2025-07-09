@@ -1,4 +1,4 @@
-query GetOrg($label: String = "") {
+query GetOrg($label: String! = "") {
   orgs(where: {label_CONTAINS: $label}) {
     id
     label
