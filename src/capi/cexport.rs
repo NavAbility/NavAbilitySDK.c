@@ -88,16 +88,16 @@ fn new_NavAbilityClient(
         // If orgLabel is NULL, we use the default organization label
         // This is a workaround for the fact that we don't have a way to pass
         // an empty string from C to Rust.
-        None
+        ""
     } else {
         let orglbl_cstr = CStr::from_ptr(orgLabel);
-        Some(orglbl_cstr.to_str().expect("Bad encoding orgLabel").to_string())
+        orglbl_cstr.to_str().expect("Bad encoding orgLabel")
     };
 
     return Box::new(crate::NavAbilityClient::new(
         &url.to_owned(),
         &atk.to_owned(),
-        orglbl.as_ref(),
+        orglbl,
     ))
 }
 
