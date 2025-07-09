@@ -29,7 +29,7 @@ impl NavAbilityClient {
         &self
     ) -> Uuid {
         if self.user_label.is_empty() {
-            crate::execute(crate::services::post_org_id(&self, None))
+            crate::execute(crate::services::post_org_id(&self, ""))
             .expect(&format!(
                 "Error, unable to get OrgId with NavAbilityClient\napi_url:{}\ntoken:{}\n",
                 self.apiurl,
@@ -43,7 +43,7 @@ impl NavAbilityClient {
     pub fn new(
         nva_api_url: &String, 
         nva_api_token: &String,
-        org_id: Option<&String>,
+        org_id: &str,
     ) -> Self {
         return Self::new_fromargs(
             nva_api_url,
@@ -60,7 +60,7 @@ impl NavAbilityClient {
         Self::new_fromargs(
             &nvacl.apiurl,
             &nvacl.nva_api_token,
-            Some(&nvacl.user_label),
+            &nvacl.user_label,
             do_events
         )
     }
@@ -68,7 +68,7 @@ impl NavAbilityClient {
     pub fn new_fromargs(
         nva_api_url: &String, 
         nva_api_token: &String,
-        org_lbl: Option<&String>,
+        org_lbl: &str,
         do_events: bool,
     ) -> Self {
 
@@ -112,8 +112,8 @@ impl NavAbilityClient {
             nva_api_token: nva_api_token.to_string(),
         };
 
-        let mut oglb = org_lbl.unwrap_or(&"".to_string()).to_string();
-        let oid = if let Ok(uid) = uuid::Uuid::parse_str(&oglb) {
+        // let mut oglb = org_lbl.unwrap_or("");
+        let oid = if let Ok(uid) = uuid::Uuid::parse_str(org_lbl) {
             uid.to_string()
         } else {
             let mut ret = "".to_owned();
@@ -122,7 +122,7 @@ impl NavAbilityClient {
             {
                 ret = crate::execute(crate::services::post_org_id(
                     &temp,
-                    Some(&oglb),
+                    org_lbl,
                 )).expect("Error, unable to get OrgId from NavAbilityClient")
                 .orgs[0].id
                 .to_string();
