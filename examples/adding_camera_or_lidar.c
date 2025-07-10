@@ -1,3 +1,20 @@
+// This is a simple example using the NavAbility SDK and API to add blob data to variables in a factor graph.
+// It demonstrates how to create a factor graph with multiple variables and manage blob data.
+// It also shows how to compute lidar registration and image processing tasks like white balance and affordance detection.
+// See other complementory examples different usage and features.
+// This is an introductory example.
+//
+// Copyright (c) 2025 The NavAbility(TM) Contributors.
+//  WhereWhen.ai supports open-source (science, algorithms, and standards), 
+//  including the permissive/free use of the Caesar.jl and NavAbilitySDKs 
+//  as is provided under the Apache License, Version 2.0 (the "License").
+//  You may use this file according to the public License, including commercial use, free of charge. 
+//  The License is available at http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+//  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and limitations under the License.
+// Contact info@wherewhen.ai regarding warranties, support, or cost savings through economies of scale.
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
