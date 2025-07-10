@@ -18,7 +18,7 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = new_NavAbilityClient(url,atk);
+  nvacl = new_NavAbilityClient(url,atk, "");
 
   // list all agents
   RVec_Agent* agents = NULL;
@@ -34,11 +34,11 @@ int main(void) {
   RVec_NvaNode_Factorgraph* fgs = NULL;
   fgs = getFactorgraphs(nvacl, ""); // must freeR(fgs) later
 
-  printf("getFactorgraphs length: %ld\n", length(fgs));
+  printf("Number of factor graphs found: %ld\n", length(fgs));
 
-  NvaNode_Factorgraph* fgi = NULL;
+  // NvaNode_Factorgraph* fgi = NULL;
   for (int i = 0; i < length(fgs); i++) {
-    printf("factor graph label: %s\n", getLabel(getIndex(fgs,i)));
+    printf("factor graph: %s\n", getLabel(getIndex(fgs,i)));
   }
 
   // look at a specific factor graph
@@ -71,23 +71,23 @@ int main(void) {
   X1 = getVariable(nvafg, "x1"); // must freeR(X1) later
 
   // look at the numerically estimated value of X1
-  RVec_f64* ppem = NULL;
-  ppem = getPPEMean(X1, "parametric");
-  if (0 < length(ppem)) {
+  RVec_f64* X1mn = NULL;
+  X1mn = getPPEMean(X1, "parametric");
+  if (0 < length(X1mn)) {
     printf(
-      "x1_ppe, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s\n", 
-      *getIndex(ppem, 0), *getIndex(ppem, 1), *getIndex(ppem, 2),
+      "x1, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s\n", 
+      *getIndex(X1mn, 0), *getIndex(X1mn, 1), *getIndex(X1mn, 2),
       "TODO_id"
     );
   } else {
-    printf("x1 has no PPE mean yet, requires numerical operations such as a solve or prediction.\n"); 
+    printf("x1 has no state estimate, requires numerical operations such as a solve or prediction.\n"); 
   }
 
   // and a covariance estimate
-  RVec_f64* ppec = NULL;
-  ppec = getPPECov(X1, "parametric");
+  RVec_f64* X1cv = NULL;
+  X1cv = getPPECov(X1, "parametric");
   
-  freeR(ppem); freeR(ppec);
+  freeR(X1mn); freeR(X1cv);
   freeR(X1);
 
   // See other examples for more concurrent usage, adding camera or lidar, launching more compute
