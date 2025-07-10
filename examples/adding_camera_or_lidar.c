@@ -17,11 +17,11 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = new_NavAbilityClient(url,atk);
+  nvacl = new_NavAbilityClient(url,atk, "");
 
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
-  sprintf(fglbl, "FG_%03d", rand());
+  snprintf(fglbl, sizeof(fglbl), "FG_%05d", rand() % 100000);
   printf("fglbl: %s\n", fglbl);
   nvafg = new_NavAbilityDFG(
       nvacl,
@@ -38,14 +38,15 @@ int main(void) {
   // BUILD A FACTOR GRAPH with multiple variables
   // inputs: (nvafg,label,variableType, [_tags,_timestamp,_nstime, _solavble])
 
-  addVariable(nvafg, "x0", "Pose2", "", "", 0, 1);
-  addVariable(nvafg, "x1", "Pose2", "DEMO_LIDAR;", "", 0, 1);
-  addVariable(nvafg, "x2", "Pose2", "", "", 0, 1);
-  addVariable(nvafg, "x3", "Pose2", "DEMO_CAM;", "", 0, 1);
-  addVariable(nvafg, "x4", "Pose2", "", "", 0, 1);
-  addVariable(nvafg, "x5", "Pose2", "DEMO_LIDAR;", "", 0, 1);
-  char* v = addVariable(nvafg, "x6", "Pose2", "", "", 0, 1);
-  printf("added last variable with return id: %s\n", v);
+  printf("Adding variables...\n");
+  addVariable(nvafg, "x0", "RoME.Pose3", "", "", 0, 1);
+  addVariable(nvafg, "x1", "RoME.Pose3", "DEMO_LIDAR;", "", 0, 1);
+  addVariable(nvafg, "x2", "RoME.Pose3", "", "", 0, 1);
+  addVariable(nvafg, "x3", "RoME.Pose3", "DEMO_CAM;", "", 0, 1);
+  addVariable(nvafg, "x4", "RoME.Pose3", "", "", 0, 1);
+  addVariable(nvafg, "x5", "RoME.Pose3", "DEMO_LIDAR;", "", 0, 1);
+  char* v = addVariable(nvafg, "x6", "RoME.Pose3", "", "", 0, 1);
+  printf("last variable: %s\n", v);
 
 
   // upload lidar data on x1
@@ -62,9 +63,9 @@ int main(void) {
     bid,                                 // associated blobId
     "left_lidar.las",                    // label
     "default",                           // blobstore
-    "SDK.c Lidar Camera Example",        // origin
-    strlen(buffer),                                   // blob size // strlen(buffer)
-    "configuration 7, with new tiedown", // description
+    "SDK.c ex camera_lidar",             // origin
+    strlen(buffer),                      // blob size // strlen(buffer)
+    "lidar EPROM set for zipco cfg 7",   // description
     mimetype,                            // data mimetype
     "",                                  // metadata
     ""                                   // timestamp UTC
@@ -87,9 +88,9 @@ int main(void) {
     bid,                                // associated blobId
     "left_lidar.las",                   // label
     "default",                          // blobstore
-    "SDK.c Lidar Camera Example",       // origin
+    "SDK.c ex camera_lidar",            // origin
     strlen(buffer),                     // blob size
-    "configuration 7, with new ziptie", // description
+    "lidar EPROM set for zipco cfg 7",  // description
     mimetype,                           // data mimetype
     "",                                 // metadata
     ""                                  // timestamp UTC
@@ -113,7 +114,7 @@ int main(void) {
     bid,                          // associated blobId
     "center_camera",              // label
     "default",                    // blobstore
-    "SDK.c Lidar Camera Example", // origin
+    "SDK.c ex camera_lidar",      // origin
     strlen(buffer),               // blob size
     "",                           // description
     mimetype2,                     // data mimetype
