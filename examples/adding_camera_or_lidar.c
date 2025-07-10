@@ -36,6 +36,10 @@ int main(void) {
   NavAbilityClient* nvacl = NULL;
   nvacl = new_NavAbilityClient(url,atk, "");
 
+  // Initialize the SubscriptionManager with the NavAbilityClient -- used later for synchronizing events
+  SubscriptionManager* nvasm = NULL;
+  nvasm = start_SubscriptionManager(nvacl, 64); // keep up to 64 events in the manager
+
   NavAbilityDFG *nvafg = NULL;
   char fglbl[30];
   snprintf(fglbl, sizeof(fglbl), "FG_%05d", rand() % 100000);
@@ -117,7 +121,9 @@ int main(void) {
 
   // compute registration between two lidar pointclouds
   char* wid = computeLidarRegistration(nvafg, "x1", "left_lidar.las", "x5", "left_lidar.las");
-  printf("received worker id: %s\n", wid);
+  bool success = block_on(nvasm, wid, 2000); 
+  // printf("received worker id: %s\n", wid);
+  freeR(wid); // free the worker id returned by computeLidarRegistration
 
   // Add camera data to x3
   // upload lidar data on x1
@@ -143,14 +149,19 @@ int main(void) {
 
   // compute registration between two lidar pointclouds
   wid = computeImageWhitebalance(nvafg, "x3", "center_camera", "center_camera_whitebalanced");
-  printf("received worker id: %s\n", wid);
+  success = block_on(nvasm, wid, 1000); 
+  // printf("received worker id: %s\n", wid);
+  freeR(wid); // free the worker id returned by computeImageWhitebalance
 
   // compute visual priors on image data
   wid = addAffordance_kNNvisual(nvafg, "x3", "map01;map02;", 5, 5);
-  printf("received worker id: %s\n", wid);
+  success = block_on(nvasm, wid, 5000); 
+  printf("Visual affordance worker success: %d\n", success);
+  freeR(wid); // free the worker id returned by addAffordance_kNNvisual
 
   // See other example for different usage of the same agent/graph/model
 
+  freeR(nvasm); // stop the subscription manager
   freeR(nvafg); freeR(nvacl); freeR(store);
   printf("All done.\n");
   return 0;
