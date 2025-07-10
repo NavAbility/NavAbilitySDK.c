@@ -82,7 +82,7 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f1); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", flb1);
+  printf("Added factor: %s\n", flb1);
   
 
   // ROBOT MOVES TO (10,0,0)
@@ -103,14 +103,11 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", flb2);
+  printf("Added factor: %s\n", flb2);
 
 
-  // Solve the basic graph
+  // Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   char* wrkid = solveGraphParametric(nvafg, "x1");
-  printf("Blocking on solve graph, action id: %s\n", wrkid);
-  
-  // wait for the worker to finish or timeout after _ milliseconds
   bool success = block_on(nvasm, wrkid, 5000); 
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric

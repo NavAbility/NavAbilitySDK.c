@@ -76,9 +76,11 @@ fn block_on(
   let wid = Uuid::parse_str(cstr_to_str(wrk_id)).expect("Cannot parse wrk_id string to uuid");
 
   let tout = std::time::Duration::from_millis(tout_millis as u64);
+  let start_time = std::time::Instant::now();
   let res = _nvasm.unwrap().block_on(&wid, tout);
+  let processing_time_ms = start_time.elapsed().as_millis();
   
-  to_console_debug(&format!("block_on: waiting for worker id {:?} with timeout {} ms, result: {:?}", wid, tout_millis, &res));
+  to_console_debug(&format!("block_on event {:?} => {:?}, ({} / timeout {} millisec)", wid, &res, processing_time_ms, tout_millis));
   return res.unwrap_or(false);
 }
 

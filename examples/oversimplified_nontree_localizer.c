@@ -79,7 +79,7 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb1);
+  printf("Added factor: %s\n", flb1);
   
   addVariable(nvafg, "x2", "RoME.Pose3", "", "", 0, 1);
   const char* flb2 = addFactor(
@@ -90,7 +90,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb2);
+  printf("Added factor: %s\n", flb2);
 
   addVariable(nvafg, "x3", "RoME.Pose3", "", "", 0, 1);
   const char* flb3 = addFactor(
@@ -101,7 +101,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb3);
+  printf("Added factor: %s\n", flb3);
 
   addVariable(nvafg, "x4", "RoME.Pose3", "", "", 0, 1);
   const char* flb4 = addFactor(
@@ -112,7 +112,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb4);
+  printf("Added factor: %s\n", flb4);
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
@@ -124,12 +124,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb5);
+  printf("Added factor: %s\n", flb5);
 
-  // Solve the basic graph
+  // Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   char* wrkid = solveGraphParametric(nvafg, "x0");
-
-  // wait for the worker to finish or timeout after _ milliseconds
   bool success = block_on(nvasm, wrkid, 30000); // overly long timeout for free tier demo purposes
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric
@@ -163,10 +161,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb6);
+  printf("Added factor: %s\n", flb6);
 
   addVariable(nvafg, "x5", "RoME.Pose3", "", "", 0, 1);
-  const char* flb7 = addFactor(
+  addFactor(
     nvafg,
     "x4;x5;",
     rf,
@@ -175,7 +173,7 @@ int main(void) {
     1
   );
   addVariable(nvafg, "x6", "RoME.Pose3", "", "", 0, 1);
-  const char* flb8 = addFactor(
+  addFactor(
     nvafg,
     "x5;x6;",
     rf,
@@ -184,9 +182,8 @@ int main(void) {
     1
   );
 
-  // Solve the basic graph
+// Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   wrkid = solveGraphParametric(nvafg, "x6");
-    // wait for the worker to finish or timeout after _ milliseconds
   success = block_on(nvasm, wrkid, 30000); // overly long timeout for free tier demo purposes
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric
