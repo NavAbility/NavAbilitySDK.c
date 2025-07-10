@@ -1,3 +1,11 @@
+// This is a simple example using the NavAbilitySDK to build and solve a graph using the NavAbility cloud infrastructure. 
+// It demonstrates how to create a factor graph with multiple variables, add factors, solve the graph
+// and manage the subscription to events. It uses a basic normal distribution for the factors.
+// This is an introductory example.
+
+// Copyright (c) 2025 Contributors, licensed by NavAbility Inc.
+
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
