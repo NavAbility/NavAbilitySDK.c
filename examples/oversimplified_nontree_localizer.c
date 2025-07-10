@@ -1,5 +1,21 @@
 
-// WORK IN PROGRESS
+// This is a simple example of using the NavAbility SDK to build a non-tree localizer and solve with NavAbility cloud API.
+// It demonstrates how to create a factor graph with multiple variables, add factors, solve the graph
+// and manage the subscription to events. It uses a basic normal distribution for the factors.
+// The example is oversimplified and does not include advanced features like Bayes/Junction tree marginalization.
+// See other examples for readily usable multisensor features like IMU, Camera, or Lidar integration.
+// This is an introductory example.
+//
+// Copyright (c) 2025 The NavAbility(TM) Contributors.
+//  WhereWhen.ai supports open-source (science, algorithms, and standards), 
+//  including the permissive/free use of the Caesar.jl and NavAbilitySDKs 
+//  as is provided under the Apache License, Version 2.0 (the "License").
+//  You may use this file according to the public License, including commercial use, free of charge. 
+//  The License is available at http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+//  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and limitations under the License.
+// Contact info@wherewhen.ai regarding warranties, support, or cost savings through economies of scale.
 
 
 #include <stdlib.h>
@@ -61,8 +77,8 @@ int main(void) {
   Pose3Pose3_FullNormal *rf = NULL;
 
   // inputs: (nvafg,label,variableType, [_tags,_solvable,_timestamp,_nstime,_metadata])
-  addVariable(nvafg, "x0", "RoME.Pose2", "", "", 0, 1);
-  addVariable(nvafg, "x1", "RoME.Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x0", "RoME.Pose3", "", "", 0, 1);
+  addVariable(nvafg, "x1", "RoME.Pose3", "", "", 0, 1);
   rf = new_Pose3Pose3(normal);  // new_ means must freeR(rf) later
   const char* flb1 = addFactor(
       nvafg,
@@ -72,9 +88,9 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb1);
+  printf("Added factor: %s\n", flb1);
   
-  addVariable(nvafg, "x2", "RoME.Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x2", "RoME.Pose3", "", "", 0, 1);
   const char* flb2 = addFactor(
     nvafg,
     "x1;x2;",
@@ -83,9 +99,9 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb2);
+  printf("Added factor: %s\n", flb2);
 
-  addVariable(nvafg, "x3", "RoME.Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x3", "RoME.Pose3", "", "", 0, 1);
   const char* flb3 = addFactor(
     nvafg,
     "x2;x3;",
@@ -94,9 +110,9 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb3);
+  printf("Added factor: %s\n", flb3);
 
-  addVariable(nvafg, "x4", "RoME.Pose2", "", "", 0, 1);
+  addVariable(nvafg, "x4", "RoME.Pose3", "", "", 0, 1);
   const char* flb4 = addFactor(
     nvafg,
     "x3;x4;",
@@ -105,7 +121,7 @@ int main(void) {
     "", 0, 
     1
   );
-  printf("Added factor label: %s\n", flb4);
+  printf("Added factor: %s\n", flb4);
 
   // and prior factor indicating the starting location
   pf = new_PriorPose3(normal);
@@ -117,13 +133,11 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb5);
+  printf("Added factor: %s\n", flb5);
 
-  // Solve the basic graph
+  // Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   char* wrkid = solveGraphParametric(nvafg, "x0");
-
-  // wait for the worker to finish or timeout after 2000 milliseconds
-  bool success = block_on(nvasm, wrkid, 5000);
+  bool success = block_on(nvasm, wrkid, 30000); // overly long timeout for free tier demo purposes
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric
 
@@ -139,7 +153,11 @@ int main(void) {
   VariableDFG* X2 = NULL;
   X2 = getVariable(nvafg, "x2");
   RVec_f64* mn_ = getPPEMean(X2, "parametric"); 
-  RVec_f64* cv_ = getPPECov(X2, "parametric");
+  printf("Mean of x2: [%.3g %.3g %.3g]\n", 
+    *getIndex(mn_, 0), *getIndex(mn_, 1), *getIndex(mn_, 2)
+  ); 
+  // RVec_f64* cv_ = getPPECov(X2, "parametric");
+
   // and prior factor by reusing the existing estimate for the oldest variable left in the graph
   freeR(normal); freeR(pf);
   normal = new_FullNormal(6,mn,cv); // FIXME fix, use mn_, cv_ instead
@@ -152,10 +170,10 @@ int main(void) {
       "", 0, 
       1
   );
-  printf("Added factor label: %s\n", flb6);
+  printf("Added factor: %s\n", flb6);
 
-  addVariable(nvafg, "x5", "RoME.Pose2", "", "", 0, 1);
-  const char* flb7 = addFactor(
+  addVariable(nvafg, "x5", "RoME.Pose3", "", "", 0, 1);
+  addFactor(
     nvafg,
     "x4;x5;",
     rf,
@@ -163,8 +181,8 @@ int main(void) {
     "", 0, 
     1
   );
-  addVariable(nvafg, "x6", "RoME.Pose2", "", "", 0, 1);
-  const char* flb8 = addFactor(
+  addVariable(nvafg, "x6", "RoME.Pose3", "", "", 0, 1);
+  addFactor(
     nvafg,
     "x5;x6;",
     rf,
@@ -173,10 +191,9 @@ int main(void) {
     1
   );
 
-  // Solve the basic graph
+// Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   wrkid = solveGraphParametric(nvafg, "x6");
-    // wait for the worker to finish or timeout after 2000 milliseconds
-  success = block_on(nvasm, wrkid, 5000);
+  success = block_on(nvasm, wrkid, 30000); // overly long timeout for free tier demo purposes
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric
 

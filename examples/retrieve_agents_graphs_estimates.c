@@ -1,3 +1,18 @@
+// This is a simple example using the NavAbility SDK and API to retrieve agents, factor graphs, and variable estimates.
+// It demonstrates how to list agents, factor graphs, and retrieve variable estimates from a factor graph.
+// See other examples for complementary usage and features.
+// This is an introductory example.
+//
+// Copyright (c) 2025 The NavAbility(TM) Contributors.
+//  WhereWhen.ai supports open-source (science, algorithms, and standards), 
+//  including the permissive/free use of the Caesar.jl and NavAbilitySDKs 
+//  as is provided under the Apache License, Version 2.0 (the "License").
+//  You may use this file according to the public License, including commercial use, free of charge. 
+//  The License is available at http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+//  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and limitations under the License.
+// Contact info@wherewhen.ai regarding warranties, support, or cost savings through economies of scale.
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,7 +33,7 @@ int main(void) {
   printf("NVA_API_TOKEN: %s\n", (atk != NULL) ? "***" : "getenv returned NULL");
 
   NavAbilityClient* nvacl = NULL;
-  nvacl = new_NavAbilityClient(url,atk);
+  nvacl = new_NavAbilityClient(url,atk, "");
 
   // list all agents
   RVec_Agent* agents = NULL;
@@ -34,11 +49,11 @@ int main(void) {
   RVec_NvaNode_Factorgraph* fgs = NULL;
   fgs = getFactorgraphs(nvacl, ""); // must freeR(fgs) later
 
-  printf("getFactorgraphs length: %ld\n", length(fgs));
+  printf("Number of factor graphs found: %ld\n", length(fgs));
 
-  NvaNode_Factorgraph* fgi = NULL;
+  // NvaNode_Factorgraph* fgi = NULL;
   for (int i = 0; i < length(fgs); i++) {
-    printf("factor graph label: %s\n", getLabel(getIndex(fgs,i)));
+    printf("factor graph: %s\n", getLabel(getIndex(fgs,i)));
   }
 
   // look at a specific factor graph
@@ -71,23 +86,23 @@ int main(void) {
   X1 = getVariable(nvafg, "x1"); // must freeR(X1) later
 
   // look at the numerically estimated value of X1
-  RVec_f64* ppem = NULL;
-  ppem = getPPEMean(X1, "parametric");
-  if (0 < length(ppem)) {
+  RVec_f64* X1mn = NULL;
+  X1mn = getPPEMean(X1, "parametric");
+  if (0 < length(X1mn)) {
     printf(
-      "x1_ppe, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s\n", 
-      *getIndex(ppem, 0), *getIndex(ppem, 1), *getIndex(ppem, 2),
+      "x1, body pose in world frame x,y,th:\n %g, %g, %g\n sanity check: %s\n", 
+      *getIndex(X1mn, 0), *getIndex(X1mn, 1), *getIndex(X1mn, 2),
       "TODO_id"
     );
   } else {
-    printf("x1 has no PPE mean yet, requires numerical operations such as a solve or prediction.\n"); 
+    printf("x1 has no state estimate, requires numerical operations such as a solve or prediction.\n"); 
   }
 
   // and a covariance estimate
-  RVec_f64* ppec = NULL;
-  ppec = getPPECov(X1, "parametric");
+  RVec_f64* X1cv = NULL;
+  X1cv = getPPECov(X1, "parametric");
   
-  freeR(ppem); freeR(ppec);
+  freeR(X1mn); freeR(X1cv);
   freeR(X1);
 
   // See other examples for more concurrent usage, adding camera or lidar, launching more compute

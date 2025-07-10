@@ -1,3 +1,20 @@
+// This is a simple example using the NavAbilitySDK to build and solve a graph using the NavAbility cloud infrastructure. 
+// It demonstrates how to create a factor graph with multiple variables, add factors, solve the graph
+// and manage the subscription to events. It uses a basic normal distribution for the factors.
+// This is an introductory example.
+//
+// Copyright (c) 2025 The NavAbility(TM) Contributors.
+//  WhereWhen.ai supports open-source (science, algorithms, and standards), 
+//  including the permissive/free use of the Caesar.jl and NavAbilitySDKs 
+//  as is provided under the Apache License, Version 2.0 (the "License").
+//  You may use this file according to the public License, including commercial use, free of charge. 
+//  The License is available at http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+//  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and limitations under the License.
+// Contact info@wherewhen.ai regarding warranties, support, or cost savings through economies of scale.
+
+
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -74,7 +91,7 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f1); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", flb1);
+  printf("Added factor: %s\n", flb1);
   
 
   // ROBOT MOVES TO (10,0,0)
@@ -95,14 +112,11 @@ int main(void) {
       "", 0, 
       1
   ); freeR(f2); freeR(normal); // because new_ was used
-  printf("Added factor label: %s\n", flb2);
+  printf("Added factor: %s\n", flb2);
 
 
-  // Solve the basic graph
+  // Solve the basic graph and wait for the worker to finish, with timeout in milliseconds
   char* wrkid = solveGraphParametric(nvafg, "x1");
-  printf("Blocking on solve graph, action id: %s\n", wrkid);
-  
-  // wait for the worker to finish or timeout after _ milliseconds
   bool success = block_on(nvasm, wrkid, 5000); 
   printf("Graph solve success: %d\n", success);
   freeR(wrkid); // free the worker id returned by solveGraphParametric

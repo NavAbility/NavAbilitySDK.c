@@ -36,7 +36,7 @@ build-camera-lidar: adding_camera_or_lidar.c
 .PHONY: build-camera-lidar
 
 run-camera-lidar: build-camera-lidar
-	@LD_LIBRARY_PATH=../target/debug/ ./build/camera_lidar_data
+	@LD_LIBRARY_PATH=../target/debug/ RUST_BACKTRACE=full ./build/camera_lidar_data
 .PHONY: run-camera-lidar
 
 build-agents-graphs: retrieve_agents_graphs_estimates.c
@@ -45,7 +45,7 @@ build-agents-graphs: retrieve_agents_graphs_estimates.c
 .PHONY: build-agents-graphs
 
 run-agents-graphs: build-agents-graphs
-	@LD_LIBRARY_PATH=../target/debug/ ./build/agents_graphs
+	@LD_LIBRARY_PATH=../target/debug/ RUST_BACKTRACE=full ./build/agents_graphs
 .PHONY: run-agents-graphs
 
 build-oversimplified-localizer: oversimplified_nontree_localizer.c
@@ -54,5 +54,5 @@ build-oversimplified-localizer: oversimplified_nontree_localizer.c
 .PHONY: build-oversimplified-localizer
 
 run-oversimplified-localizer: build-oversimplified-localizer
-	@LD_LIBRARY_PATH=../target/debug/ ./build/oversimple_localizer
+	@LD_LIBRARY_PATH=../target/debug/ RUST_BACKTRACE=full ./build/oversimple_localizer
 .PHONY: run-oversimplified-localizer
