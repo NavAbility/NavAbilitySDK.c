@@ -51,7 +51,7 @@ graphql-codegen:
 .PHONY: graphql-codegen
 
 install-sys-deps:
-	sudo apt install curl pkg-config libssl-dev xclip -y
+	sudo apt install curl pkg-config libssl-dev xclip cbindgen -y
 
 install-rust: install-sys-deps
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
