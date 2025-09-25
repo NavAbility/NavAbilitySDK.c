@@ -5,6 +5,7 @@ use reqwest_eventsource::{
   Event,
 };
 
+use serde::{Deserialize, Serialize};
 #[cfg(any(feature = "tokio", feature = "thread"))]
 use url::form_urlencoded;
 
@@ -38,7 +39,7 @@ use crate::{
   to_console_error,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WorkerStatusEnum {
   Pending,
   Status(String),
@@ -121,6 +122,10 @@ impl SubscriptionManager {
     );
 
     return nvasm;
+  }
+
+  pub fn events_raw(&self) -> BTreeMap<Uuid, Option<crate::default_subscription::ResponseData>> {
+    return self.events.clone();
   }
 
   /// List all tracked UUIDs, returning a tuple of:
@@ -242,7 +247,9 @@ impl SubscriptionManager {
         let idstr = &subs.id;
         if let Ok(id) = Uuid::parse_str(idstr) {
           self.events.insert(id, Some(subscr));
-          self.sse_history.push(id);
+          if !self.sse_history.contains(&id) {
+            self.sse_history.push(id);
+          }
           if self.sse_history.len() > self.size {
             let old_id = self.sse_history.remove(0);
             self.events.remove(&old_id);
@@ -259,7 +266,7 @@ impl SubscriptionManager {
   pub fn block_on(
     &mut self,
     wid: &Uuid,
-    tout_millis: std::time::Duration,
+    tout_millis: std::time::Duration, // FIXME, time.rs not available in wasm
   ) -> Option<bool> {
     // if using both polling and blocking, add the id to the polling track map
     self.add_tracking(wid);
@@ -276,7 +283,7 @@ impl SubscriptionManager {
   pub fn block_on_standalone(
     blocking_into: Sender<(Uuid,Sender<crate::default_subscription::ResponseData>)>,
     wid: &Uuid,
-    tout_millis: std::time::Duration,
+    tout_millis: std::time::Duration, // FIXME, time.rs not available in wasm
   ) -> Option<bool> {
 
     let (etx, erx) = channel();
@@ -326,67 +333,89 @@ impl SubscriptionManager {
 
     // wasmbindgen limitation?  overcome +'static requirement
 
-    to_console_debug("Starting subscription handler...");
-    // start a thread to run the async event loop monitoring the EventSource 
-    // and send received eventes into the channel
-    crate::execute(async move {
-      let mut please_notify: BTreeMap<Uuid, Sender<crate::default_subscription::ResponseData>> = BTreeMap::new();
-      while let Some(event) = nvaes.next().await {
-        use crate::to_console_debug;
+    // // start a thread to run the async event loop monitoring the EventSource 
+    // // and send received eventes into the channel
+    // crate::execute(async move {
+    //   Self::do_stuff(
+    //     nvaes,
+    //     blocking_recv,
+    //     nonblocking_into
+    //   ).await
+    // });
 
-        // to_console_debug("nvaes.next()");
-        // pull any direct user request uuids
-        match blocking_recv.try_recv() {
-          Ok((uuid, sender)) => {
-            please_notify.insert(uuid, sender);
-          },
-          Err(_) => {}
-        }
-
-        // process the event
-        match event {
-          Ok(Event::Open) => to_console_debug("SSE connection open..."),
-          Ok(Event::Message(message)) => {
-            let msg_: Result<
-              serde_json::Map<String, serde_json::Value>,
-              serde_json::Error
-            > = serde_json::from_str(&message.data);
-            if let Err(e) = msg_ {
-              to_console_error(&format!("Failed to parse message data: {}", e));
-              continue;
-            }
-            let msg = msg_.unwrap();
-            if let Some(jobj) = msg.get("data") { //msg.contains_key("data") {
-              // to_console_debug(&format!("{:?}",&msg));
-              let jstr = jobj.to_string();
-              let jobj_: Result<
-                crate::default_subscription::ResponseData, 
-                serde_json::Error
-              > = serde_json::from_str(&jstr);
-              if let Ok(subwe) = jobj_ {
-                use uuid::Uuid;
-
-                nonblocking_into.send(
-                  subwe.clone()
-                ).expect("Failed to send Event");
-                // notify any direct uuids requested by the user
-                let ewid = Uuid::parse_str(&subwe.worker_event.as_ref().unwrap().id).expect("Failed to parse UUID from worker event id");
-                if let Some(sender) = please_notify.remove(&ewid) {
-                  sender.send(subwe).expect(&format!("Failed to send direct notification for UUID {}", &ewid));
-                }
-              } else {
-                to_console_error("Failed to parse 'data' from message data");
-              }
-            }
-          },
-          Err(err) => {
-            to_console_error(&format!("Error: {}", err));
-            nvaes.close();
-          }
-        } // match event
-        // to_console_debug("Processed an event from the EventSource");
+    // FIXME check this vs execute runtime, especially in SDK.c wrappers
+    #[cfg(feature = "tokio")]
+    tokio::spawn(
+      async move {
+        Self::do_stuff(
+          nvaes,
+          blocking_recv,
+          nonblocking_into
+        ).await
       }
-    });
-    to_console_debug("Subscription handler running...");
+    );
+  }
+
+  // DONE FOR RESOLVING NESTED RUNTIMES ISSUE, clean up required, TODO
+  // put here for quicker lint (should make functional instead)
+  async fn do_stuff(
+    mut nvaes: EventSource,
+    blocking_recv: Receiver<(Uuid, Sender<crate::default_subscription::ResponseData>)>,
+    nonblocking_into: Sender<crate::default_subscription::ResponseData>,
+  ) {
+    let mut please_notify: BTreeMap<Uuid, Sender<crate::default_subscription::ResponseData>> = BTreeMap::new();
+    while let Some(event) = nvaes.next().await {
+      // pull any direct user request uuids
+      match blocking_recv.try_recv() {
+        Ok((uuid, sender)) => {
+          please_notify.insert(uuid, sender);
+        },
+        Err(_) => {}
+      }
+  
+      // process the event
+      match event {
+        Ok(Event::Open) => to_console_debug("SSE connection open..."),
+        Ok(Event::Message(message)) => {
+          let msg_: Result<
+            serde_json::Map<String, serde_json::Value>,
+            serde_json::Error
+          > = serde_json::from_str(&message.data);
+          if let Err(e) = msg_ {
+            to_console_error(&format!("Failed to parse message data: {}", e));
+            continue;
+          }
+          let msg = msg_.unwrap();
+          if let Some(jobj) = msg.get("data") { //msg.contains_key("data") {
+            // to_console_debug(&format!("{:?}",&msg));
+            let jstr = jobj.to_string();
+            let jobj_: Result<
+              crate::default_subscription::ResponseData, 
+              serde_json::Error
+            > = serde_json::from_str(&jstr);
+            if let Ok(subwe) = jobj_ {
+              use uuid::Uuid;
+
+              if let Err(e) = nonblocking_into.send(
+                subwe.clone()
+              ) {
+                to_console_error(&format!("SubscriptionManager failed to send Event: {}", e));
+              }
+              // notify any direct uuids requested by the user
+              let ewid = Uuid::parse_str(&subwe.worker_event.as_ref().unwrap().id).expect("Failed to parse UUID from worker event id");
+              if let Some(sender) = please_notify.remove(&ewid) {
+                sender.send(subwe).expect(&format!("Failed to send direct notification for UUID {}", &ewid));
+              }
+            } else {
+              to_console_error("Failed to parse 'data' from message");
+            }
+          }
+        },
+        Err(err) => {
+          to_console_error(&format!("Error: {}", err));
+          nvaes.close();
+        }
+      }
+    }
   }
 }

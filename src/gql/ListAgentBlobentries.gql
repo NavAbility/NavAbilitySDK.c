@@ -1,0 +1,11 @@
+query ListAgentBlobentries(
+  $agentLabel: String!,
+) {
+  agents(
+    where: {label: $agentLabel}
+  ) {
+    blobEntries {
+      label
+    }
+  }
+}

@@ -3,7 +3,7 @@ mutation AddVariable(
   $label: String!,
   $variableType: String!,
   $tags: [String!]! = ["VARIABLE"],
-  $timestamp: DateTime! = "2025-01-01 00:00:00.000",
+  $timestamp: DateTime! = "2025-01-01 00:00:00.000Z",
   $nstime: BigInt! = "0",
   $solvable: Int! = 1,
   $metadata: String = "e30=",

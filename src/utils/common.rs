@@ -59,6 +59,7 @@ pub fn execute<R, F>(
   std::thread::spawn(move || futures::executor::block_on(f));
 }
 
+// FIXME, why an entire runtime, why not just tokio::spawn??
 #[cfg(feature = "tokio")]
 pub fn execute<R,F: Future<Output = R>>(
   f: F
