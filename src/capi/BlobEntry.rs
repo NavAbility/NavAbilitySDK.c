@@ -63,7 +63,7 @@ fn new_BlobEntry(
   let mut be = crate::BlobEntry::new();
   be.blobId = Uuid::parse_str(_blobId).expect(&format!("new_BlobEntry unable to parse blobId uuid: {:?}",_blobId));
   be.label = cstr_to_str(label).to_string();
-  be.blobstore = cstr_to_str(label).to_string();
+  be.blobstore = cstr_to_str(blobstore).to_string();
   be.hash = "".to_owned();
   be.origin = cstr_to_str(origin).to_string();
   be.size = Some(size);

@@ -32,17 +32,17 @@ The last instruction protects the upstream SDK.rs from receiving C related code 
 You should push and pull against SDK.c repo as normal
 ```
 git pull
-git pull origin # the default
+git pull origin   # the usual default
 ```
 
-But fold in upstream changes into local PR via,
+but merge upstream:develop changes into a local branch via
 ```
 git checkout -b 25Q1/ff/somefix
 git pull upstream develop
 git push origin 25Q1/ff/somefix
 ```
 
-Note the default branch is `develop`, but could also be stable such as pulling from `upstreams` branch `release/v0.X`.
+Note the default branch is `develop`, but could also be stable such as pulling from `upstream`'s `release/v...` branch.
 
 
 ### System Dependencies

@@ -47,7 +47,7 @@ int main(void) {
     freeR(agents);
 
     NavAbilityBlobStore *store = NULL;
-    store = new_NavAbilityBlobStore(nvacl, "default");
+    store = new_NavAbilityBlobStore(nvacl, "default", false);
     printf("getLabel(store): %s\n", getLabel(store));
 
     srand(time(NULL));

@@ -311,7 +311,7 @@ pub struct AddVariable;
 pub struct DeleteVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
