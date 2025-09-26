@@ -19,7 +19,7 @@ This repo derives from upstream branches at NavAbility/NavAbilitySDK.rs:develop,
 ```
 git clone <this https/ssh>
 cd NavAbilitySDK.c
-git remote add upstream <https or ssh github.com/NavAbilitySDK.rs>
+git remote add upstream git@github.com:NavAbility/NavAbilitySDK.rs.git
 git remote set-url --push upstream no-pushing
 ```
 
