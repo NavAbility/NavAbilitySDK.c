@@ -28,7 +28,7 @@ delete-schema:
 	rm -f $(NVA_API_SCHEMA_PATH)
 
 build-tokio: 
-	cargo build -F tokio
+	cargo build -F tokio -F own_runtime
 .PHONY: build-tokio
 
 build-thread: 

@@ -331,29 +331,24 @@ impl SubscriptionManager {
       nvacl_e.client.get(&uri)
     ).expect("Failed to create EventSource");
 
-    // wasmbindgen limitation?  overcome +'static requirement
+    
+    #[cfg(all(feature = "tokio", not(feature = "own_runtime")))]
+    tokio::spawn(async move {
+      Self::do_stuff(
+        nvaes,
+        blocking_recv,
+        nonblocking_into
+      ).await
+    });
 
-    // // start a thread to run the async event loop monitoring the EventSource 
-    // // and send received eventes into the channel
-    // crate::execute(async move {
-    //   Self::do_stuff(
-    //     nvaes,
-    //     blocking_recv,
-    //     nonblocking_into
-    //   ).await
-    // });
-
-    // FIXME check this vs execute runtime, especially in SDK.c wrappers
-    #[cfg(feature = "tokio")]
-    tokio::spawn(
-      async move {
-        Self::do_stuff(
-          nvaes,
-          blocking_recv,
-          nonblocking_into
-        ).await
-      }
-    );
+    #[cfg(all(feature = "tokio", feature = "own_runtime"))]
+    crate::execute(async move {
+      Self::do_stuff(
+        nvaes,
+        blocking_recv,
+        nonblocking_into
+      ).await
+    });
   }
 
   // DONE FOR RESOLVING NESTED RUNTIMES ISSUE, clean up required, TODO
