@@ -298,7 +298,8 @@ struct BlobEntry *new_BlobEntry(const char *blobId,
 struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const double *array_covr);
 
 struct NavAbilityBlobStore *new_NavAbilityBlobStore(const struct NavAbilityClient *nvacl,
-                                                    const char *label);
+                                                    const char *label,
+                                                    bool onprem);
 
 struct NavAbilityClient *new_NavAbilityClient(const char *api_url,
                                               const char *api_token,
