@@ -1,0 +1,40 @@
+fragment solverdata_fields on SolverData {
+    # Note this must be the same order as PackedVariableNodeData otherwise JSON3 will fail.
+    id
+    vecval
+    dimval
+    vecbw
+    dimbw
+    BayesNetOutVertIDs
+    dimIDs
+    dims
+    eliminated
+    BayesNetVertID
+    separator
+    variableType
+    initialized
+    infoPerCoord
+    ismargin
+    dontmargin
+    solveInProgress
+    solvedCount
+    solveKey
+    covar
+    _version  
+}
+
+
+query GetVariableState(
+  $varId: ID!,
+  $stateLabel: String!
+) {
+  variables(
+    where: {id: $varId}
+  ) {
+    solverData(
+      where: {solveKey: $stateLabel}
+    ) {
+      ...solverdata_fields
+    }
+  }
+}
