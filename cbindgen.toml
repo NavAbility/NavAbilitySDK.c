@@ -52,6 +52,7 @@ usize_is_size_t = true
 
 
 [defines]
+# "feature = tokio" = "DEFINE_TOKIO"
 # "target_os = freebsd" = "DEFINE_FREEBSD"
 # "feature = serde" = "DEFINE_SERDE"
 

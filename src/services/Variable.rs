@@ -2,9 +2,10 @@
 
 use std::fmt;
 use std::str::FromStr;
-
+use uuid::Uuid;
 
 use crate::{
+    Error,
     to_console_error, 
     MeanMaxPPE, 
     PackedVariableNodeData, 
@@ -17,16 +18,16 @@ use crate::{
 
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 use crate::{
+    GraphQLQuery,
     parse_str_utc, 
-    Uuid,
     BlobEntry, 
-    Error,     
     Sender, 
     NavAbilityDFG,
     send_api_result,
     post_to_nvaapi,
     GetVariable, 
-    GraphQLQuery,
+    GetVariableState,
+    get_variable_state,
     ListVariables,
     AddVariable,
     DeleteVariable,
@@ -248,6 +249,79 @@ impl VariableDFG {
     }
 }
 
+pub trait PackedSolverDataFieldsTrait {
+    fn id(&self) -> Option<Uuid>;
+    fn dim_i_ds(&self) -> Vec<i32>; // funny spelling because graphql-client auto converts to snake_case
+    fn info_per_coord(&self) -> Vec<f64>;
+    fn bayes_net_out_vert_i_ds(&self) -> Vec<String>;
+    fn separator(&self) -> Vec<String>;
+    fn vecval(&self) -> Vec<f64>;
+    fn vecbw(&self) -> Vec<f64>;
+    fn covar(&self) -> Vec<f64>;
+    fn dimval(&self) -> i32;
+    fn dimbw(&self) -> i32;
+    fn dims(&self) -> i32;
+    fn solved_count(&self) -> i32;
+    fn solve_in_progress(&self) -> i32;
+    fn initialized(&self) -> bool;
+    fn ismargin(&self) -> bool;
+    fn dontmargin(&self) -> bool;
+    fn eliminated(&self) -> bool;
+    fn bayes_net_vert_id(&self) -> String;
+    fn variable_type(&self) -> String;
+    fn solve_key(&self) -> String;
+    fn version(&self) -> String;
+}
+
+// FIXME refactor into macro like similar traits to avoid duplication while achieving "overloading"
+impl PackedSolverDataFieldsTrait for get_variable::solverdata_fields {
+    fn id(&self) -> Option<Uuid> { return Some(Uuid::parse_str(&self.id).expect("failed to parse variable solver data id to uuid")); }
+    fn dim_i_ds(&self) -> Vec<i32> { return self.dim_i_ds.clone().into_iter().map(|x| x as i32).collect(); }
+    fn info_per_coord(&self) -> Vec<f64> { return self.info_per_coord.clone(); }
+    fn bayes_net_out_vert_i_ds(&self) -> Vec<String> { return self.bayes_net_out_vert_i_ds.clone().expect("PackedVariableNodeData to struct failed on BayesNetOutVertIDs"); }
+    fn separator(&self) -> Vec<String> { return self.separator.clone().unwrap_or(Vec::new()); }
+    fn vecval(&self) -> Vec<f64> { return self.vecval.clone().expect("PackedVariableNodeData to struct failed on vecval"); }
+    fn vecbw(&self) -> Vec<f64> { return self.vecbw.clone().expect("PackedVariableNodeData to struct failed on vecbw"); }
+    fn covar(&self) -> Vec<f64> { return self.covar.clone().expect("PackedVariableNodeData to struct failed on covar"); }
+    fn dimval(&self) -> i32 { return self.dimval as i32; }
+    fn dimbw(&self) -> i32 { return self.dimbw as i32; }
+    fn dims(&self) -> i32 { return self.dims as i32; }
+    fn solved_count(&self) -> i32 { return self.solved_count as i32; }
+    fn solve_in_progress(&self) -> i32 { return self.solve_in_progress as i32; }
+    fn initialized(&self) -> bool { return self.initialized; }
+    fn ismargin(&self) -> bool { return self.ismargin; }
+    fn dontmargin(&self) -> bool { return self.dontmargin; }
+    fn eliminated(&self) -> bool { return self.eliminated; }
+    fn bayes_net_vert_id(&self) -> String { return self.bayes_net_vert_id.as_ref().unwrap_or(&"".to_string()).to_string(); }
+    fn variable_type(&self) -> String { return self.variable_type.to_string(); }
+    fn solve_key(&self) -> String { return self.solve_key.to_string(); }
+    fn version(&self) -> String { return self.version.to_string(); }
+}
+
+// FIXME refactor into macro like similar traits to avoid duplication while achieving "overloading"
+impl PackedSolverDataFieldsTrait for get_variable_state::solverdata_fields {
+    fn id(&self) -> Option<Uuid> { return Some(Uuid::parse_str(&self.id).expect("failed to parse variable solver data id to uuid")); }
+    fn dim_i_ds(&self) -> Vec<i32> { return self.dim_i_ds.clone().into_iter().map(|x| x as i32).collect(); }
+    fn info_per_coord(&self) -> Vec<f64> { return self.info_per_coord.clone(); }
+    fn bayes_net_out_vert_i_ds(&self) -> Vec<String> { return self.bayes_net_out_vert_i_ds.clone().expect("PackedVariableNodeData to struct failed on BayesNetOutVertIDs"); }
+    fn separator(&self) -> Vec<String> { return self.separator.clone().unwrap_or(Vec::new()); }
+    fn vecval(&self) -> Vec<f64> { return self.vecval.clone().expect("PackedVariableNodeData to struct failed on vecval"); }
+    fn vecbw(&self) -> Vec<f64> { return self.vecbw.clone().expect("PackedVariableNodeData to struct failed on vecbw"); }
+    fn covar(&self) -> Vec<f64> { return self.covar.clone().expect("PackedVariableNodeData to struct failed on covar"); }
+    fn dimval(&self) -> i32 { return self.dimval as i32; }
+    fn dimbw(&self) -> i32 { return self.dimbw as i32; }
+    fn dims(&self) -> i32 { return self.dims as i32; }
+    fn solved_count(&self) -> i32 { return self.solved_count as i32; }
+    fn solve_in_progress(&self) -> i32 { return self.solve_in_progress as i32; }
+    fn initialized(&self) -> bool { return self.initialized; }
+    fn ismargin(&self) -> bool { return self.ismargin; }
+    fn dontmargin(&self) -> bool { return self.dontmargin; }
+    fn eliminated(&self) -> bool { return self.eliminated; }
+    fn bayes_net_vert_id(&self) -> String { return self.bayes_net_vert_id.as_ref().unwrap_or(&"".to_string()).to_string(); }
+    fn variable_type(&self) -> String { return self.variable_type.to_string(); }
+    fn solve_key(&self) -> String { return self.solve_key.to_string(); }
+    fn version(&self) -> String { return self.version.to_string(); }   
+}
 
 impl PackedVariableNodeData {
     pub fn new(
@@ -278,31 +352,32 @@ impl PackedVariableNodeData {
     }
 
     #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
-    pub fn from_gql(
-        vndgql: &get_variable::solverdata_fields
-    ) -> Self {
+    pub fn from_gql<T>(vndgql: &T) -> Self
+    where
+        T: PackedSolverDataFieldsTrait,
+    {
         return Self {
-            id: Some(Uuid::parse_str(&vndgql.id).expect("failed to parse variable solver data id to uuid")),
-            dimIDs: vndgql.dim_i_ds.clone().into_iter().map(|x| x as i32).collect(),
-            infoPerCoord: vndgql.info_per_coord.clone(),
-            BayesNetOutVertIDs: vndgql.bayes_net_out_vert_i_ds.clone().expect("PackedVariableNodeData to struct failed on BayesNetOutVertIDs"),
-            separator: vndgql.separator.clone().unwrap_or(Vec::new()),
-            vecval: vndgql.vecval.clone().expect("PackedVariableNodeData to struct failed on vecval"),
-            vecbw: vndgql.vecbw.clone().expect("PackedVariableNodeData to struct failed on vecbw"),
-            covar: vndgql.covar.clone().expect("PackedVariableNodeData to struct failed on covar"),
-            dimval: vndgql.dimval as i32,
-            dimbw: vndgql.dimbw as i32,
-            dims: vndgql.dims as i32,
-            solvedCount: vndgql.solved_count as i32,
-            solveInProgress: vndgql.solve_in_progress as i32,
-            initialized: vndgql.initialized,
-            ismargin: vndgql.ismargin,
-            dontmargin: vndgql.dontmargin,
-            eliminated: vndgql.eliminated,
-            BayesNetVertID: vndgql.bayes_net_vert_id.as_ref().unwrap_or(&"".to_string()).to_string(),
-            variableType: vndgql.variable_type.to_string(),
-            solveKey: vndgql.solve_key.to_string(), 
-            _version: vndgql.version.to_string(),
+            id: vndgql.id(),
+            dimIDs: vndgql.dim_i_ds(),
+            infoPerCoord: vndgql.info_per_coord(),
+            BayesNetOutVertIDs: vndgql.bayes_net_out_vert_i_ds(),
+            separator: vndgql.separator(),
+            vecval: vndgql.vecval(),
+            vecbw: vndgql.vecbw(),
+            covar: vndgql.covar(),
+            dimval: vndgql.dimval(),
+            dimbw: vndgql.dimbw(),
+            dims: vndgql.dims(),
+            solvedCount: vndgql.solved_count(),
+            solveInProgress: vndgql.solve_in_progress(),
+            initialized: vndgql.initialized(),
+            ismargin: vndgql.ismargin(),
+            dontmargin: vndgql.dontmargin(),
+            eliminated: vndgql.eliminated(),
+            BayesNetVertID: vndgql.bayes_net_vert_id(),
+            variableType: vndgql.variable_type(),
+            solveKey: vndgql.solve_key(),
+            _version: vndgql.version(),
         }
     }
 }
@@ -348,6 +423,87 @@ pub fn getPPECov(
         todo!("getPPECov, TODO extract from solverData.val -- see JuliaRobotics/DistributedFactorGraphs.jl#535");
     }
     return Vec::new();
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+pub async fn post_get_variable_state(
+    nvafg: &NavAbilityDFG,
+    variableLabel: &str,
+    stateLabel: &str
+) -> Result<PackedVariableNodeData, Box<dyn Error>> {
+    let id = nvafg.fg.getId(variableLabel); 
+    let request_body = GetVariableState::build_query(
+        get_variable_state::Variables {
+            var_id: id.to_string(),
+            state_label: stateLabel.to_string(),
+        }
+    );
+
+    return post_to_nvaapi::<
+        get_variable_state::Variables,
+        get_variable_state::ResponseData,
+        Result<PackedVariableNodeData, Box<dyn Error>>
+    >(
+        &nvafg.client,
+        request_body, 
+        |s| {
+            if 0 < s.variables.len() {
+                if 0 < s.variables[0].solver_data.len() {
+                    return Ok(PackedVariableNodeData::from_gql(&s.variables[0].solver_data[0]));
+                }
+                return Err("State not found".into());
+            }
+            return Err("Variable not found".into());
+        },
+        Some(3),
+    ).await?;
+}
+
+
+
+
+
+
+
+// trait GetState {
+//     fn getState(
+//         &self,
+//         stateLabel: &str
+//     ) -> PackedVariableNodeData;
+// }
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+pub fn getVariableState(
+    nvafg: &NavAbilityDFG,
+    variableLabel: &str,
+    stateLabel: &str
+) -> Result<PackedVariableNodeData, Box<dyn Error>> {
+    // #[cfg(feature = "wasm")]
+    // let nvafg = &nvafg.clone();
+    // #[cfg(feature = "wasm")]
+    // let variableLabel = variableLabel.to_string();
+    // #[cfg(feature = "wasm")]
+    // let stateLabel = stateLabel.to_string();
+    return crate::execute(post_get_variable_state(
+        nvafg,
+        &variableLabel,
+        &stateLabel,
+    ));
+}
+
+// #[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+pub fn getState(
+    vari: &VariableDFG,
+    stateLabel: &str
+) -> Result<PackedVariableNodeData, Box<dyn Error>> {
+    for vnd in vari.solverData.iter() {
+        if vnd.solveKey.eq(stateLabel) {
+            return Ok(vnd.clone());
+        }
+    }
+    return Err(format!("Variable {} does not have the state label {}", vari.label, stateLabel).into());
 }
 
 
@@ -443,8 +599,9 @@ pub async fn post_list_variables(
 }
 
 
+#[allow(non_snake_case)]
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
-pub async fn send_list_variables(
+pub async fn q_listVariables(
     send_into: Sender<Vec<String>>,
     nvafg: &NavAbilityDFG,
 ) -> Result<(), Box<dyn Error>> {
@@ -458,13 +615,9 @@ pub async fn send_list_variables(
 pub fn listVariables(
     nvafg: &NavAbilityDFG,
 ) -> Result<Vec<String>, Box<dyn Error>> {
-    return tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(post_list_variables(
-            nvafg,
-        ));
+    return crate::execute(post_list_variables(
+        nvafg,
+    ));
 }
 
 

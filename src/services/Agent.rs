@@ -108,9 +108,9 @@ pub async fn post_list_agents(
   let request_body = ListAgents::build_query(variables);
   
   return post_to_nvaapi::<
-  crate::list_agents::Variables,
-  crate::list_agents::ResponseData,
-  Vec<String>
+    crate::list_agents::Variables,
+    crate::list_agents::ResponseData,
+    Vec<String>
   >(
     nvacl,
     request_body, 

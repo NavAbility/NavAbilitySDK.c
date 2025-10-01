@@ -76,25 +76,91 @@ fn getVariable(
 }
 
 
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct StateValue {
+  pub point: RVec<f64>,
+  pub covar: RVec<f64>
+}
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getPoint(
+  state_: Option<&StateValue>,
+)  -> Option<Box<RVec<c_double>>> {
+
+  if let Some(state) = state_ {
+    return Some(Box::new(
+      state.point.clone()
+    ));
+  }
+
+  return None;
+}
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getCovariance(
+  state_: Option<&StateValue>,
+)  -> Option<Box<RVec<c_double>>> {
+
+  if let Some(state) = state_ {
+    return Some(Box::new(
+      state.covar.clone()
+    ));
+  }
+
+  return None;
+}
+
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getVariableState(
+  nvafg: Option<&crate::NavAbilityDFG>,
+  variableLabel: *const c_char,
+  stateLabel: *const c_char
+) -> Option<Box<StateValue>> {
+  let state_ = crate::services::getVariableState(
+    nvafg.unwrap(), 
+    &cstr_to_str(variableLabel),
+    &cstr_to_str(stateLabel)
+  );
+
+  let state = state_.unwrap();
+
+  return Some(Box::new(
+    StateValue {
+      point: vec_to_ffi(state.vecval),
+      covar: vec_to_ffi(state.vecbw)
+    }
+  ))
+}
+
+
 #[allow(non_snake_case)]
 #[no_mangle] pub unsafe extern "C" 
 fn getPPEMean(
   vari_: Option<&crate::VariableDFG>,
-  _solveKey: *const c_char
+  _stateLabel: *const c_char
 ) -> Option<Box<RVec<c_double>>> {
   if vari_.is_none() {
     to_console_error("getPPEMean: provided *VariableDFG is NULL/None");
     return None;
   }
   let vari = vari_.unwrap();
-  let solveKey = cstr_to_str(_solveKey);
+  let stateLabel = cstr_to_str(_stateLabel);
   let ppem = crate::services::getPPEMean(
     vari,
-    &solveKey,
+    &stateLabel,
   );
 
   if ppem.is_empty() {
-    // to_console_error(&format!("getPPEMean: for VariableDFG {}:{} is empty", &vari.getLabel(), &solveKey));
+    // to_console_error(&format!("getPPEMean: for VariableDFG {}:{} is empty", &vari.getLabel(), &stateLabel));
     return None;
   }
   
@@ -110,7 +176,7 @@ fn getPPEMean(
 #[no_mangle] pub unsafe extern "C" 
 fn getPPECov(
   vari_: Option<&crate::VariableDFG>,
-  _solveKey: *const c_char
+  _stateLabel: *const c_char
 ) -> Option<Box<RVec<c_double>>> {
   if vari_.is_none() {
     to_console_error("getPPECov: provided *VariableDFG is NULL/None");
@@ -120,7 +186,7 @@ fn getPPECov(
 
   let ppec = crate::services::getPPECov(
     vari,
-    &cstr_to_str(_solveKey),
+    &cstr_to_str(_stateLabel),
   );
 
   if ppec.is_empty() {

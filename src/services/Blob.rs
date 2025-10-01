@@ -25,7 +25,7 @@ use crate::{
   CreateDownload,
   create_download,
   CreateUpload,
-  create_upload,
+  create_upload::{self, BlobStoreType},
   CompleteUpload,
   complete_upload,
   DeleteBlob,
@@ -91,84 +91,6 @@ pub fn q_createDownload(
 }
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
-pub async fn post_create_upload(
-  nvacl: NavAbilityClient,
-  // filename: String,
-  // blob_size: i64,
-  blob_id: Uuid,
-  parts: Option<i64>,
-) -> Result<create_upload::ResponseData, Box<dyn Error>> {
-  
-  let variables = create_upload::Variables {
-    // label: label.to_string(),
-    blob_id: blob_id.to_string(),
-    parts: parts.unwrap_or(1),
-  };
-  
-  let request_body = CreateUpload::build_query(variables);
-
-  return post_to_nvaapi::<
-    create_upload::Variables,
-    create_upload::ResponseData,
-    create_upload::ResponseData
-  >(
-    &nvacl,
-    request_body, 
-    |s| s,
-    Some(1)
-  ).await;
-}
-
-
-#[cfg(any(feature = "tokio"))] // , feature = "thread"
-pub fn q_createUpload(
-  send_into: Sender<create_upload::ResponseData>, 
-  nvacl: &NavAbilityClient,
-  _filename: &String,
-  _blob_size: i64,
-  nparts: Option<i64>,
-  blob_id: Option<Uuid>, // doenst work yet, leave None
-) -> Result<(), Box<dyn Error>> {
-  return crate::execute(async { send_api_result(
-      send_into, 
-      post_create_upload(
-          nvacl.clone(),
-          blob_id.expect("Must provide blob_id to create_upload_send"),
-          nparts
-      ).await,
-    )
-  });
-}
-
-#[cfg(feature = "wasm")]
-pub fn q_createUpload(
-  send_into: Sender<create_upload::ResponseData>, 
-  nvacl: &NavAbilityClient,
-  _filename: &String,
-  _blob_size: i64,
-  nparts: Option<i64>,
-  blob_id: Option<Uuid>, // doenst work yet, leave None
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = (*nvacl).clone();
-  let send_into_ = send_into.clone();
-  let blob_id_ = blob_id.clone();
-  let nparts_ = nparts.clone();
-  crate::execute(async move {
-    let _ = send_api_result(
-      send_into_, 
-      post_create_upload(
-        nvacl_.clone(),
-        blob_id_.expect("Must provide blob_id to create_upload_send"),
-        nparts_
-      ).await,
-    );
-  });
-}
-
-
-
 
 // TODO update to new query/mutation pattern
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
@@ -217,6 +139,66 @@ pub async fn post_complete_upload(
 
 
 
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+pub async fn post_create_upload(
+  nvabs: &NavAbilityBlobStore,
+  blob_id: Uuid,
+  parts: Option<i64>,
+) -> Result<create_upload::ResponseData, Box<dyn Error>> {
+  
+  let store_label = match &nvabs.label {
+    crate::NvaStoreLabel::Cloud(lb) => lb.to_string(),
+    crate::NvaStoreLabel::Onprem(lb) => lb.to_string(),
+  };
+  let store_type = match &nvabs.label {
+    crate::NvaStoreLabel::Cloud(_lb) => BlobStoreType::NVA_CLOUD,
+    crate::NvaStoreLabel::Onprem(_lb) => BlobStoreType::NVA_ON_PREM,
+  };
+
+  let variables = create_upload::Variables {
+    blob_id: blob_id.to_string(),
+    parts: parts.unwrap_or(1),
+    store_label: store_label.to_string(),
+    store_type: BlobStoreType::NVA_CLOUD, // store_type, // currently only cloud supported
+  };
+  
+  let request_body = CreateUpload::build_query(variables);
+
+  return post_to_nvaapi::<
+    create_upload::Variables,
+    create_upload::ResponseData,
+    create_upload::ResponseData
+  >(
+    &nvabs.client,
+    request_body, 
+    |s| s,
+    Some(1)
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn q_createUpload(
+  send_into: Sender<create_upload::ResponseData>, 
+  nvabs: &NavAbilityBlobStore,
+  _filename: &String,
+  _blob_size: i64,
+  nparts: Option<i64>,
+  blob_id: Option<Uuid>, // doenst work yet, leave None
+) -> Result<(), Box<dyn Error>> {
+  return crate::execute(async { send_api_result(
+      send_into, 
+      post_create_upload(
+          &nvabs.clone(),
+          blob_id.expect("Must provide blob_id to create_upload_send"),
+          nparts
+      ).await,
+    )
+  });
+}
+
+
+
 
 // TODO , feature = "blocking"
 #[cfg(any(feature = "tokio", feature = "thread"))]
@@ -229,11 +211,11 @@ pub async fn post_blob_singlepart(
   _file_timestamp: Option<&chrono::DateTime<Utc>>,
   file_bytes: std::sync::Arc<[u8]>,
 ) -> Result<(), Box<dyn Error>> {
-  let _nvacl = &nvabs.client;
+  let _nvacl = &nvabs.client.clone();
   let upl = post_create_upload(
-    _nvacl.clone(), // change to allow borrow 
+    &nvabs.clone(), // change to allow borrow 
     blobId,
-    Some(1) // one part upload
+    Some(1), // one part upload
   ).await;
   
   // send the single part blob

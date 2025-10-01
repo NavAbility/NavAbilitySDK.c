@@ -53,8 +53,9 @@ int main(void) {
       1   // addGraphIfAbsent
   ); // must freeR(nvafg) later
 
+  // Create a blob store for this graph, using the same factorgraph label
   NavAbilityBlobStore *store = NULL;
-  store = new_NavAbilityBlobStore(nvacl, "default"); // must freeR(store) later
+  store = new_NavAbilityBlobStore(nvacl, "SDK_c_examples", false); // must freeR(store) later
 
   // BUILD A FACTOR GRAPH with multiple variables
   // inputs: (nvafg,label,variableType, [_tags,_timestamp,_nstime, _solavble])

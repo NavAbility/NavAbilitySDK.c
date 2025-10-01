@@ -86,7 +86,6 @@ fn addAffordance_kNNvisual(
   map.insert("robotLabel".to_string(), serde_json::json!(nvafg.unwrap().agent.label));
   map.insert("sessionLabel".to_string(), serde_json::json!(nvafg.unwrap().fg.label));
   map.insert("variableLabel".to_string(), serde_json::json!(cstr_to_str(variableLabel)));
-  map.insert("latest".to_string(), serde_json::json!("true"));
   map.insert("n_matches".to_string(), serde_json::json!(format!("{}",n_matches)));
   map.insert("total_n_matches".to_string(), serde_json::json!(format!("{}",total_n_matches)));
   map.insert("mapSessionLabels".to_string(), serde_json::json!(mapsessions));

@@ -50,7 +50,7 @@ use crate::{
 // https://users.rust-lang.org/t/preparing-an-array-of-structs-for-ffi/33411
 // Alt C style, https://users.rust-lang.org/t/how-to-return-byte-array-from-rust-function-to-ffi-c/18136/4
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RVec<T> {
     pub ptr: *mut T,
     pub len: usize, // number of elems
@@ -160,14 +160,20 @@ fn get_apiurl(
 fn new_NavAbilityBlobStore(
     nvacl: Option<&crate::NavAbilityClient>,
     label: *const c_char,
+    onprem: bool,
 ) -> Option<Box<crate::NavAbilityBlobStore>> {
     if nvacl.is_none() {
         to_console_error("new_NavAbilityBlobStore: provided *NavAbilityClient is NULL/None");
         return None;
     }
+    let bslb = if onprem {
+        crate::NvaStoreLabel::Onprem(cstr_to_str(label).to_string())
+    } else {
+        crate::NvaStoreLabel::Cloud(cstr_to_str(label).to_string())
+    };
     return Some(Box::new(crate::NavAbilityBlobStore {
         client: nvacl.unwrap().clone(),
-        label: crate::NvaStoreLabel::Cloud(cstr_to_str(label).to_string())
+        label: bslb
     }));
 }
 

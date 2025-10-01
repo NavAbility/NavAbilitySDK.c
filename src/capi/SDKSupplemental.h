@@ -92,6 +92,7 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
         RVec_String*:             free_RVec_String,           \
         RVec_Agent*:              free_RVec_Agent,            \
         RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \
+        StateValue*:              free_StateValue,            \
         BlobEntry*:               free_BlobEntry,             \
         NavAbilityClient*:        free_NavAbilityClient,      \
         NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \
@@ -163,6 +164,7 @@ void freeR(struct RVec_f64* s) { free_RVec_f64(s); }
 void freeR(struct RVec_String* s) { free_RVec_String(s); }
 void freeR(struct RVec_Agent* s) { free_RVec_Agent(s); }
 void freeR(struct RVec_NvaNode_Factorgraph* s) { free_RVec_NvaNode_Factorgraph(s); }
+void freeR(struct StateValue* s) { free_StateValue(s); }
 void freeR(struct BlobEntry* s) { free_BlobEntry(s); }
 void freeR(struct NavAbilityClient* s) { free_NavAbilityClient(s); }
 void freeR(struct SubscriptionManager* s) { free_SubscriptionManager(s); }

@@ -124,6 +124,16 @@ pub struct ListAgents;
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
+    query_path = "src/gql/ListAgentBlobentries.gql",
+    response_derives = "Debug"
+)]
+pub struct ListAgentBlobentries;
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+#[derive(GraphQLQuery, Clone)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/UpdateAgent.gql",
     response_derives = "Debug"
 )]
@@ -200,7 +210,7 @@ pub struct GetModel;
 pub struct ListModelsGraphs;
 
 
-#[cfg(any(feature = "tokio", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -270,6 +280,18 @@ pub struct CompleteUpload;
 pub struct StartWorker;
 
 
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
+    query_path = "src/gql/ListVariables.gql",
+    response_derives = "Debug"
+)]
+pub struct ListVariables;
+// Implicit ListWhere due to graphql-client limitation: https://github.com/graphql-rust/graphql-client/issues/508
+
+
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -284,11 +306,10 @@ pub struct GetVariable;
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
-    query_path = "src/gql/ListVariables.gql",
+    query_path = "src/gql/GetVariableState.gql",
     response_derives = "Debug"
 )]
-pub struct ListVariables;
-// Implicit ListWhere due to graphql-client limitation: https://github.com/graphql-rust/graphql-client/issues/508
+pub struct GetVariableState;
 
 
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
@@ -311,7 +332,7 @@ pub struct AddVariable;
 pub struct DeleteVariable;
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 #[derive(GraphQLQuery)]
 #[graphql(
     schema_path = "src/gql/schema.json",
@@ -492,6 +513,7 @@ pub trait QueryDetails<Q: Serialize> {
     fn operation_name(&self) -> &str;
     fn query(&self) -> String;
     fn variables_jstr(&self) -> Result<String,serde_json::Error>;
+    fn to_jobj(&self) -> serde_json::Value;
     fn to_jstr(&self) -> String;
 }
 
@@ -508,14 +530,17 @@ impl<Q: Serialize> QueryDetails<Q> for QueryBody<Q> {
         serde_json::to_string(&self.variables)
     }
 
+    fn to_jobj(&self) -> serde_json::Value {
+        serde_json::json!({
+            "extensions": {},
+            "operationName": self.operation_name(),
+            "query": self.query(),
+            "variables": self.variables
+        })
+    }
+
     fn to_jstr(&self) -> String {
-        format!(
-            r#"{{"extensions": {}, "operationName": "{}", "query": "{}", "variables": {}}}"#, 
-            "{}",
-            self.operation_name(),
-            self.query(),
-            self.variables_jstr().unwrap_or("".to_owned()),
-        )
+        self.to_jobj().to_string()
     }
 }
 

@@ -32,6 +32,8 @@ use crate::{
   AddAgentBlobEntry,
   AddVariableBlobEntry,
   AddModelBlobEntry,
+  list_agent_blobentries,
+  // ListAgentBlobentries,
 };
 
 // #[macro_use]
@@ -151,7 +153,7 @@ impl BlobEntry {
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_blob_entry(
   nvacl: &NavAbilityClient,
-  id: Uuid
+  id: Uuid // FIXME should be label String, not id Uuid
 ) -> Result<Vec<BlobEntry>, Box<dyn Error>> {
   
   let variables = get_blob_entry::Variables {
@@ -193,12 +195,130 @@ pub async fn post_get_blob_entry(
 // # }
 
 
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+pub async fn post_list_agent_blobentries(
+  nvacl: &NavAbilityClient,
+  agent_label: &str
+) -> Result<Vec<String>, Box<dyn Error>> {
+  
+  let variables = list_agent_blobentries::Variables {
+    agent_label: agent_label.to_string(),
+  };
+  
+  let request_body = crate::ListAgentBlobentries::build_query(variables);
+  
+  // let agLb = agent_label.to_string();
+  return post_to_nvaapi::<
+    list_agent_blobentries::Variables,
+    list_agent_blobentries::ResponseData,
+    Vec<String>
+  >(
+    nvacl,
+    request_body, 
+    |s| {
+      let mut bes = Vec::new();
+      if s.agents.is_empty() {
+        to_console_error(&format!("Didn't find that agentLabel"));
+      } else {
+        for be in &s.agents[0].blob_entries {
+          bes.push(be.label.to_string());
+        }
+      }
+      return bes
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[allow(non_snake_case)]
+pub async fn q_listAgentBlobentries(
+  send_into: std::sync::mpsc::Sender<Vec<String>>,
+  nvacl: &NavAbilityClient,
+  agent_label: &str
+) -> Result<(), Box<dyn Error>> {
+  return send_api_result(
+    send_into, 
+    post_list_agent_blobentries(
+      nvacl, 
+      agent_label,
+    ).await,
+  );
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+#[allow(non_snake_case)]
+pub fn listAgentBlobentries(
+  nvacl: &NavAbilityClient,
+  agent_label: &str
+) -> Result<Vec<String>, Box<dyn Error>> {
+  crate::execute(post_list_agent_blobentries(
+    nvacl,
+    agent_label,
+  ))
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[allow(non_snake_case)]
+pub async fn post_get_agent_blobentry(
+  nvacl: &NavAbilityClient,
+  agent_label: &str,
+  entry_label: &str
+) -> Result<
+  Vec<BlobEntry>, 
+  Box<dyn Error>
+> {
+  let id = nvacl.getId(&format!("{}{}",agent_label,entry_label));
+
+  return post_get_blob_entry(
+    nvacl,
+    id,
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm"))]
+#[allow(non_snake_case)]
+pub async fn post_delete_agent_blobentry(
+  nvacl: &NavAbilityClient,
+  agent_label: &str,
+  entry_label: &str
+) -> Result<delete_blob_entry::ResponseData, Box<dyn Error>> {
+  
+  let id = nvacl.getId(&format!("{}{}",agent_label,entry_label));
+  
+  return post_delete_blobentry(
+    nvacl,
+    id,
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio", feature = "thread"))]
+#[allow(non_snake_case)]
+pub fn deleteAgentBlobentry(
+  nvacl: &NavAbilityClient,
+  agent_label: &str,
+  entry_label: &str
+) -> Result<delete_blob_entry::ResponseData, Box<dyn Error>> {
+
+  return crate::execute(post_delete_agent_blobentry(
+    nvacl,
+    agent_label,
+    entry_label
+  ));
+}
+
+
 
 #[cfg(any(feature = "tokio", feature = "thread"))]
 pub async fn get_blob_entry_send(
   send_into: std::sync::mpsc::Sender<Vec<BlobEntry>>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
-  id: Uuid
+  id: Uuid // FIXME should be label String, not id Uuid
 ) -> Result<(),Box<dyn Error>> {
   
   return send_api_result(
@@ -212,7 +332,7 @@ pub async fn get_blob_entry_send(
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_delete_blobentry(
   nvacl: &NavAbilityClient,
-  id: Uuid,
+  id: Uuid, // FIXME should be label String, not id Uuid
 ) -> Result<delete_blob_entry::ResponseData, Box<dyn Error>> {
   
   let variables = delete_blob_entry::Variables {
@@ -237,7 +357,7 @@ pub async fn post_delete_blobentry(
 pub async fn delete_blobentry_send(
   send_into: std::sync::mpsc::Sender<delete_blob_entry::ResponseData>, //get_blob_entry::ResponseData>,
   nvacl: &NavAbilityClient,
-  id: Uuid,
+  id: Uuid, // FIXME should be label String, not id Uuid
 ) -> Result<(), Box<dyn Error>> {
   return send_api_result(
     send_into, 
@@ -250,7 +370,7 @@ pub async fn delete_blobentry_send(
 #[allow(non_snake_case)]
 pub fn deleteBlobEntry(
   nvacl: &NavAbilityClient,
-  id: Uuid,
+  id: Uuid, // FIXME should be label String, not id Uuid
 ) -> Result<delete_blob_entry::ResponseData, Box<dyn Error>> {
   crate::execute(post_delete_blobentry(
     nvacl,
@@ -262,7 +382,7 @@ pub fn deleteBlobEntry(
 #[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_update_blobentry_metadata(
   nvacl: &NavAbilityClient,
-  id: &Uuid,
+  id: &Uuid, // FIXME should be label String, not id Uuid
   metadata_b64: &str
 ) -> Result<update_blobentry_metadata::ResponseData,Box<dyn Error>> {
   
@@ -444,19 +564,23 @@ pub async fn post_add_variable_blobentry(
   entry: &BlobEntry,
 ) -> Result<Uuid,Box<dyn Error>> {
   
-  let entry_id = nvafg.getId(&format!("{}{}",&variable_lbl,&entry.label));
-  
   let mut size_s: Option<String> = None;
   if let Some(sz) = entry.size {
     size_s = Some(format!("{}",sz));
   }
-  let mut metadata = entry.metadata.to_string();
-  if metadata.is_empty() {
-    metadata = "e30=".to_string();
-  }
+  let metadata = if entry.metadata.is_empty() {
+    "e30=".to_string()
+  } else {
+    entry.metadata.to_string()
+  };
   
+  let variable_id = nvafg.getId(&format!("{}", variable_lbl));
+  crate::to_console_debug(&format!("This variable is getting a BlobEntry: {} {}", variable_lbl, &variable_id));
+  let entry_id = nvafg.getId(&format!("{}{}", &variable_lbl, &entry.label));
+  crate::to_console_debug(&format!("Adding BlobEntry: {} {}", &entry.label, &entry_id));
+
   let variables = crate::add_variable_blob_entry::Variables {
-    variable_id: nvafg.getId(&format!("{}{}",variable_lbl,entry.label)).to_string(),
+    variable_id: variable_id.to_string(),
     entry_id: entry_id.to_string(),
     entry_label: entry.label.to_string(),
     blob_id: entry.blobId.to_string(),

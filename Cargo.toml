@@ -48,6 +48,7 @@ graphql_client_cli = "^0.14"
 
 [features]
 tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
+own_runtime = []
 thread = ["dep:reqwest"]
 blocking = ["graphql_client/reqwest","graphql_client/reqwest-blocking"]
 

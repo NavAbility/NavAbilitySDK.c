@@ -256,6 +256,11 @@ fn free_RVec_String (
     free_rvec::<String>(*(rvec.unwrap()))
 }
 
+#[no_mangle] pub unsafe extern "C" 
+fn free_StateValue (
+    sv: Option<Box<crate::StateValue>>
+) {}
+
 // Take ownership via passing by value, i.e. runs drop on fn exit. Option for null case.
 #[allow(non_snake_case)]
 #[no_mangle] pub extern "C" 

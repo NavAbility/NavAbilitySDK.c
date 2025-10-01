@@ -128,6 +128,11 @@ typedef struct RVec_f64 {
   size_t len;
 } RVec_f64;
 
+typedef struct StateValue {
+  struct RVec_f64 point;
+  struct RVec_f64 covar;
+} StateValue;
+
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
 char *addAffordance_kNNvisual(const struct NavAbilityDFG *nvafg,
@@ -235,6 +240,8 @@ void free_RVec_String(struct RVec_String *rvec);
 
 void free_RVec_f64(struct RVec_f64 *rvec);
 
+void free_StateValue(struct StateValue *sv);
+
 void free_SubscriptionManager(struct SubscriptionManager*);
 
 void free_VariableDFG(struct VariableDFG*);
@@ -242,6 +249,8 @@ void free_VariableDFG(struct VariableDFG*);
 void free_cstr(char *pointer);
 
 struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl, const char *label_contains);
+
+struct RVec_f64 *getCovariance(const struct StateValue *state_);
 
 struct RVec_NvaNode_Factorgraph *getFactorgraphs(const struct NavAbilityClient *_nvacl,
                                                  const char *label_contains);
@@ -267,11 +276,17 @@ const char *getLabel_NavAbilityDFG(const struct NavAbilityDFG *input);
 
 const char *getLabel_NvaNode_Factorgraph(const struct NvaNode_Factorgraph *input);
 
-struct RVec_f64 *getPPECov(const struct VariableDFG *vari_, const char *_solveKey);
+struct RVec_f64 *getPPECov(const struct VariableDFG *vari_, const char *_stateLabel);
 
-struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *_solveKey);
+struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *_stateLabel);
+
+struct RVec_f64 *getPoint(const struct StateValue *state_);
 
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
+
+struct StateValue *getVariableState(const struct NavAbilityDFG *nvafg,
+                                    const char *variableLabel,
+                                    const char *stateLabel);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 
@@ -298,7 +313,8 @@ struct BlobEntry *new_BlobEntry(const char *blobId,
 struct FullNormal *new_FullNormal(size_t dim, const double *array_mean, const double *array_covr);
 
 struct NavAbilityBlobStore *new_NavAbilityBlobStore(const struct NavAbilityClient *nvacl,
-                                                    const char *label);
+                                                    const char *label,
+                                                    bool onprem);
 
 struct NavAbilityClient *new_NavAbilityClient(const char *api_url,
                                               const char *api_token,
@@ -436,6 +452,7 @@ GEN_ADD_FACTOR(Pose3Pose3_FullNormal);
         RVec_String*:             free_RVec_String,           \
         RVec_Agent*:              free_RVec_Agent,            \
         RVec_NvaNode_Factorgraph*: free_RVec_NvaNode_Factorgraph, \
+        StateValue*:              free_StateValue,            \
         BlobEntry*:               free_BlobEntry,             \
         NavAbilityClient*:        free_NavAbilityClient,      \
         NavAbilityBlobStore*:     free_NavAbilityBlobStore,   \
@@ -507,6 +524,7 @@ void freeR(struct RVec_f64* s) { free_RVec_f64(s); }
 void freeR(struct RVec_String* s) { free_RVec_String(s); }
 void freeR(struct RVec_Agent* s) { free_RVec_Agent(s); }
 void freeR(struct RVec_NvaNode_Factorgraph* s) { free_RVec_NvaNode_Factorgraph(s); }
+void freeR(struct StateValue* s) { free_StateValue(s); }
 void freeR(struct BlobEntry* s) { free_BlobEntry(s); }
 void freeR(struct NavAbilityClient* s) { free_NavAbilityClient(s); }
 void freeR(struct SubscriptionManager* s) { free_SubscriptionManager(s); }

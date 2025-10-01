@@ -1,14 +1,15 @@
-
-
 mutation CreateUpload(
   $blobId: ID!, 
-  $parts: Int!
+  $parts: Int!,
+  $store_label: String! = "default",
+  $store_type: BlobStoreType!
 ) {
   createUpload(
     blobId: $blobId
     parts: $parts
     store: {
-      label: "default"
+      label: $store_label,
+      type: $store_type
     }
   ) {
     blobId
@@ -19,5 +20,3 @@ mutation CreateUpload(
     uploadId
   }
 }
-
-
