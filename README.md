@@ -21,6 +21,7 @@ git clone <this https/ssh>
 cd NavAbilitySDK.c
 git remote add upstream git@github.com:NavAbility/NavAbilitySDK.rs.git
 git remote set-url --push upstream no-pushing
+git config pull.rebase false
 ```
 
 The last instruction protects the upstream SDK.rs from receiving C related code directly.  Any work required on SDK.rs should be done there as normal.
