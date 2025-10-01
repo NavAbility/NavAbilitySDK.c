@@ -136,6 +136,26 @@ int main(void) {
     *getIndex(cv_, 6), *getIndex(cv_, 7), *getIndex(cv_, 8)
   ); 
 
+  // // TODO use getVariableState to extract the results (deprecate PPE)
+  // StateValue* sv = getVariableState(dfg, variableLabel, "parametric");
+  // if (sv != NULL) {
+  //   printf("StateValue for variable %s:\n", variableLabel);
+  //   RVec_f64* pt_ = getPoint(sv);
+  //   printf(
+  //     "point of %s:\n[%.3f %.3f %.3f %.3f %.3f %.3f]\n", variableLabel,
+  //       *getIndex(pt_, 0), *getIndex(pt_, 1), *getIndex(pt_, 2),
+  //       *getIndex(pt_, 3), *getIndex(pt_, 4), *getIndex(pt_, 5)
+  //       );
+  //   RVec_f64* cv_ = getCovariance(sv);
+  //   printf(
+  //     "vectorized cov of %s:\n[%.3f %.3f %.3f ...]\n", variableLabel,
+  //       *getIndex(cv_, 0), *getIndex(cv_, 1), *getIndex(cv_, 2)
+  //   );
+  // } else {
+  //   printf("Failed to get state for variable %s\n", variableLabel);
+  // }
+  // freeR(sv);
+
   // freeR(fglbl); // free the string created by sprintf
   freeR(nvafg); 
   freeR(nvasm);
