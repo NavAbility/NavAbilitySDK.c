@@ -1,6 +1,6 @@
 [package]
 name = "navabilitysdk"
-version = "0.1.0-rc6"
+version = "0.1.0-rc7"
 authors = ["NavAbility™ by WhereWhen.ai Technologies Inc."]
 edition = "2021"
 
