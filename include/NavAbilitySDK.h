@@ -128,6 +128,11 @@ typedef struct RVec_f64 {
   size_t len;
 } RVec_f64;
 
+typedef struct StateValue {
+  struct RVec_f64 point;
+  struct RVec_f64 covar;
+} StateValue;
+
 struct BlobEntry *BlobEntry_basic(const char *label, const char *mimeType);
 
 char *addAffordance_kNNvisual(const struct NavAbilityDFG *nvafg,
@@ -243,6 +248,8 @@ void free_cstr(char *pointer);
 
 struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl, const char *label_contains);
 
+struct RVec_f64 *getCovariance(const struct StateValue *state_);
+
 struct RVec_NvaNode_Factorgraph *getFactorgraphs(const struct NavAbilityClient *_nvacl,
                                                  const char *label_contains);
 
@@ -267,11 +274,17 @@ const char *getLabel_NavAbilityDFG(const struct NavAbilityDFG *input);
 
 const char *getLabel_NvaNode_Factorgraph(const struct NvaNode_Factorgraph *input);
 
-struct RVec_f64 *getPPECov(const struct VariableDFG *vari_, const char *_solveKey);
+struct RVec_f64 *getPPECov(const struct VariableDFG *vari_, const char *_stateLabel);
 
-struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *_solveKey);
+struct RVec_f64 *getPPEMean(const struct VariableDFG *vari_, const char *_stateLabel);
+
+struct RVec_f64 *getPoint(const struct StateValue *state_);
 
 struct VariableDFG *getVariable(const struct NavAbilityDFG *nvafg, const char *label);
+
+struct StateValue *getVariableState(const struct NavAbilityDFG *nvafg,
+                                    const char *variableLabel,
+                                    const char *stateLabel);
 
 char *get_apiurl(const struct NavAbilityClient *nvacl);
 

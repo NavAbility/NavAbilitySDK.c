@@ -50,7 +50,7 @@ use crate::{
 // https://users.rust-lang.org/t/preparing-an-array-of-structs-for-ffi/33411
 // Alt C style, https://users.rust-lang.org/t/how-to-return-byte-array-from-rust-function-to-ffi-c/18136/4
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RVec<T> {
     pub ptr: *mut T,
     pub len: usize, // number of elems
