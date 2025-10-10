@@ -131,14 +131,15 @@ fn getVariableState(
     &cstr_to_str(stateLabel)
   );
 
-  let state = state_.unwrap();
-
-  return Some(Box::new(
-    StateValue {
-      point: vec_to_ffi(state.vecval),
-      covar: vec_to_ffi(state.vecbw)
-    }
-  ))
+  if let Ok(state) = state_ {
+    return Some(Box::new(
+      StateValue {
+        point: vec_to_ffi(state.vecval),
+        covar: vec_to_ffi(state.vecbw)
+      }
+    ))
+  }
+  return None;
 }
 
 
