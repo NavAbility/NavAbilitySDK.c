@@ -97,3 +97,28 @@ fn updateAgentMetadata(
         }
     }
 }
+
+
+
+#[allow(non_snake_case)]
+#[no_mangle] pub unsafe extern "C" 
+fn getAgentMetadata(
+    _nvacl: Option<&crate::NavAbilityClient>,
+    label: *const c_char,
+) -> *const c_char {
+    if _nvacl.is_none() {
+        to_console_error("getAgents: provided *NavAbilityClient is NULL/None");
+        return convert_str("");
+    }
+
+    let lbl_cont = cstr_to_str(label);
+    match crate::services::getAgentMetadata(_nvacl.unwrap(), lbl_cont.into()) {
+        Ok(metadata) => {
+            return convert_str(&metadata);
+        }
+        Err(e) => {
+            to_console_error(&format!("NvaSDK.c error during getAgentMetadata: {:?}", e));
+            return convert_str("");
+        }
+    }
+}

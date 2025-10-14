@@ -335,6 +335,74 @@ pub fn addAgent(
 }
 
 
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+pub async fn post_get_agent_metadata(
+  nvacl: &NavAbilityClient,
+  label: &str,
+) -> Result<String, Box<dyn Error>> {
+  
+  // https://github.com/graphql-rust/graphql-client/blob/3090e0add5504ed31df74c32c2bda203793a890a/examples/github/examples/github.rs#L45C1-L48C7
+  let variables = crate::get_agent_metadata::Variables {
+    label: label.to_string(),
+  };
+
+  let request_body = crate::GetAgentMetadata::build_query(variables);
+
+  return post_to_nvaapi::<
+    crate::get_agent_metadata::Variables,
+    crate::get_agent_metadata::ResponseData,
+    String
+  >(
+    nvacl,
+    request_body, 
+    |s| {
+      if !s.agents.is_empty() {
+        if let Some(metadata) = Some(s.agents[0].metadata.clone()) {
+          if let Some(meta) = metadata {
+            if let Ok(decoded) = base64::decode(meta) {
+              if let Ok(decoded_str) = String::from_utf8(decoded) {
+                return decoded_str;
+              }
+            }
+            return "failed to decode base64 metadata".into();
+          }
+          return "".into();
+        }
+      }
+      return "".into();
+    },
+    Some(3)
+  ).await;
+}
+
+
+#[cfg(any(feature = "tokio"))] // feature = "thread", 
+pub fn q_getAgentMetadata(
+  send_into: Sender<String>, 
+  nvacl: &NavAbilityClient,
+  agent_label: &String,
+) -> Result<(), Box<dyn Error>> {
+  crate::execute(async {
+    return crate::send_api_result(
+      send_into, 
+      post_get_agent_metadata(&nvacl, agent_label).await,
+    );
+  })
+}
+
+
+#[cfg(any(feature = "tokio"))] // , feature = "thread"
+pub fn getAgentMetadata(
+  nvacl: &NavAbilityClient,
+  label: &str,
+) -> Result<String, Box<dyn Error>> {
+  return crate::execute(post_get_agent_metadata(nvacl, label));
+}
+
+
+
 // ------------------------ Agent Entries Metadata ------------------------
 
 
