@@ -247,7 +247,7 @@ pub fn parse_utc_or_none(
 
 
 fn format_type_of<T>(_: &T) {
-    format!("{}", std::any::type_name::<T>());
+    let _ = format!("{}", std::any::type_name::<T>());
 }
 
 

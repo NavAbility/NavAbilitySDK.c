@@ -164,6 +164,16 @@ pub struct GetAgent;
 #[derive(GraphQLQuery, Clone)]
 #[graphql(
     schema_path = "src/gql/schema.json",
+    query_path = "src/gql/GetAgentMetadata.gql",
+    response_derives = "Debug"
+)]
+pub struct GetAgentMetadata;
+
+
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
+#[derive(GraphQLQuery, Clone)]
+#[graphql(
+    schema_path = "src/gql/schema.json",
     query_path = "src/gql/GetFactorgraphs.gql",
     response_derives = "Debug"
 )]

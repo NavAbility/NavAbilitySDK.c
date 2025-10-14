@@ -248,6 +248,8 @@ void free_VariableDFG(struct VariableDFG*);
 
 void free_cstr(char *pointer);
 
+const char *getAgentMetadata(const struct NavAbilityClient *_nvacl, const char *label);
+
 struct RVec_Agent *getAgents(const struct NavAbilityClient *_nvacl, const char *label_contains);
 
 struct RVec_f64 *getCovariance(const struct StateValue *state_);

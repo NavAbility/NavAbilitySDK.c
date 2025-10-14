@@ -1,0 +1,9 @@
+query GetAgentMetadata(
+  $label: String!,
+) {
+  agents(
+    where: {label: $label}
+  ) {
+    metadata
+  }
+}
