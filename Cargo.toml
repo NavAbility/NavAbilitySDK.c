@@ -43,8 +43,9 @@ libc = { version = "^0.2", default-features = false, optional=true}
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 gloo-console = { version = "^0.3", optional = true }
 
-[build-dependencies]
-graphql_client_cli = "^0.14"
+# TBD, likely leads to incorrect Time.rs dependency issue on wasm targets
+# [build-dependencies]
+# graphql_client_cli = "^0.14"
 
 [features]
 tokio = ["dep:tokio", "dep:reqwest", "dep:ffi-convert", "dep:libc"]
