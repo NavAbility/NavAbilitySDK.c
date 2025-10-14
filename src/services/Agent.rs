@@ -337,7 +337,7 @@ pub fn addAgent(
 
 
 
-#[cfg(any(feature = "tokio", feature = "thread", feature = "wasm", feature = "blocking"))]
+#[cfg(any(feature = "tokio", feature = "thread", feature = "blocking"))]
 pub async fn post_get_agent_metadata(
   nvacl: &NavAbilityClient,
   label: &str,
@@ -390,25 +390,6 @@ pub fn q_getAgentMetadata(
       post_get_agent_metadata(&nvacl, agent_label).await,
     );
   })
-}
-
-#[cfg(any(feature = "wasm"))] // feature = "thread", 
-pub fn q_getAgentMetadata(
-  send_into: Sender<String>, 
-  nvacl: &NavAbilityClient,
-  agent_label: &String,
-) {
-  // wasmbindgen limitation?  overcome +'static requirement
-  let nvacl_ = nvacl.clone();
-  let send_into_ = send_into.clone();
-  let ag_lbl_ = agent_label.clone();
-  crate::execute(async move {
-    let _ = crate::send_api_result(
-      send_into_, 
-      post_get_agent_metadata(&nvacl_, &ag_lbl_).await,
-    );
-    ()
-  });
 }
 
 
