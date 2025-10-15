@@ -263,7 +263,7 @@ pub async fn post_blob_singlepart(
 }
 
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[allow(non_snake_case)]
 struct PostOnPrem {
   storeLabel: String,
@@ -283,26 +283,44 @@ pub async fn post_blob_onprem(
   file_bytes: std::sync::Arc<[u8]>,
 ) -> Result<(), Box<dyn Error>> {
 
+
+  let label = match &nvabs.label {
+    crate::NvaStoreLabel::Cloud(lb) => lb.to_string(),
+    crate::NvaStoreLabel::Onprem(lb) => lb.to_string(),
+  };
+
   let input = general_purpose::STANDARD.encode(file_bytes.to_vec());
   let request_body = crate::QueryBody::<PostOnPrem> {
-    query: "addBlobFS",
+    query: "mutation AddBlobFS($storeLabel:String!$blobId:String!$input:String!){addBlobFS(blobId:$blobId input:$input storeLabel:$storeLabel)}",
     variables: PostOnPrem {
-      storeLabel: "".to_owned(),
+      storeLabel: label,
       blobId: blobId.to_string(),
       input,
     },
-    operation_name: "addBlobFS",
+    operation_name: "AddBlobFS",
   };
+
+  // dbg!("post_blob_onprem request_body: {:?}", &request_body);
   
   let req_res = nvabs.client.client
   .post(&nvabs.client.apiurl)
   .json(&request_body)
   .send().await;
 
+  // dbg!("post_blob_onprem req_res: {:?}", &req_res);
+
   if let Err(ref re) = req_res {
-    to_console_error(&format!("Error in upload request to NavAbilityBlobStoreOnPrem: {:?}", re));
+    let emsg = format!("post_blob_upload error on request to NavAbilityBlobStoreOnPrem: {:?}", re);
+    to_console_error(&emsg);
+    return Err(emsg.into());
   }
   // TODO extract blobId from response and better error handling
+  let status = req_res.as_ref().unwrap().status();
+  if status != reqwest::StatusCode::OK {
+    let emsg = format!("post_blob_onprem upload failed with status: {}", status);
+    to_console_error(&emsg);
+    return Err(emsg.into());
+  }
 
   return Ok(());
 }
